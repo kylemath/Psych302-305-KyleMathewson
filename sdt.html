@@ -240,9 +240,9 @@
           pctx.fillRect(40 + Math.random() * 640, 30 + Math.random() * 160, 8, 18);
         }
         if (showT) {
-          pctx.fillStyle = "rgba(251,113,133,0.55)";
-          pctx.fillRect(probe.width / 2 - 16, probe.height / 2 - 28, 32, 6);
-          pctx.fillRect(probe.width / 2 - 3, probe.height / 2 - 28, 6, 40);
+          pctx.fillStyle = "rgba(251,113,133,0.82)";
+          pctx.fillRect(probe.width / 2 - 22, probe.height / 2 - 36, 44, 8);
+          pctx.fillRect(probe.width / 2 - 4, probe.height / 2 - 36, 8, 52);
         }
       }
 
@@ -275,7 +275,7 @@
         pctx.fillRect(0, 0, probe.width, probe.height);
         window.setTimeout(() => {
           drawProbe(field.present[field.i]);
-          window.setTimeout(() => {
+            window.setTimeout(() => {
             pctx.fillStyle = "#07090d";
             pctx.fillRect(0, 0, probe.width, probe.height);
             pctx.fillStyle = "#f6f1e6";
@@ -283,7 +283,7 @@
             pctx.textAlign = "center";
             pctx.fillText("Present?  J yes   F no", probe.width / 2, probe.height / 2);
             field.waiting = true;
-          }, 180);
+          }, 420);
         }, 400);
       }
 

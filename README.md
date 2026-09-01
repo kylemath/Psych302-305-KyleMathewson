@@ -26,7 +26,7 @@ Open the HTML files in a browser. No install, no build, no accounts.
 6. Remix: Arts changes the field; Science adds a factor.
 7. Four-minute critique.
 
-A 6-trial demo exists on the search page for the instructor walkthrough. The full block is 36 trials.
+A 6-trial demo exists on the search page for the instructor walkthrough. Treat those slopes as noisy: one trial per cell. The full block is 36 trials. Slopes use correct responses between 150 and 2500 ms so a lapse does not become a theory.
 
 ## Why this and not a methods lecture
 

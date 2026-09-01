@@ -175,7 +175,7 @@
         <section class="panel stage-wrap">
           <div class="hud">
             <span id="status">Press start. Click only the red T.</span>
-            <span id="progress">0 / 0</span>
+            <span id="progress">0 / 0 · usable RTs 150–2500 ms</span>
           </div>
           <div class="canvas-frame">
             <canvas id="field" width="900" height="560" aria-label="Visual search display"></canvas>
@@ -228,6 +228,10 @@
       const SET_SIZES = [4, 8, 16];
       const CONDITIONS = ["feature", "conjunction"];
 
+      const STORAGE_KEY = "psych302-search-results";
+      const RT_MIN = 150;
+      const RT_MAX = 2500;
+
       let trials = [];
       let trialIndex = -1;
       let items = [];
@@ -235,6 +239,7 @@
       let phase = "idle";
       let results = [];
       let waitingClick = false;
+      let exported = true;
 
       function shuffle(list) {
         const copy = list.slice();
@@ -365,10 +370,16 @@
         return items.find((item) => Math.hypot(item.x - point.x, item.y - point.y) < size * 0.7);
       }
 
+      function persist() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
+      }
+
       function startBlock(reps) {
         trials = makeTrials(reps);
         trialIndex = -1;
         results = [];
+        exported = false;
+        persist();
         nextTrial();
       }
 
@@ -408,6 +419,7 @@
           rt: Math.round(performance.now() - trialStart),
           correct: correct ? 1 : 0,
         });
+        persist();
         phase = "feedback";
         waitingClick = false;
         clearField(correct ? "Found" : "That was not the target");
@@ -415,17 +427,21 @@
         renderStats();
       }
 
+      function isUsable(row) {
+        return row.correct && row.rt >= RT_MIN && row.rt <= RT_MAX;
+      }
+
       function cellStats() {
         const rows = [];
         CONDITIONS.forEach((cond) => {
           SET_SIZES.forEach((n) => {
             const cell = results.filter((row) => row.condition === cond && row.setSize === n);
-            const hits = cell.filter((row) => row.correct);
+            const usable = cell.filter(isUsable);
             rows.push({
               cond,
               n,
-              meanRt: hits.length ? Math.round(mean(hits.map((row) => row.rt))) : null,
-              hits: hits.length,
+              meanRt: usable.length ? Math.round(mean(usable.map((row) => row.rt))) : null,
+              hits: usable.length,
               nTrials: cell.length,
             });
           });
@@ -448,14 +464,19 @@
         const conjunction = conditionSlope("conjunction", rows);
         document.getElementById("featureSlope").textContent = feature === null ? "—" : feature.toFixed(1);
         document.getElementById("conjunctionSlope").textContent = conjunction === null ? "—" : conjunction.toFixed(1);
-        if (feature === null || conjunction === null) {
-          reading.textContent = "Need at least two set-size means per condition.";
-        } else if (conjunction > feature + 8 && feature < 20) {
-          reading.textContent = "Classic pattern: pop-out is almost flat; binding costs time as the field grows.";
+        const thin = rows.some((row) => row.nTrials > 0 && row.hits < 2);
+        const dropped = results.filter((row) => row.correct && !isUsable(row)).length;
+        const dropNote = dropped ? ` Dropped ${dropped} lapse${dropped === 1 ? "" : "s"} outside ${RT_MIN}–${RT_MAX} ms.` : "";
+        if (thin) {
+          reading.textContent = "Demo or thin cells: slopes swing wildly with one trial per N. Run the 36-trial block before you interpret." + dropNote;
+        } else if (feature === null || conjunction === null) {
+          reading.textContent = "Need at least two usable set-size means per condition." + dropNote;
+        } else if (Math.abs(feature) < 18 && conjunction > feature + 10) {
+          reading.textContent = "Classic pattern: pop-out is almost flat; binding costs time as the field grows." + dropNote;
         } else if (conjunction > feature) {
-          reading.textContent = "Conjunction is steeper, but the feature slope is not fully flat. Practice, contrast, or grouping may be leaking in.";
+          reading.textContent = "Conjunction is steeper, but the feature slope is not near zero. Practice, contrast, or grouping may be leaking in." + dropNote;
         } else {
-          reading.textContent = "This block did not reproduce the textbook figure. That is data. What in the composition might have helped conjunction?";
+          reading.textContent = "This block did not reproduce the textbook figure. That is data. What in the composition might have helped conjunction?" + dropNote;
         }
         drawChart(rows, feature, conjunction);
       }
@@ -464,7 +485,7 @@
         const svg = document.getElementById("chart");
         const pad = { l: 46, r: 16, t: 16, b: 32 };
         const ys = rows.map((row) => row.meanRt).filter((value) => value !== null);
-        const yMax = Math.max(800, ...ys, 1);
+        const yMax = Math.min(2200, Math.max(800, ...ys, 1) * 1.1);
         const xOf = (n) => pad.l + ((n - 4) / 12) * (640 - pad.l - pad.r);
         const yOf = (rt) => 220 - pad.b - (rt / yMax) * (220 - pad.t - pad.b);
         const dots = rows
@@ -477,6 +498,9 @@
           const intercept = mean(means.map((row) => row.meanRt)) - sl * mean(means.map((row) => row.n));
           return `<line x1="${xOf(4)}" y1="${yOf(intercept + sl * 4)}" x2="${xOf(16)}" y2="${yOf(intercept + sl * 16)}" stroke="${cond === "feature" ? "#e8b86d" : "#7dd3fc"}" stroke-width="2"></line>`;
         };
+        const yTicks = [0, Math.round(yMax / 2), Math.round(yMax)]
+          .map((rt) => `<text x="8" y="${yOf(rt) + 4}" fill="#b7b1a4" font-size="11">${rt}</text>`)
+          .join("");
         svg.innerHTML = `
           <rect x="0" y="0" width="640" height="220" fill="rgba(255,255,255,0.02)" rx="12"></rect>
           <text x="12" y="18" fill="#b7b1a4" font-size="11" font-family="Segoe UI">Mean RT (ms)</text>
@@ -484,6 +508,7 @@
           <text x="54" y="210" fill="#b7b1a4" font-size="11">4</text>
           <text x="318" y="210" fill="#b7b1a4" font-size="11">8</text>
           <text x="600" y="210" fill="#b7b1a4" font-size="11">16</text>
+          ${yTicks}
           ${line("feature", featureSlope)}
           ${line("conjunction", conjunctionSlope)}
           ${dots}
@@ -501,8 +526,10 @@
       document.getElementById("fullBtn").addEventListener("click", () => startBlock(6));
       document.getElementById("exportBtn").addEventListener("click", () => {
         if (!results.length) return;
-        const header = "trial,condition,setSize,rt_ms,correct";
-        const body = results.map((row) => [row.trial, row.condition, row.setSize, row.rt, row.correct].join(",")).join("\n");
+        const header = "trial,condition,setSize,rt_ms,correct,usable";
+        const body = results
+          .map((row) => [row.trial, row.condition, row.setSize, row.rt, row.correct, isUsable(row) ? 1 : 0].join(","))
+          .join("\n");
         const blob = new Blob([header + "\n" + body], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -510,7 +537,29 @@
         link.download = "psych302-search-slopes.csv";
         link.click();
         URL.revokeObjectURL(url);
+        exported = true;
       });
+
+      window.addEventListener("beforeunload", (event) => {
+        if (results.length && !exported) {
+          event.preventDefault();
+          event.returnValue = "";
+        }
+      });
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        if (Array.isArray(saved) && saved.length) {
+          results = saved;
+          exported = false;
+          phase = "done";
+          statusEl.textContent = "Restored last block from this browser.";
+          progressEl.textContent = `${results.length} trials`;
+          clearField("Last block restored. Export or run again.");
+        }
+      } catch (error) {
+        results = [];
+      }
 
       ["targetColor", "distractorColor", "ground", "itemSize"].forEach((id) => {
         document.getElementById(id).addEventListener("change", () => {
@@ -518,7 +567,7 @@
         });
       });
 
-      clearField("Your field will appear here");
+      if (!results.length) clearField("Your field will appear here");
       renderStats();
     </script>
   </body>
