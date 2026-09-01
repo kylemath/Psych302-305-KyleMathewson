@@ -183,6 +183,7 @@
           <div class="actions">
             <button id="demoBtn" class="secondary">6-trial demo</button>
             <button id="fullBtn" class="primary">Full lab block (36 trials)</button>
+            <button id="talkBtn" class="secondary">Instructor illustration data</button>
             <button id="exportBtn" class="secondary">Export CSV</button>
           </div>
           <svg id="chart" viewBox="0 0 640 220" role="img" aria-label="Reaction time by set size"></svg>
@@ -530,8 +531,28 @@
         finishTrial(Boolean(hit.target));
       });
 
+      function illustrationBlock() {
+        const sample = [];
+        let trial = 1;
+        const featureRts = { 4: [390, 410, 405, 430, 398, 415], 8: [400, 422, 408, 418, 412, 425], 16: [415, 428, 420, 435, 410, 422] };
+        const conjunctionRts = { 4: [470, 490, 510, 455, 488, 502], 8: [560, 590, 575, 610, 548, 600], 16: [760, 810, 790, 830, 745, 805] };
+        SET_SIZES.forEach((n) => {
+          featureRts[n].forEach((rt) => sample.push({ trial: trial++, condition: "feature", setSize: n, rt, correct: 1 }));
+          conjunctionRts[n].forEach((rt) => sample.push({ trial: trial++, condition: "conjunction", setSize: n, rt, correct: 1 }));
+        });
+        results = sample;
+        exported = false;
+        persist();
+        phase = "done";
+        statusEl.textContent = "Illustration data only. Not from this room.";
+        progressEl.textContent = `${results.length} illustrated trials`;
+        clearField("These numbers are for talking through the equation.");
+        renderStats();
+      }
+
       document.getElementById("demoBtn").addEventListener("click", () => startBlock(1));
       document.getElementById("fullBtn").addEventListener("click", () => startBlock(6));
+      document.getElementById("talkBtn").addEventListener("click", illustrationBlock);
       document.getElementById("exportBtn").addEventListener("click", () => {
         if (!results.length) return;
         const header = "trial,condition,setSize,rt_ms,correct,usable";
