@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Week 2 · Visual search computation · PSYCH 302 / 305</title>
+    <link rel="stylesheet" href="studio.css" />
+    <style>
+      .lab-grid {
+        display: grid;
+        grid-template-columns: 320px minmax(0, 1fr);
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+
+      .stage-wrap {
+        display: grid;
+        gap: 12px;
+      }
+
+      .canvas-frame {
+        background: #07090d;
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid var(--panel-border);
+        position: relative;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        cursor: crosshair;
+      }
+
+      .hud {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        font-family: "Segoe UI", sans-serif;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: "Segoe UI", sans-serif;
+        font-size: 0.88rem;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 6px 4px;
+        border-bottom: 1px solid var(--panel-border);
+      }
+
+      .slope-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 12px 0;
+      }
+
+      .slope-box div {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 12px;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+        font-family: "Segoe UI", sans-serif;
+        font-size: 0.85rem;
+      }
+
+      .controls label {
+        display: grid;
+        gap: 6px;
+        color: var(--muted);
+      }
+
+      input,
+      select {
+        background: #0b0f14;
+        color: var(--ink);
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        padding: 8px;
+      }
+
+      #chart {
+        width: 100%;
+        height: 220px;
+      }
+
+      @media (max-width: 980px) {
+        .lab-grid,
+        .controls,
+        .slope-box {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="topnav">
+        <a class="brand" href="index.html">
+          <small>Week 2 · Signature computation</small>
+          <strong>RT = a + bN</strong>
+        </a>
+        <div class="nav-links">
+          <a href="index.html">Course design</a>
+          <a href="playground.html">Week 1 · Web</a>
+          <a href="search.html" aria-current="page">Week 2 · Search</a>
+          <a href="sdt.html">Week 3 · d′</a>
+        </div>
+      </nav>
+
+      <header class="panel" style="margin-bottom: 18px">
+        <div class="kicker">Feature search vs conjunction search</div>
+        <h1>Find the red T. Time how the field fights back.</h1>
+        <p class="lede">
+          Click the red T as soon as you see it. When every distractor is a green T, color
+          should pop out and the slope should stay near zero. When red Ls and green Ts
+          share the target’s features, the mind has to bind color to shape. That binding
+          costs milliseconds per extra item.
+        </p>
+      </header>
+
+      <div class="lab-grid">
+        <aside class="panel">
+          <div class="kicker">Tonight’s prediction</div>
+          <h2>Two slopes</h2>
+          <p>
+            Feature search: target defined by color alone. Conjunction search: target
+            defined by color <em>and</em> shape. Set sizes 4, 8, and 16.
+          </p>
+          <div class="equation">
+            b = Σ(N − N̄)(RT − RT̄) / Σ(N − N̄)²
+            <small>Ordinary least squares on the three cell means. Units: ms/item.</small>
+          </div>
+          <div class="slope-box">
+            <div>
+              <div class="chip gold">Feature</div>
+              <div class="stat" id="featureSlope">—</div>
+              <div class="muted">ms / item</div>
+            </div>
+            <div>
+              <div class="chip">Conjunction</div>
+              <div class="stat" id="conjunctionSlope">—</div>
+              <div class="muted">ms / item</div>
+            </div>
+          </div>
+          <p id="reading" class="muted">Run a block to compute your own slopes.</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Condition</th>
+                <th>N</th>
+                <th>Mean RT</th>
+                <th>Hits</th>
+              </tr>
+            </thead>
+            <tbody id="meansBody"></tbody>
+          </table>
+        </aside>
+
+        <section class="panel stage-wrap">
+          <div class="hud">
+            <span id="status">Press start. Click only the red T.</span>
+            <span id="progress">0 / 0</span>
+          </div>
+          <div class="canvas-frame">
+            <canvas id="field" width="900" height="560" aria-label="Visual search display"></canvas>
+          </div>
+          <div class="actions">
+            <button id="demoBtn" class="secondary">6-trial demo</button>
+            <button id="fullBtn" class="primary">Full lab block (36 trials)</button>
+            <button id="exportBtn" class="secondary">Export CSV</button>
+          </div>
+          <svg id="chart" viewBox="0 0 640 220" role="img" aria-label="Reaction time by set size"></svg>
+        </section>
+      </div>
+
+      <section class="panel">
+        <div class="kicker">Remix during the last 40 minutes</div>
+        <h2>Change the composition, then ask whether the slope moved</h2>
+        <div class="controls">
+          <label>Target color <input id="targetColor" type="color" value="#fb7185" /></label>
+          <label>Distractor color <input id="distractorColor" type="color" value="#6ee7b7" /></label>
+          <label>Ground
+            <select id="ground">
+              <option value="#07090d">Night lab</option>
+              <option value="#f6f1e6">Paper</option>
+              <option value="#111827">Slate</option>
+              <option value="#1d4ed8">Stage blue</option>
+            </select>
+          </label>
+          <label>Item size
+            <select id="itemSize">
+              <option value="34">Small</option>
+              <option value="44" selected>Studio</option>
+              <option value="58">Poster</option>
+            </select>
+          </label>
+        </div>
+        <p class="muted">
+          Arts fork: make a field you would hang, then test whether beauty helped or hid the target.
+          Science fork: add a target-absent key, or a third set size, by editing this page.
+        </p>
+      </section>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("field");
+      const ctx = canvas.getContext("2d");
+      const statusEl = document.getElementById("status");
+      const progressEl = document.getElementById("progress");
+      const meansBody = document.getElementById("meansBody");
+      const reading = document.getElementById("reading");
+      const SET_SIZES = [4, 8, 16];
+      const CONDITIONS = ["feature", "conjunction"];
+
+      let trials = [];
+      let trialIndex = -1;
+      let items = [];
+      let trialStart = 0;
+      let phase = "idle";
+      let results = [];
+      let waitingClick = false;
+
+      function shuffle(list) {
+        const copy = list.slice();
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      }
+
+      function mean(values) {
+        return values.reduce((sum, value) => sum + value, 0) / values.length;
+      }
+
+      function slope(xs, ys) {
+        const xBar = mean(xs);
+        const yBar = mean(ys);
+        let num = 0;
+        let den = 0;
+        xs.forEach((x, i) => {
+          num += (x - xBar) * (ys[i] - yBar);
+          den += (x - xBar) ** 2;
+        });
+        return den === 0 ? 0 : num / den;
+      }
+
+      function makeTrials(reps) {
+        const built = [];
+        CONDITIONS.forEach((cond) => {
+          SET_SIZES.forEach((n) => {
+            for (let i = 0; i < reps; i++) built.push({ cond, n });
+          });
+        });
+        return shuffle(built);
+      }
+
+      function gridPositions(n) {
+        const cols = 8;
+        const rows = 5;
+        const cells = [];
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) cells.push({ c, r });
+        }
+        return shuffle(cells).slice(0, n).map(({ c, r }) => ({
+          x: 70 + c * 100 + (Math.random() * 18 - 9),
+          y: 70 + r * 96 + (Math.random() * 16 - 8),
+        }));
+      }
+
+      function buildItems(trial) {
+        const spots = gridPositions(trial.n);
+        const targetColor = document.getElementById("targetColor").value;
+        const distractorColor = document.getElementById("distractorColor").value;
+        const targetAt = Math.floor(Math.random() * trial.n);
+        return spots.map((spot, index) => {
+          if (index === targetAt) {
+            return { ...spot, kind: "T", color: targetColor, target: true };
+          }
+          if (trial.cond === "feature") {
+            return { ...spot, kind: "T", color: distractorColor, target: false };
+          }
+          const useL = Math.random() < 0.5;
+          return {
+            ...spot,
+            kind: useL ? "L" : "T",
+            color: useL ? targetColor : distractorColor,
+            target: false,
+          };
+        });
+      }
+
+      function drawLetter(item, size) {
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.fillStyle = item.color;
+        const t = size * 0.16;
+        const h = size * 0.78;
+        const w = size * 0.62;
+        if (item.kind === "T") {
+          ctx.fillRect(-w / 2, -h / 2, w, t);
+          ctx.fillRect(-t / 2, -h / 2, t, h);
+        } else {
+          ctx.fillRect(-w / 2, -h / 2, t, h);
+          ctx.fillRect(-w / 2, h / 2 - t, w, t);
+        }
+        ctx.restore();
+      }
+
+      function clearField(message) {
+        ctx.fillStyle = document.getElementById("ground").value;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        if (message) {
+          ctx.fillStyle = document.getElementById("ground").value === "#f6f1e6" ? "#1c1915" : "#f6f1e6";
+          ctx.font = "28px Georgia";
+          ctx.textAlign = "center";
+          ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+        }
+      }
+
+      function drawFixation() {
+        clearField();
+        ctx.strokeStyle = "#e8b86d";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2 - 12, canvas.height / 2);
+        ctx.lineTo(canvas.width / 2 + 12, canvas.height / 2);
+        ctx.moveTo(canvas.width / 2, canvas.height / 2 - 12);
+        ctx.lineTo(canvas.width / 2, canvas.height / 2 + 12);
+        ctx.stroke();
+      }
+
+      function drawItems() {
+        clearField();
+        const size = Number(document.getElementById("itemSize").value);
+        items.forEach((item) => drawLetter(item, size));
+      }
+
+      function pointOnCanvas(event) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: ((event.clientX - rect.left) / rect.width) * canvas.width,
+          y: ((event.clientY - rect.top) / rect.height) * canvas.height,
+        };
+      }
+
+      function hitItem(point) {
+        const size = Number(document.getElementById("itemSize").value);
+        return items.find((item) => Math.hypot(item.x - point.x, item.y - point.y) < size * 0.7);
+      }
+
+      function startBlock(reps) {
+        trials = makeTrials(reps);
+        trialIndex = -1;
+        results = [];
+        nextTrial();
+      }
+
+      function nextTrial() {
+        trialIndex += 1;
+        waitingClick = false;
+        if (trialIndex >= trials.length) {
+          phase = "done";
+          clearField("Block complete. Read your slopes.");
+          statusEl.textContent = "Block complete.";
+          progressEl.textContent = `${results.length} / ${trials.length}`;
+          renderStats();
+          return;
+        }
+        const trial = trials[trialIndex];
+        phase = "fixation";
+        progressEl.textContent = `${trialIndex + 1} / ${trials.length}`;
+        statusEl.textContent = trial.cond === "feature"
+          ? "Feature search: the red T should pop."
+          : "Conjunction: color is no longer enough.";
+        drawFixation();
+        window.setTimeout(() => {
+          items = buildItems(trial);
+          drawItems();
+          trialStart = performance.now();
+          phase = "search";
+          waitingClick = true;
+        }, 500);
+      }
+
+      function finishTrial(correct) {
+        const trial = trials[trialIndex];
+        results.push({
+          trial: trialIndex + 1,
+          condition: trial.cond,
+          setSize: trial.n,
+          rt: Math.round(performance.now() - trialStart),
+          correct: correct ? 1 : 0,
+        });
+        phase = "feedback";
+        waitingClick = false;
+        clearField(correct ? "Found" : "That was not the target");
+        window.setTimeout(nextTrial, 450);
+        renderStats();
+      }
+
+      function cellStats() {
+        const rows = [];
+        CONDITIONS.forEach((cond) => {
+          SET_SIZES.forEach((n) => {
+            const cell = results.filter((row) => row.condition === cond && row.setSize === n);
+            const hits = cell.filter((row) => row.correct);
+            rows.push({
+              cond,
+              n,
+              meanRt: hits.length ? Math.round(mean(hits.map((row) => row.rt))) : null,
+              hits: hits.length,
+              nTrials: cell.length,
+            });
+          });
+        });
+        return rows;
+      }
+
+      function conditionSlope(cond, rows) {
+        const ready = rows.filter((row) => row.cond === cond && row.meanRt !== null);
+        if (ready.length < 2) return null;
+        return slope(ready.map((row) => row.n), ready.map((row) => row.meanRt));
+      }
+
+      function renderStats() {
+        const rows = cellStats();
+        meansBody.innerHTML = rows
+          .map((row) => `<tr><td>${row.cond}</td><td>${row.n}</td><td>${row.meanRt ?? "—"}</td><td>${row.hits}/${row.nTrials}</td></tr>`)
+          .join("");
+        const feature = conditionSlope("feature", rows);
+        const conjunction = conditionSlope("conjunction", rows);
+        document.getElementById("featureSlope").textContent = feature === null ? "—" : feature.toFixed(1);
+        document.getElementById("conjunctionSlope").textContent = conjunction === null ? "—" : conjunction.toFixed(1);
+        if (feature === null || conjunction === null) {
+          reading.textContent = "Need at least two set-size means per condition.";
+        } else if (conjunction > feature + 8 && feature < 20) {
+          reading.textContent = "Classic pattern: pop-out is almost flat; binding costs time as the field grows.";
+        } else if (conjunction > feature) {
+          reading.textContent = "Conjunction is steeper, but the feature slope is not fully flat. Practice, contrast, or grouping may be leaking in.";
+        } else {
+          reading.textContent = "This block did not reproduce the textbook figure. That is data. What in the composition might have helped conjunction?";
+        }
+        drawChart(rows, feature, conjunction);
+      }
+
+      function drawChart(rows, featureSlope, conjunctionSlope) {
+        const svg = document.getElementById("chart");
+        const pad = { l: 46, r: 16, t: 16, b: 32 };
+        const ys = rows.map((row) => row.meanRt).filter((value) => value !== null);
+        const yMax = Math.max(800, ...ys, 1);
+        const xOf = (n) => pad.l + ((n - 4) / 12) * (640 - pad.l - pad.r);
+        const yOf = (rt) => 220 - pad.b - (rt / yMax) * (220 - pad.t - pad.b);
+        const dots = rows
+          .filter((row) => row.meanRt !== null)
+          .map((row) => `<circle cx="${xOf(row.n)}" cy="${yOf(row.meanRt)}" r="5" fill="${row.cond === "feature" ? "#e8b86d" : "#7dd3fc"}"></circle>`)
+          .join("");
+        const line = (cond, sl) => {
+          const means = rows.filter((row) => row.cond === cond && row.meanRt !== null);
+          if (!means.length || sl === null) return "";
+          const intercept = mean(means.map((row) => row.meanRt)) - sl * mean(means.map((row) => row.n));
+          return `<line x1="${xOf(4)}" y1="${yOf(intercept + sl * 4)}" x2="${xOf(16)}" y2="${yOf(intercept + sl * 16)}" stroke="${cond === "feature" ? "#e8b86d" : "#7dd3fc"}" stroke-width="2"></line>`;
+        };
+        svg.innerHTML = `
+          <rect x="0" y="0" width="640" height="220" fill="rgba(255,255,255,0.02)" rx="12"></rect>
+          <text x="12" y="18" fill="#b7b1a4" font-size="11" font-family="Segoe UI">Mean RT (ms)</text>
+          <text x="300" y="210" fill="#b7b1a4" font-size="11" font-family="Segoe UI">Set size N</text>
+          <text x="54" y="210" fill="#b7b1a4" font-size="11">4</text>
+          <text x="318" y="210" fill="#b7b1a4" font-size="11">8</text>
+          <text x="600" y="210" fill="#b7b1a4" font-size="11">16</text>
+          ${line("feature", featureSlope)}
+          ${line("conjunction", conjunctionSlope)}
+          ${dots}
+        `;
+      }
+
+      canvas.addEventListener("click", (event) => {
+        if (!waitingClick || phase !== "search") return;
+        const hit = hitItem(pointOnCanvas(event));
+        if (!hit) return;
+        finishTrial(Boolean(hit.target));
+      });
+
+      document.getElementById("demoBtn").addEventListener("click", () => startBlock(1));
+      document.getElementById("fullBtn").addEventListener("click", () => startBlock(6));
+      document.getElementById("exportBtn").addEventListener("click", () => {
+        if (!results.length) return;
+        const header = "trial,condition,setSize,rt_ms,correct";
+        const body = results.map((row) => [row.trial, row.condition, row.setSize, row.rt, row.correct].join(",")).join("\n");
+        const blob = new Blob([header + "\n" + body], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "psych302-search-slopes.csv";
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+
+      ["targetColor", "distractorColor", "ground", "itemSize"].forEach((id) => {
+        document.getElementById(id).addEventListener("change", () => {
+          if (phase === "idle" || phase === "done") clearField("Remix saved. Start a new block.");
+        });
+      });
+
+      clearField("Your field will appear here");
+      renderStats();
+    </script>
+  </body>
+</html>

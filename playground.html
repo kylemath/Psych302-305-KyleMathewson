@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Week 1 · How a page computes · PSYCH 302 / 305</title>
+    <link rel="stylesheet" href="studio.css" />
+    <style>
+      .lesson-grid {
+        display: grid;
+        grid-template-columns: 0.9fr 1.3fr;
+        gap: 18px;
+      }
+
+      .language-tabs,
+      .actions-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+
+      .tab {
+        border: 1px solid var(--panel-border);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--ink);
+        border-radius: 10px;
+        padding: 8px 14px;
+        cursor: pointer;
+      }
+
+      .tab.active {
+        background: linear-gradient(135deg, var(--gold), #f3d39a);
+        color: #1c1408;
+        font-weight: 700;
+      }
+
+      .concept {
+        display: none;
+      }
+
+      .concept.active {
+        display: block;
+      }
+
+      .code-swatch {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.85rem;
+        margin: 0 6px 8px 0;
+      }
+
+      .html-tag {
+        background: rgba(232, 184, 109, 0.14);
+        color: var(--gold);
+      }
+
+      .css-tag {
+        background: var(--sky-soft);
+        color: var(--sky);
+      }
+
+      .js-tag {
+        background: rgba(110, 231, 183, 0.12);
+        color: var(--mint);
+      }
+
+      .editor-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .editor-box {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .editor-box label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 180px;
+        background: rgba(2, 6, 23, 0.8);
+        border: 1px solid var(--panel-border);
+        color: var(--ink);
+        border-radius: 12px;
+        padding: 12px;
+        resize: vertical;
+        font-family: "Courier New", monospace;
+        font-size: 0.88rem;
+        line-height: 1.45;
+      }
+
+      iframe {
+        display: block;
+        width: 100%;
+        min-height: 300px;
+        border: 0;
+        background: white;
+        border-radius: 14px;
+      }
+
+      @media (max-width: 900px) {
+        .lesson-grid,
+        .editor-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="topnav">
+        <a class="brand" href="index.html">
+          <small>Week 1 · 3-hour studio</small>
+          <strong>How a page computes</strong>
+        </a>
+        <div class="nav-links">
+          <a href="index.html">Course design</a>
+          <a href="playground.html" aria-current="page">Week 1 · Web</a>
+          <a href="search.html">Week 2 · Search</a>
+          <a href="sdt.html">Week 3 · d′</a>
+        </div>
+      </nav>
+
+      <header class="panel" style="margin-bottom: 18px">
+        <div class="kicker">The tool computation before the mind computation</div>
+        <h1>Structure, style, behavior.</h1>
+        <p class="lede">
+          A webpage is already a three-part model of a psychological experiment:
+          what is there, how it appears, and what it does when someone acts.
+          Tonight is only this. Next week those three layers become a visual search task.
+        </p>
+        <div class="equation">
+          page = HTML + CSS + JavaScript
+          <small>Tonight’s remix: change one layer at a time and say what changed in the experience.</small>
+        </div>
+      </header>
+
+      <div class="lesson-grid">
+        <section class="panel">
+          <h2>Three building blocks</h2>
+          <div class="language-tabs">
+            <button class="tab active" data-tab="html">HTML</button>
+            <button class="tab" data-tab="css">CSS</button>
+            <button class="tab" data-tab="js">JavaScript</button>
+          </div>
+
+          <div class="concept active" data-panel="html">
+            <span class="code-swatch html-tag">&lt;h1&gt;</span>
+            <span class="code-swatch html-tag">&lt;button&gt;</span>
+            <p>HTML is the skeleton: headings, marks, buttons, the things a participant can see or click.</p>
+            <ul>
+              <li>In an experiment this is the trial structure.</li>
+              <li>In a composition this is the inventory of forms.</li>
+              <li>If you delete an element, it is gone. That is an independent variable.</li>
+            </ul>
+          </div>
+
+          <div class="concept" data-panel="css">
+            <span class="code-swatch css-tag">color: gold;</span>
+            <span class="code-swatch css-tag">padding: 20px;</span>
+            <p>CSS is appearance: color, spacing, rhythm, figure and ground.</p>
+            <ul>
+              <li>Arts students already speak this language.</li>
+              <li>Science students should treat palette as a factor, not a theme.</li>
+              <li>Next week, color is what makes a target pop out.</li>
+            </ul>
+          </div>
+
+          <div class="concept" data-panel="js">
+            <span class="code-swatch js-tag">click</span>
+            <span class="code-swatch js-tag">addEventListener</span>
+            <p>JavaScript is behavior: it notices an action and changes the world.</p>
+            <ul>
+              <li>This is also how we record a reaction time.</li>
+              <li>A click is a response. A timer is a dependent variable.</li>
+              <li>You do not need to be a programmer to change one line and see the mind of the page change.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="sandbox-head" style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center">
+            <h2>Live coding sandbox</h2>
+            <div class="actions-row" style="margin: 0">
+              <button id="runButton" class="primary">Run page</button>
+              <button id="resetButton" class="secondary">Reset</button>
+            </div>
+          </div>
+
+          <div class="editor-grid">
+            <div class="editor-box">
+              <label for="htmlInput">HTML <span>structure</span></label>
+              <textarea id="htmlInput" spellcheck="false"></textarea>
+            </div>
+            <div class="editor-box">
+              <label for="cssInput">CSS <span>style</span></label>
+              <textarea id="cssInput" spellcheck="false"></textarea>
+            </div>
+            <div class="editor-box">
+              <label for="jsInput">JavaScript <span>behavior</span></label>
+              <textarea id="jsInput" spellcheck="false"></textarea>
+            </div>
+          </div>
+
+          <iframe id="preview" title="Preview of the web page"></iframe>
+          <p class="muted" style="font-family: 'Segoe UI', sans-serif; font-size: 0.9rem">
+            Exit ticket: screenshot one change and write a sentence naming which layer did the work.
+          </p>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const defaultHTML = `
+<div class="card">
+  <h1>A page can be an experiment</h1>
+  <p>HTML builds the structure. CSS dresses it. JavaScript waits for you.</p>
+  <button id="demoButton">Click when you are ready</button>
+</div>
+`;
+
+      const defaultCSS = `
+body {
+  font-family: Georgia, serif;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(135deg, #0b0f14, #1d4ed8);
+  color: #f6f1e6;
+}
+
+.card {
+  background: rgba(255,255,255,0.1);
+  padding: 28px 32px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 420px;
+}
+
+button {
+  background: #e8b86d;
+  color: #1c1408;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+`;
+
+      const defaultJS = `
+const button = document.getElementById('demoButton');
+const started = performance.now();
+button.addEventListener('click', () => {
+  const rt = Math.round(performance.now() - started);
+  button.textContent = 'You responded in ' + rt + ' ms';
+  button.style.background = '#6ee7b7';
+});
+`;
+
+      const htmlInput = document.getElementById("htmlInput");
+      const cssInput = document.getElementById("cssInput");
+      const jsInput = document.getElementById("jsInput");
+      const preview = document.getElementById("preview");
+
+      htmlInput.value = defaultHTML.trim();
+      cssInput.value = defaultCSS.trim();
+      jsInput.value = defaultJS.trim();
+
+      function renderPreview() {
+        preview.srcdoc = `<!DOCTYPE html><html><head><style>${cssInput.value}</style></head><body>${htmlInput.value}<script>${jsInput.value}<\/script></body></html>`;
+      }
+
+      document.getElementById("runButton").addEventListener("click", renderPreview);
+      document.getElementById("resetButton").addEventListener("click", () => {
+        htmlInput.value = defaultHTML.trim();
+        cssInput.value = defaultCSS.trim();
+        jsInput.value = defaultJS.trim();
+        renderPreview();
+      });
+
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach((item) => item.classList.toggle("active", item === tab));
+          document.querySelectorAll(".concept").forEach((panel) => {
+            panel.classList.toggle("active", panel.dataset.panel === tab.dataset.tab);
+          });
+        });
+      });
+
+      renderPreview();
+    </script>
+  </body>
+</html>
