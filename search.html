@@ -367,7 +367,7 @@
 
       function hitItem(point) {
         const size = Number(document.getElementById("itemSize").value);
-        return items.find((item) => Math.hypot(item.x - point.x, item.y - point.y) < size * 0.7);
+        return items.find((item) => Math.hypot(item.x - point.x, item.y - point.y) < size * 0.95);
       }
 
       function persist() {
@@ -514,6 +514,14 @@
           ${dots}
         `;
       }
+
+      canvas.addEventListener("mousemove", (event) => {
+        if (phase !== "search" || !waitingClick) {
+          canvas.style.cursor = "crosshair";
+          return;
+        }
+        canvas.style.cursor = hitItem(pointOnCanvas(event)) ? "pointer" : "crosshair";
+      });
 
       canvas.addEventListener("click", (event) => {
         if (!waitingClick || phase !== "search") return;
