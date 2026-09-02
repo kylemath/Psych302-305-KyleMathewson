@@ -327,11 +327,114 @@ button:hover,
   font-size: 0.88rem;
 }
 
+.toc {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0 0;
+}
+
+.toc a {
+  text-decoration: none;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 0.88rem;
+}
+
+.toc a:hover {
+  border-color: rgba(232, 184, 109, 0.5);
+}
+
+.toc b {
+  display: block;
+  color: var(--gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.meeting {
+  margin: 18px 0 0;
+}
+
+.meeting-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.when {
+  font-family: "Segoe UI", sans-serif;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.agenda,
+.forks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.agenda dl {
+  margin: 0;
+}
+
+.agenda dt {
+  color: var(--gold);
+  font-family: "Segoe UI", sans-serif;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.agenda dd {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.dark-week {
+  border-style: dashed;
+  opacity: 0.92;
+}
+
+@media print {
+  body {
+    background: white;
+    color: #1c1915;
+  }
+
+  .topnav,
+  .actions {
+    display: none;
+  }
+
+  .panel,
+  .card,
+  .meeting {
+    break-inside: avoid;
+    box-shadow: none;
+    background: white;
+    border-color: #ddd;
+  }
+}
+
 @media (max-width: 900px) {
   .hero,
   .grid-3,
   .grid-2,
-  .week-grid {
+  .week-grid,
+  .toc,
+  .agenda,
+  .forks {
     grid-template-columns: 1fr;
   }
 
