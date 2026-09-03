@@ -159,54 +159,49 @@ AI disclosure: no Copilot tonight</pre>
     </div>
 
     <script>
-      const defaultPage = `<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body {
-      font-family: Georgia, serif;
-      display: grid;
-      place-items: center;
-      min-height: 100vh;
-      margin: 0;
-      background: #0b0f14;
-      color: #f6f1e6;
-    }
-    .card {
-      background: #1a2230;
-      padding: 28px 32px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 420px;
-    }
-    button {
-      background: #e8b86d;
-      color: #1c1408;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Hello, I am a student</h1>
-    <p>Replace this sentence with something true about you.</p>
-    <p id="detail">A second fact can go here.</p>
-    <button id="more">Click for a third fact</button>
-  </div>
-  <script>
-    const button = document.getElementById("more");
-    button.addEventListener("click", () => {
-      document.getElementById("detail").textContent =
-        "I clicked this button in class.";
-      button.textContent = "Thanks";
-    });
-  <\/script>
-</body>
-</html>`;
+      const defaultPage = `<!DOCTYPE html> <html> <head> <title>About Me</title> <style> body { font-family: Arial, sans-serif; display: grid; place-items: center; min-height: 100vh; margin: 0; background: #18202b; color: white; }
+.card {
+  background: #263447;
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  max-width: 450px;
+  box-shadow: 0 0 20px #111;
+}
+
+h1 {
+  color: #f0bd68;
+}
+
+button {
+  background: #f0bd68;
+  color: #1c1408;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #ffd58f;
+}
+
+#detail {
+  color: #cbd5e1;
+  min-height: 40px;
+}
+
+</style> </head> <body> <div class="card">
+<h1>Hey, I'm Kyle</h1>
+
+<p>I am over 6 feet tall, my house is only one story tall, and I like dogs.</p>
+
+<p id="detail">Here is a random fact about me.</p>
+
+<button id="more">Click Me</button>
+
+</div> <script> const button = document.getElementById("more"); const detail = document.getElementById("detail"); // I added a few random facts const facts = [ "I clicked this button in class.", "I like dogs.", "I am over 6 feet tall.", "My house is only one story.", "I probably spent too long making this website." ]; button.addEventListener("click", () => { const randomFact = facts[Math.floor(Math.random() * facts.length)]; detail.textContent = randomFact; button.textContent = "Click Again"; }); <\/script> </body> </html>`;
 
       const codeInput = document.getElementById("codeInput");
       const preview = document.getElementById("preview");
