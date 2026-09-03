@@ -1,225 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Week 1 · Make this page about you · PSYCH 302 / 305</title>
-    <link rel="stylesheet" href="studio.css" />
-    <style>
-      .studio {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-      }
-
-      .actions-row {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      textarea {
-        width: 100%;
-        min-height: 420px;
-        background: rgba(2, 6, 23, 0.8);
-        border: 1px solid var(--panel-border);
-        color: var(--ink);
-        border-radius: 12px;
-        padding: 12px;
-        resize: vertical;
-        font-family: "Courier New", monospace;
-        font-size: 0.86rem;
-        line-height: 1.45;
-      }
-
-      iframe {
-        display: block;
-        width: 100%;
-        min-height: 420px;
-        border: 0;
-        background: white;
-        border-radius: 14px;
-      }
-
-      @media (max-width: 900px) {
-        .studio {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <nav class="topnav">
-        <a class="brand" href="index.html">
-          <small>Week 1 · PSYCH 302 / 305</small>
-          <strong>A page about you</strong>
-        </a>
-        <div class="nav-links">
-          <a href="index.html">Overview</a>
-          <a href="schedule.html">Schedule</a>
-          <a href="workflow.html">Computing</a>
-          <a href="playground.html" aria-current="page">Week 1</a>
-          <a href="labs.html">Labs</a>
-        </div>
-      </nav>
-
-      <header class="panel" style="margin-bottom: 18px">
-        <div class="kicker">Week 1 laboratory · after the GitHub form</div>
-        <h1>Make this website about yourself in three ways</h1>
-        <p class="lede">
-          If you do not have a GitHub username yet, finish
-          <a href="https://canvas.ualberta.ca/courses/35483/assignments/812211">Week 0</a>
-          first. Then edit the page below. One window holds the whole file:
-          HTML (words and structure), CSS (inside <code>&lt;style&gt;</code>),
-          and JavaScript (inside <code>&lt;script&gt;</code>).
-        </p>
-        <div class="equation">
-          three changes that could only be yours
-          <small>A name, a look, and something the page does when you click. Disclose any AI use.</small>
-        </div>
-      </header>
-
-      <section class="panel" style="margin-bottom: 18px">
-        <div class="kicker">The assignment · do all four</div>
-        <h2>Customize, publish, fork, then pull request</h2>
-        <p class="muted">
-          Change the page in <strong>three ways</strong> so a stranger can tell
-          it is about you. Then complete every step, in order:
-        </p>
-        <ol class="muted">
-          <li><strong>Your own repository.</strong> Click <strong>Save as index.html</strong>. Create a new public repo on your account, add that file as <code>index.html</code>, commit, and push.</li>
-          <li><strong>GitHub Pages on that repo.</strong> Settings → Pages → Deploy from a branch → <code>main</code> → <code>/ (root)</code> → Save. Wait a minute. Open <code>https://YOURUSER.github.io/YOURREPO/</code> and confirm it is your page.</li>
-          <li><strong>Fork the whole class repository.</strong>
-            Fork <a href="https://github.com/kylemath/Psych302-305-KyleMathewson">kylemath/Psych302-305-KyleMathewson</a>
-            (the entire handbook, not the small repo from step 1).
-            On that fork, replace <code>index.html</code> with your page so it is the default. Leave the other course files.</li>
-          <li><strong>Open a pull request back to the class repo.</strong>
-            From your fork, open a PR into
-            <a href="https://github.com/kylemath/Psych302-305-KyleMathewson">kylemath/Psych302-305-KyleMathewson</a>.
-            This is practice — and a contest. The instructor will merge the coolest one as the new default homepage of the class site.</li>
-        </ol>
-        <p class="muted">
-          Paste all four links on the
-          <a href="https://canvas.ualberta.ca/courses/35483/assignments/812443">Week 1 Canvas assignment</a>.
-        </p>
-        <p class="muted">
-          Before you start, we will open a few published pages from past
-          courses:
-          <a href="https://kylemath.github.io/BrainGames/">Brain Games</a>
-          (most recent demo),
-          <a href="https://kylemath.github.io/Brainimation/">Brainimation</a>
-          (the class that demo grew out of),
-          <a href="https://kylemath.github.io/p5.eegedu/">p5.eegedu</a>
-          (the oldest student EEG art catalogue), the
-          <a href="https://kylemath.github.io/NeuroimagingClass/portfolio_test/student_portfolios_index.html">PSYCH 403 student portfolios</a>,
-          and the instructor catalogue at
-          <a href="https://kylemathewson.com/">kylemathewson.com</a>.
-          Same idea as tonight: a file in a repo, then GitHub Pages.
-        </p>
-      </section>
-
-      <div class="studio">
-        <section class="panel">
-          <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px">
-            <h2 style="margin: 0">Code</h2>
-            <div class="actions-row">
-              <button id="runButton" class="primary">Run page</button>
-              <button id="saveButton" class="secondary">Save as index.html</button>
-              <button id="resetButton" class="secondary">Reset</button>
-            </div>
-          </div>
-          <textarea id="codeInput" spellcheck="false" aria-label="Page source"></textarea>
-        </section>
-        <section class="panel">
-          <h2>Preview</h2>
-          <iframe id="preview" title="Preview of the web page"></iframe>
-        </section>
-      </div>
-
-      <p class="muted" style="margin-top: 16px">
-        Due Tuesday 8 September, 17:00: own-repo URL, Pages URL, fork URL,
-        pull-request URL, the three changes, and the disclosure. Tonight we
-        also discuss
-        <a href="workflow.html#agentic">agentic coding</a>:
-        you stay the author.
-      </p>
-    </div>
-
-    <script>
-      const defaultPage = `<!DOCTYPE html>
-<html>
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Week 1 · Ash Kumar · PSYCH 305</title>
+  <link rel="stylesheet" href="studio.css" />
   <style>
-    body {
-      font-family: Georgia, serif;
-      display: grid;
-      place-items: center;
-      min-height: 100vh;
-      margin: 0;
-      background: #0b0f14;
-      color: #f6f1e6;
-    }
-    .card {
-      background: #1a2230;
-      padding: 28px 32px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 420px;
-    }
-    button {
-      background: #e8b86d;
-      color: #1c1408;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    .studio{display:grid;grid-template-columns:1fr 1fr;gap:18px}.actions-row{display:flex;gap:8px;flex-wrap:wrap}textarea{width:100%;min-height:460px;background:rgba(2,6,23,.8);border:1px solid var(--panel-border);color:var(--ink);border-radius:12px;padding:12px;resize:vertical;font-family:"Courier New",monospace;font-size:.84rem;line-height:1.45}iframe{display:block;width:100%;min-height:460px;border:0;background:white;border-radius:14px}@media(max-width:900px){.studio{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Hello, I am a student</h1>
-    <p>Replace this sentence with something true about you.</p>
-    <p id="detail">A second fact can go here.</p>
-    <button id="more">Click for a third fact</button>
+  <div class="wrap">
+    <nav class="topnav">
+      <a class="brand" href="index.html"><small>Week 1 · PSYCH 305</small><strong>Ash Kumar</strong></a>
+      <div class="nav-links"><a href="index.html">Published page</a><a href="playground.html" aria-current="page">Week 1 editor</a><a href="schedule.html">Schedule</a></div>
+    </nav>
+
+    <header class="panel" style="margin-bottom:18px">
+      <div class="kicker">Week 1 laboratory</div>
+      <h1>Personal website: Ash Kumar</h1>
+      <p class="lede">This playground now starts with my personalized page. The three required changes are visible in the content, visual design, and JavaScript interaction.</p>
+      <div class="equation">HTML + CSS + JavaScript<small>Research content · custom design · clickable research focus. AI use disclosed on the page.</small></div>
+    </header>
+
+    <section class="panel" style="margin-bottom:18px">
+      <div class="kicker">Assignment checklist</div>
+      <h2>What I changed</h2>
+      <ol class="muted">
+        <li><strong>Content:</strong> the page identifies me as Ash Kumar and focuses on my research interests in birds, bioacoustics, modelling, and work connected with the Bayne, Shapiro, and Nagendran labs.</li>
+        <li><strong>Appearance:</strong> the original starter card was replaced with a responsive research-profile layout and a restrained green/neutral visual system.</li>
+        <li><strong>Behaviour:</strong> the research-focus buttons change the text shown on the page when clicked.</li>
+      </ol>
+      <p class="muted">The fork homepage is <a href="index.html"><code>index.html</code></a>. The rest of the course repository remains available for later weeks.</p>
+    </section>
+
+    <div class="studio">
+      <section class="panel">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+          <h2 style="margin:0">Code</h2>
+          <div class="actions-row"><button id="runButton" class="primary">Run page</button><button id="saveButton" class="secondary">Save as index.html</button><button id="resetButton" class="secondary">Reset</button></div>
+        </div>
+        <textarea id="codeInput" spellcheck="false" aria-label="Page source"></textarea>
+      </section>
+      <section class="panel"><h2>Preview</h2><iframe id="preview" title="Preview of Ash Kumar's web page"></iframe></section>
+    </div>
   </div>
+
   <script>
-    const button = document.getElementById("more");
-    button.addEventListener("click", () => {
-      document.getElementById("detail").textContent =
-        "I clicked this button in class.";
-      button.textContent = "Thanks";
-    });
-  <\/script>
+    const defaultPage = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ash Kumar · Research</title>
+<style>
+:root{--bg:#f5f4ef;--ink:#17211c;--muted:#66716a;--accent:#24513c;--line:#d9ddd8}*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#faf9f5,var(--bg));color:var(--ink);font-family:Arial,sans-serif;line-height:1.55}.page{width:min(900px,calc(100% - 30px));margin:auto;padding:30px 0}header{padding:55px 0 45px;border-bottom:1px solid var(--line)}.eyebrow{color:var(--accent);font-size:.78rem;font-weight:bold;letter-spacing:.1em;text-transform:uppercase}h1{font:500 clamp(3.4rem,10vw,6.4rem)/.9 Georgia,serif;letter-spacing:-.05em;margin:10px 0 22px}.intro{max-width:680px;color:#39453e;font-size:1.08rem}.labs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:32px 0}.card{border:1px solid var(--line);border-radius:16px;background:white;padding:20px}.dept{color:var(--accent);font-size:.72rem;font-weight:bold;text-transform:uppercase}.card h2{font-size:1.05rem;margin:24px 0 8px}.card p{color:var(--muted);font-size:.92rem}.focus{border-top:1px solid var(--line);padding-top:28px}.buttons{display:flex;gap:8px;flex-wrap:wrap}.focus button{border:1px solid var(--line);background:white;border-radius:999px;padding:8px 12px;cursor:pointer}.focus button.active{border-color:var(--accent);background:#e0e9e3;color:var(--accent)}#focusText{font:1.45rem/1.35 Georgia,serif;max-width:700px}footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:.78rem}@media(max-width:720px){.labs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="page">
+<header><p class="eyebrow">Biological Sciences · University of Alberta</p><h1>Ash Kumar</h1><p class="intro">My research interests include birds, bioacoustics, modelling, and quantitative biological research across Biological Sciences and the Department of Surgery.</p></header>
+<section class="labs">
+<article class="card"><span class="dept">Biological Sciences</span><h2>Erin Bayne's Lab</h2><p>Bird ecology, bioacoustics, and ecological data.</p></article>
+<article class="card"><span class="dept">Department of Surgery</span><h2>Shapiro Lab</h2><p>Quantitative and clinically relevant surgical research.</p></article>
+<article class="card"><span class="dept">Department of Surgery</span><h2>Nagendran Lab</h2><p>Clinical and translational research, modelling, and biological mechanisms.</p></article>
+</section>
+<section class="focus"><p class="eyebrow">Interactive research focus</p><div class="buttons"><button class="active" data-focus="bayne">Bayne</button><button data-focus="shapiro">Shapiro</button><button data-focus="nagendran">Nagendran</button></div><p id="focusText">Bioacoustics connects field biology with signal processing and ecological inference.</p></section>
+<footer>PSYCH 305 Week 1 · AI use: ChatGPT assisted with HTML, CSS, and JavaScript; I reviewed and customized the final page.</footer>
+</main>
+<script>
+const copy={bayne:"Bioacoustics connects field biology with signal processing and ecological inference.",shapiro:"Clinical research uses quantitative evidence to test questions relevant to surgery.",nagendran:"Modelling can connect biological mechanisms with measurable clinical data."};document.querySelectorAll("[data-focus]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-focus]").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.getElementById("focusText").textContent=copy[b.dataset.focus]}));
+<\/script>
 </body>
 </html>`;
 
-      const codeInput = document.getElementById("codeInput");
-      const preview = document.getElementById("preview");
-
-      function renderPreview() {
-        preview.srcdoc = codeInput.value;
-      }
-
-      document.getElementById("runButton").addEventListener("click", renderPreview);
-      document.getElementById("saveButton").addEventListener("click", () => {
-        const blob = new Blob([codeInput.value], { type: "text/html;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "index.html";
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-      document.getElementById("resetButton").addEventListener("click", () => {
-        codeInput.value = defaultPage;
-        renderPreview();
-      });
-
-      codeInput.value = defaultPage;
-      renderPreview();
-    </script>
-  </body>
+    const codeInput=document.getElementById("codeInput"),preview=document.getElementById("preview");
+    function renderPreview(){preview.srcdoc=codeInput.value}
+    document.getElementById("runButton").addEventListener("click",renderPreview);
+    document.getElementById("saveButton").addEventListener("click",()=>{const blob=new Blob([codeInput.value],{type:"text/html;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="index.html";a.click();URL.revokeObjectURL(url)});
+    document.getElementById("resetButton").addEventListener("click",()=>{codeInput.value=defaultPage;renderPreview()});
+    codeInput.value=defaultPage;renderPreview();
+  </script>
+</body>
 </html>
