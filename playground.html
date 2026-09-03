@@ -161,6 +161,7 @@ AI disclosure: no Copilot tonight</pre>
     <script>
       const defaultPage = `<!DOCTYPE html>
 <html>
+
 <head>
   <style>
     body {
@@ -172,6 +173,7 @@ AI disclosure: no Copilot tonight</pre>
       background: #0b0f14;
       color: #f6f1e6;
     }
+
     .card {
       background: #1a2230;
       padding: 28px 32px;
@@ -179,6 +181,7 @@ AI disclosure: no Copilot tonight</pre>
       text-align: center;
       max-width: 420px;
     }
+
     button {
       background: #e8b86d;
       color: #1c1408;
@@ -188,24 +191,99 @@ AI disclosure: no Copilot tonight</pre>
       font-weight: bold;
       cursor: pointer;
     }
+
+    #catTrigger {
+      position: fixed;
+      width: 48px;
+      height: 48px;
+    }
+
+    #cat {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #cat[hidden] {
+      display: none;
+    }
   </style>
 </head>
+
 <body>
   <div class="card">
-    <h1>Hello, I am a student</h1>
-    <p>Replace this sentence with something true about you.</p>
-    <p id="detail">A second fact can go here.</p>
+    <h1>Hello, I'm Joshua Tokarsky</h1>
+    <p>I've exhibited creative coding art in Japan, Spain, and Germany.</p>
+    <p id="detail">I live in the woods with two cats (see if you can find one of them on this page) and my wife and
+      (soon) my new daughter</p>
+
+    <div id="hidden" hidden="until-found">
+      <p>Nice reflexes. (Or nice job using CTL-F)</p>
+      <Button id="hideButton">Hide This Again</Button>
+    </div>
+
     <button id="more">Click for a third fact</button>
   </div>
+  <div id="catTrigger">
+    <img id="cat" src="https://media.tenor.com/TcGFFG6utCkAAAAi/dancing-cat-dance.gif" hidden />
+  </div>
   <script>
+
     const button = document.getElementById("more");
-    button.addEventListener("click", () => {
-      document.getElementById("detail").textContent =
-        "I clicked this button in class.";
-      button.textContent = "Thanks";
+
+    const isNearButton = (rect, mouseX, mouseY, padding) =>
+      mouseX > rect.left - padding &&
+      mouseX < rect.right + padding &&
+      mouseY > rect.top - padding &&
+      mouseY < rect.bottom + padding;
+
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+    const viewportWidth = document.documentElement.clientWidth;
+    const viewportHeight = document.documentElement.clientHeight;
+
+    document.addEventListener('mousemove', (event) => {
+      const padding = 25;
+      const rect = button.getBoundingClientRect();
+      if (!isNearButton(rect, event.clientX, event.clientY, padding)) return;
+
+
+      const dodgeX = event.clientX < rect.left + rect.width / 2 ? padding * 2 : -padding * 2;
+      const dodgeY = event.clientY < rect.top + rect.height / 2 ? padding * 2 : -padding * 2;
+      const nextLeft = clamp(rect.left + dodgeX, 0, viewportWidth - rect.width);
+      const nextTop = clamp(rect.top + dodgeY, 0, viewportHeight - rect.height);
+
+      button.style = \`position: fixed; left: \${nextLeft}px; top: \${nextTop}px; margin: 0;\`;
     });
+
+
+    button.addEventListener("click", () => {
+      document.getElementById("hidden").removeAttribute('hidden');
+      button.setAttribute("hidden", "")
+    })
+
+    const catSize = 48;
+    const catX = clamp(Math.random() * (viewportWidth - catSize), 0, viewportWidth - catSize);
+    const catY = clamp(Math.random() * (viewportHeight - catSize), 0, viewportHeight - catSize);
+    const cat = document.getElementById("cat");
+    const catTrigger = document.getElementById("catTrigger")
+    catTrigger.style.left = \`\${catX}px\`;
+    catTrigger.style.top = \`\${catY}px\`;
+
+    catTrigger.addEventListener("mouseenter", () => {
+      cat.removeAttribute("hidden", "")
+    })
+    document.getElementById("hideButton").addEventListener("click", () => {
+      document.getElementById("hidden").setAttribute('hidden', "until-found");
+      button.removeAttribute("hidden", "")
+    })
+
+    document.getElementById("hidden").addEventListener('beforematch', (event) => {
+      button.setAttribute("hidden", "")
+    })
   <\/script>
 </body>
+
 </html>`;
 
       const codeInput = document.getElementById("codeInput");
