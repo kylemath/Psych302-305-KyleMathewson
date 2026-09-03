@@ -3,172 +3,215 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Ash Kumar's Week 1 PSYCH 305 research page at the University of Alberta." />
   <title>Ash Kumar · Research</title>
   <style>
     :root {
-      --bg: #f3f2ed;
-      --paper: rgba(255, 255, 255, 0.78);
+      --bg: #f6f4ee;
+      --paper: #fffefb;
       --ink: #17211c;
-      --muted: #66716a;
-      --line: #d9ddd8;
+      --muted: #657068;
       --accent: #24513c;
-      --accent-soft: #e0e9e3;
-      --shadow: 0 18px 55px rgba(29, 43, 35, 0.08);
+      --accent-soft: #e4ece7;
+      --line: #d9ddd8;
     }
+
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at 84% 8%, rgba(36, 81, 60, 0.10), transparent 27rem), linear-gradient(180deg, #faf9f5 0%, var(--bg) 100%);
+      background: linear-gradient(180deg, #fbfaf6 0%, var(--bg) 100%);
       color: var(--ink);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.6;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.55;
     }
-    a { color: inherit; }
-    button { font: inherit; }
-    .page { width: min(1040px, calc(100% - 36px)); margin: 0 auto; padding: 28px 0 44px; }
-    nav { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 4px 2px 26px; border-bottom: 1px solid var(--line); }
-    .mark { font-weight: 780; letter-spacing: -0.02em; text-decoration: none; }
-    .nav-links { display: flex; gap: 18px; color: var(--muted); font-size: 0.9rem; }
-    .nav-links a { text-decoration: none; }
-    .nav-links a:hover, .nav-links a:focus-visible { color: var(--accent); }
-    .hero { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.75fr); gap: 48px; align-items: end; padding: 82px 0 68px; }
-    .eyebrow { margin: 0 0 12px; color: var(--accent); font-size: 0.82rem; font-weight: 780; letter-spacing: 0.12em; text-transform: uppercase; }
-    h1, h2, h3, p { margin-top: 0; }
-    h1 { margin-bottom: 20px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.6rem, 9vw, 7.5rem); font-weight: 500; line-height: 0.9; letter-spacing: -0.065em; }
-    .intro { max-width: 690px; margin-bottom: 0; color: #37433c; font-size: clamp(1.04rem, 2vw, 1.23rem); }
-    .hero-note { padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); box-shadow: var(--shadow); }
-    .hero-note strong { display: block; margin-bottom: 8px; font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; font-weight: 600; }
-    .hero-note p { margin-bottom: 0; color: var(--muted); font-size: 0.94rem; }
-    .section { padding: 34px 0 20px; border-top: 1px solid var(--line); }
-    .section-heading { display: grid; grid-template-columns: 0.6fr 1.4fr; gap: 28px; align-items: start; margin-bottom: 26px; }
-    h2 { margin-bottom: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2rem, 4vw, 3.1rem); font-weight: 500; letter-spacing: -0.035em; }
-    .section-heading p { max-width: 620px; margin-bottom: 0; color: var(--muted); }
-    .lab-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .lab-card { min-height: 236px; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); box-shadow: 0 8px 28px rgba(29, 43, 35, 0.04); }
-    .lab-card .dept { display: inline-block; margin-bottom: 34px; color: var(--accent); font-size: 0.76rem; font-weight: 760; letter-spacing: 0.08em; text-transform: uppercase; }
-    .lab-card h3 { margin-bottom: 10px; font-size: 1.12rem; }
-    .lab-card p { margin-bottom: 0; color: var(--muted); font-size: 0.94rem; }
-    .focus-panel { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 18px; align-items: stretch; margin-top: 20px; }
-    .focus-controls, .focus-output { padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
-    .focus-controls p, .focus-output p { color: var(--muted); }
-    .focus-buttons { display: flex; flex-wrap: wrap; gap: 9px; }
-    .focus-button { border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); padding: 9px 13px; cursor: pointer; transition: 140ms ease; }
-    .focus-button:hover, .focus-button:focus-visible, .focus-button.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); outline: none; }
-    .focus-output { display: flex; flex-direction: column; justify-content: center; min-height: 180px; }
-    .focus-output .label { margin-bottom: 7px; color: var(--accent); font-size: 0.78rem; font-weight: 760; letter-spacing: 0.09em; text-transform: uppercase; }
-    #focusText { margin-bottom: 0; color: var(--ink); font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.3; }
-    footer { display: flex; justify-content: space-between; gap: 28px; margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.82rem; }
-    footer p { margin-bottom: 0; }
-    .disclosure { max-width: 580px; text-align: right; }
-    @media (max-width: 820px) {
-      .hero, .section-heading, .focus-panel { grid-template-columns: 1fr; }
-      .hero { padding: 58px 0 52px; gap: 28px; }
-      .lab-grid { grid-template-columns: 1fr; }
-      .lab-card { min-height: 0; }
-      .lab-card .dept { margin-bottom: 22px; }
+
+    .page {
+      width: min(960px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 44px;
     }
-    @media (max-width: 560px) {
-      .page { width: min(100% - 24px, 1040px); padding-top: 18px; }
-      nav { align-items: flex-start; }
-      .nav-links { flex-direction: column; align-items: flex-end; gap: 5px; }
-      h1 { font-size: clamp(3.1rem, 18vw, 5.2rem); }
-      footer { flex-direction: column; }
-      .disclosure { text-align: left; }
+
+    header {
+      padding: 46px 0 42px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow,
+    .dept {
+      color: var(--accent);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 10px 0 18px;
+      font: 500 clamp(3.6rem, 10vw, 7rem) / 0.9 Georgia, "Times New Roman", serif;
+      letter-spacing: -0.055em;
+    }
+
+    .intro {
+      max-width: 720px;
+      margin: 0;
+      color: #3f4a43;
+      font-size: 1.08rem;
+    }
+
+    .labs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding: 32px 0;
+    }
+
+    .card {
+      min-height: 270px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper);
+    }
+
+    .card h2 {
+      margin: 26px 0 10px;
+      font-size: 1.05rem;
+      line-height: 1.3;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .focus {
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+    }
+
+    .focus h2 {
+      margin: 6px 0 12px;
+      font: 500 1.8rem/1.2 Georgia, "Times New Roman", serif;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 20px;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--ink);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover,
+    button:focus-visible,
+    button.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+      outline: none;
+    }
+
+    #focusText {
+      max-width: 760px;
+      margin: 0;
+      font: 1.35rem/1.4 Georgia, "Times New Roman", serif;
+    }
+
+    footer {
+      margin-top: 42px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 760px) {
+      .labs { grid-template-columns: 1fr; }
+      .card { min-height: 0; }
+      header { padding-top: 28px; }
     }
   </style>
 </head>
 <body>
   <main class="page">
-    <nav aria-label="Primary navigation">
-      <a class="mark" href="index.html">Ash Kumar</a>
-      <div class="nav-links">
-        <a href="#research">Research</a>
-        <a href="playground.html">Week 1</a>
-      </div>
-    </nav>
-
-    <header class="hero">
-      <div>
-        <p class="eyebrow">Biological Sciences · University of Alberta</p>
-        <h1>Ash<br />Kumar</h1>
-        <p class="intro">
-          I work across research groups in Biological Sciences and the Department of Surgery.
-          My interests centre on birds, bioacoustics, modelling, and quantitative approaches to biological research.
-        </p>
-      </div>
-      <aside class="hero-note">
-        <strong>Research across disciplines</strong>
-        <p>I am interested in how data, biological signals, and modelling can be used to answer questions at different scales—from ecological systems to clinical research.</p>
-      </aside>
+    <header>
+      <p class="eyebrow">University of Alberta · Biological Sciences & Department of Surgery</p>
+      <h1>Ash Kumar</h1>
+      <p class="intro">
+        My research experience spans bird bioacoustics and ecological modelling, clinical islet transplantation,
+        and cardiac-surgery research involving ex vivo organ perfusion.
+      </p>
     </header>
 
-    <section class="section" id="research">
-      <div class="section-heading">
-        <h2>Research</h2>
-        <p>Three groups currently shape the questions and methods I am interested in. The common thread is extracting useful information from complex biological data.</p>
-      </div>
+    <section class="labs" aria-label="Research groups">
+      <article class="card">
+        <span class="dept">Biological Sciences</span>
+        <h2>Erin M. Bayne Lab</h2>
+        <p>
+          I work with birds, bioacoustics, and ecological modelling using passive acoustic monitoring data.
+          The lab uses autonomous recording units, remote sensing, and large-scale models to study wildlife responses to human activity.
+        </p>
+      </article>
 
-      <div class="lab-grid">
-        <article class="lab-card">
-          <span class="dept">Biological Sciences</span>
-          <h3>Erin Bayne's Lab</h3>
-          <p>Bird ecology, bioacoustics, and the use of ecological data to study patterns in natural systems.</p>
-        </article>
-        <article class="lab-card">
-          <span class="dept">Department of Surgery</span>
-          <h3>Shapiro Lab</h3>
-          <p>Surgical research where quantitative analysis and evidence are used to address clinically relevant questions.</p>
-        </article>
-        <article class="lab-card">
-          <span class="dept">Department of Surgery</span>
-          <h3>Nagendran Lab</h3>
-          <p>Clinical and translational research with an interest in modelling, data, and biological mechanisms.</p>
-        </article>
-      </div>
+      <article class="card">
+        <span class="dept">Department of Surgery</span>
+        <h2>A.M. James Shapiro · Clinical Islet Transplant Program</h2>
+        <p>
+          I am involved in research connected with the clinical islet transplantation group.
+          The program studies pancreatic islet transplantation and cell-replacement approaches for type 1 diabetes.
+        </p>
+      </article>
 
-      <div class="focus-panel">
-        <div class="focus-controls">
-          <p class="eyebrow">Interactive change</p>
-          <h3>Research focus</h3>
-          <p>Click a lab to change the research thread shown on the page.</p>
-          <div class="focus-buttons" role="group" aria-label="Choose a research focus">
-            <button class="focus-button active" type="button" data-focus="bayne">Bayne</button>
-            <button class="focus-button" type="button" data-focus="shapiro">Shapiro</button>
-            <button class="focus-button" type="button" data-focus="nagendran">Nagendran</button>
-          </div>
-        </div>
-        <div class="focus-output" aria-live="polite">
-          <span class="label" id="focusLabel">Bayne Lab</span>
-          <p id="focusText">Bioacoustics turns sound into data: a useful bridge between field biology, signal processing, and ecological inference.</p>
-        </div>
-      </div>
+      <article class="card">
+        <span class="dept">Division of Cardiac Surgery</span>
+        <h2>Jeevan Nagendran Lab</h2>
+        <p>
+          I have helped with ex vivo lung perfusion (EVLP) and heart-perfusion work.
+          The group works in cardiac surgery, including valvular heart disease and translational cardiovascular research.
+        </p>
+      </article>
     </section>
 
-    <footer>
-      <p>PSYCH 305 · Week 1 · Fall 2026</p>
-      <p class="disclosure">Three changes: personal research content, a new visual design, and an interactive research selector. AI use: ChatGPT assisted with the HTML, CSS, and JavaScript; I reviewed and customized the final page.</p>
-    </footer>
+    <section class="focus">
+      <span class="eyebrow">Interactive research focus</span>
+      <h2>What I work on</h2>
+      <div class="buttons" role="group" aria-label="Choose a research group">
+        <button class="active" type="button" data-focus="bayne">Erin M. Bayne</button>
+        <button type="button" data-focus="shapiro">A.M. James Shapiro</button>
+        <button type="button" data-focus="nagendran">Jeevan Nagendran</button>
+      </div>
+      <p id="focusText" aria-live="polite">
+        Birds, passive acoustic recordings, bioacoustics, and modelling ecological patterns from monitoring data.
+      </p>
+    </section>
+
+    <footer>PSYCH 305 · Week 1 · Fall 2026</footer>
   </main>
 
   <script>
-    const focusCopy = {
-      bayne: { label: "Bayne Lab", text: "Bioacoustics turns sound into data: a useful bridge between field biology, signal processing, and ecological inference." },
-      shapiro: { label: "Shapiro Lab", text: "Clinical research asks how quantitative evidence can sharpen decisions, test assumptions, and improve how biological questions are studied in surgery." },
-      nagendran: { label: "Nagendran Lab", text: "Modelling and translational research connect biological mechanisms with patient-centred questions and measurable clinical data." }
+    const copy = {
+      bayne: "Birds, passive acoustic recordings, bioacoustics, and modelling ecological patterns from monitoring data.",
+      shapiro: "Clinical islet transplantation and cell-replacement research for type 1 diabetes.",
+      nagendran: "Ex vivo lung perfusion (EVLP), heart perfusion, and translational work in cardiac surgery."
     };
-    const buttons = document.querySelectorAll(".focus-button");
-    const focusLabel = document.getElementById("focusLabel");
-    const focusText = document.getElementById("focusText");
-    buttons.forEach(function (button) {
+
+    document.querySelectorAll("[data-focus]").forEach(function (button) {
       button.addEventListener("click", function () {
-        const selected = focusCopy[button.dataset.focus];
-        buttons.forEach(function (item) { item.classList.remove("active"); });
+        document.querySelectorAll("[data-focus]").forEach(function (item) {
+          item.classList.remove("active");
+        });
         button.classList.add("active");
-        focusLabel.textContent = selected.label;
-        focusText.textContent = selected.text;
+        document.getElementById("focusText").textContent = copy[button.dataset.focus];
       });
     });
   </script>
