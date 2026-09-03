@@ -21,9 +21,9 @@ Use something already taught: simple or choice RT, the inventory, a two-conditio
 
 Classmate data, a pair, a slide deck, or a statistical test beyond descriptives and a comparison you can explain.
 
-## Graded
+## Graded (35 points)
 
-A clear measure, a written prediction, a visible result, and a stated limit.
+See [rubrics.html](../rubrics.html). Running page 8, prediction 7, result 8, limitation 7, data 3, disclosure 2.
 
 ## Not graded
 
