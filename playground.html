@@ -160,53 +160,225 @@ AI disclosure: no Copilot tonight</pre>
 
     <script>
       const defaultPage = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ash · Research</title>
   <style>
+    :root {
+      --bg: #f6f4ee;
+      --paper: #fffefb;
+      --ink: #17211c;
+      --muted: #657068;
+      --accent: #24513c;
+      --accent-soft: #e4ece7;
+      --line: #d9ddd8;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: Georgia, serif;
-      display: grid;
-      place-items: center;
-      min-height: 100vh;
       margin: 0;
-      background: #0b0f14;
-      color: #f6f1e6;
+      background: linear-gradient(180deg, #fbfaf6 0%, var(--bg) 100%);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.55;
     }
+
+    .page {
+      width: min(960px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 44px;
+    }
+
+    header {
+      padding: 46px 0 42px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow,
+    .dept {
+      color: var(--accent);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 10px 0 18px;
+      font: 500 clamp(3.6rem, 10vw, 7rem) / 0.9 Georgia, "Times New Roman", serif;
+      letter-spacing: -0.055em;
+    }
+
+    .intro {
+      max-width: 720px;
+      margin: 0;
+      color: #3f4a43;
+      font-size: 1.08rem;
+    }
+
+    .labs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding: 32px 0;
+    }
+
     .card {
-      background: #1a2230;
-      padding: 28px 32px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 420px;
+      min-height: 270px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper);
     }
+
+    .card h2 {
+      margin: 26px 0 10px;
+      font-size: 1.05rem;
+      line-height: 1.3;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .focus {
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+    }
+
+    .focus h2 {
+      margin: 6px 0 12px;
+      font: 500 1.8rem/1.2 Georgia, "Times New Roman", serif;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 20px;
+    }
+
     button {
-      background: #e8b86d;
-      color: #1c1408;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-weight: bold;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--ink);
+      font: inherit;
       cursor: pointer;
+    }
+
+    button:hover,
+    button:focus-visible,
+    button.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+      outline: none;
+    }
+
+    #focusText {
+      max-width: 760px;
+      margin: 0;
+      font: 1.35rem/1.4 Georgia, "Times New Roman", serif;
+    }
+
+    footer {
+      margin-top: 42px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 760px) {
+      .labs { grid-template-columns: 1fr; }
+      .card { min-height: 0; }
+      header { padding-top: 28px; }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Hello, I am a student</h1>
-    <p>Replace this sentence with something true about you.</p>
-    <p id="detail">A second fact can go here.</p>
-    <button id="more">Click for a third fact</button>
-  </div>
+  <main class="page">
+    <header>
+      <p class="eyebrow">University of Alberta · Biological Sciences & Department of Surgery</p>
+      <h1>Ash</h1>
+      <p class="intro">
+        My research experience spans bird bioacoustics and ecological modelling, clinical islet transplantation,
+        and cardiac-surgery research involving ex vivo organ perfusion.
+      </p>
+    </header>
+
+    <section class="labs" aria-label="Research groups">
+      <article class="card">
+        <span class="dept">Biological Sciences</span>
+        <h2>Erin M. Bayne Lab</h2>
+        <p>
+          I work with birds, bioacoustics, and ecological modelling using passive acoustic monitoring data.
+          The lab uses autonomous recording units, remote sensing, and large-scale models to study wildlife responses to human activity.
+        </p>
+      </article>
+
+      <article class="card">
+        <span class="dept">Department of Surgery</span>
+        <h2>A.M. James Shapiro · Clinical Islet Transplant Program</h2>
+        <p>
+          I am involved in research connected with the clinical islet transplantation group.
+          The program studies pancreatic islet transplantation and cell-replacement approaches for type 1 diabetes.
+        </p>
+      </article>
+
+      <article class="card">
+        <span class="dept">Division of Cardiac Surgery</span>
+        <h2>Jeevan Nagendran Lab</h2>
+        <p>
+          I have helped with ex vivo lung perfusion (EVLP) and heart-perfusion work.
+          The group works in cardiac surgery, including valvular heart disease and translational cardiovascular research.
+        </p>
+      </article>
+    </section>
+
+    <section class="focus">
+      <span class="eyebrow">Interactive research focus</span>
+      <h2>What I work on</h2>
+      <div class="buttons" role="group" aria-label="Choose a research group">
+        <button class="active" type="button" data-focus="bayne">Erin M. Bayne</button>
+        <button type="button" data-focus="shapiro">A.M. James Shapiro</button>
+        <button type="button" data-focus="nagendran">Jeevan Nagendran</button>
+      </div>
+      <p id="focusText" aria-live="polite">
+        Birds, passive acoustic recordings, bioacoustics, and modelling ecological patterns from monitoring data.
+      </p>
+    </section>
+
+    <footer>PSYCH 305 · Week 1 · Fall 2026</footer>
+  </main>
+
   <script>
-    const button = document.getElementById("more");
-    button.addEventListener("click", () => {
-      document.getElementById("detail").textContent =
-        "I clicked this button in class.";
-      button.textContent = "Thanks";
+    const copy = {
+      bayne: "Birds, passive acoustic recordings, bioacoustics, and modelling ecological patterns from monitoring data.",
+      shapiro: "Clinical islet transplantation and cell-replacement research for type 1 diabetes.",
+      nagendran: "Ex vivo lung perfusion (EVLP), heart perfusion, and translational work in cardiac surgery."
+    };
+
+    document.querySelectorAll("[data-focus]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        document.querySelectorAll("[data-focus]").forEach(function (item) {
+          item.classList.remove("active");
+        });
+        button.classList.add("active");
+        document.getElementById("focusText").textContent = copy[button.dataset.focus];
+      });
     });
   <\/script>
 </body>
-</html>`;
+</html>
+`;
 
       const codeInput = document.getElementById("codeInput");
       const preview = document.getElementById("preview");
