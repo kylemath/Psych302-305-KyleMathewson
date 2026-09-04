@@ -11,6 +11,7 @@ python studio_pipeline.py modules-create
 # after students submit:
 python studio_pipeline.py week0-pull
 python studio_pipeline.py week0-grade          # complete/incomplete from parsed username
+python studio_pipeline.py week1-pull           # harvest Week 1 Canvas links; does not grade
 python studio_pipeline.py repos-mint           # dry-run plan (default)
 python studio_pipeline.py repos-mint --apply   # create private repos + add collaborators
 python studio_pipeline.py repos-sync           # dry-run: missing template files on existing repos
@@ -26,4 +27,6 @@ python studio_pipeline.py modules-create       # Canvas modules + weekly assignm
 
 `repos-sync` is for repos that already exist (for example after a later template addition such as `report/`). Default is dry-run. `--apply` clones each existing consented repo, copies only files that are still missing, commits, and does a regular `git push`. It never overwrites a file the student already has and never force-pushes.
 
-To the agent: **`plant week0`** means create (or confirm) the assignment and announcement. **`pull week0`** means harvest usernames. **`grade week0`** means complete/incomplete. **`mint repos`** means dry-run first, then `--apply` for eligible students only. **`sync repos`** means dry-run first, then `--apply` to add missing template files only.
+To the agent: **`plant week0`** means create (or confirm) the assignment and announcement. **`pull week0`** means harvest usernames. **`grade week0`** means complete/incomplete. **`pull week1`** means harvest the four GitHub links from Canvas (do not invent scores). **`mint repos`** means dry-run first, then `--apply` for eligible students only. **`sync repos`** means dry-run first, then `--apply` to add missing template files only.
+
+Week 1 is due Tuesday 17:00. Do not post Week 1 grades before the due date. GitHub forks/PRs are evidence of work; Canvas paste is the official submission.

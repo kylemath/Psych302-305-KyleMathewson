@@ -36,7 +36,7 @@ No class 30 September or 11 November.
 - **15%** individual midterm check-in, 28 October.
 - **35%** individual final project, 2 December.
 
-No graded group work and no graded peer review. Week 0 is complete/incomplete and omitted from the average.
+Marking schemes: [rubrics.html](rubrics.html). Official late work and letter grades: Simple Syllabus on Canvas. No graded group work and no graded peer review. Week 0 is complete/incomplete and omitted from the average.
 
 ## Instructor pipeline
 
