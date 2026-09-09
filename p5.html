@@ -92,10 +92,6 @@
           <div class="kicker" id="stepKicker">Step 1</div>
           <h2 id="stepTitle">Pixels on a display</h2>
           <p class="muted" id="stepProse"></p>
-          <div class="actions" style="margin-top: 12px">
-            <button type="button" id="prevBtn" class="secondary">Previous</button>
-            <button type="button" id="nextBtn" class="primary">Next piece</button>
-          </div>
         </section>
         <aside class="panel">
           <div class="kicker">Live sketch</div>
@@ -546,8 +542,6 @@ ${source}
         host.innerHTML = "";
         current = new p5(step.factory, host);
         runPreview();
-        document.getElementById("nextBtn").textContent =
-          stepIndex === steps.length - 1 ? "Open the RT lab" : "Next piece";
       }
 
       const row = document.getElementById("stepRow");
@@ -560,14 +554,6 @@ ${source}
         row.appendChild(btn);
       });
 
-      document.getElementById("prevBtn").addEventListener("click", () => showStep(stepIndex - 1));
-      document.getElementById("nextBtn").addEventListener("click", () => {
-        if (stepIndex === steps.length - 1) {
-          window.location.href = "rt.html";
-          return;
-        }
-        showStep(stepIndex + 1);
-      });
       document.getElementById("runBtn").addEventListener("click", runPreview);
       document.getElementById("resetBtn").addEventListener("click", () => showStep(stepIndex));
 
