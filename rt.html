@@ -6,19 +6,76 @@
     <title>Week 2 · Reaction time sandbox · PSYCH 302 / 305</title>
     <link rel="stylesheet" href="studio.css" />
     <style>
-      textarea {
-        width: 100%;
-        min-height: 360px;
-        background: rgba(2, 6, 23, 0.8);
-        border: 1px solid var(--panel-border);
-        color: var(--ink);
+      .code-wrap {
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        height: 420px;
         border-radius: 12px;
-        padding: 12px;
-        resize: vertical;
-        font-family: "Courier New", monospace;
-        font-size: 0.82rem;
-        line-height: 1.45;
+        border: 1px solid var(--panel-border);
+        background: #0e1318;
+        overflow: hidden;
+        font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
+        font-size: 13px;
+        line-height: 1.55;
+        tab-size: 2;
       }
+      .code-gutter {
+        margin: 0;
+        padding: 12px 8px 12px 0;
+        height: 100%;
+        overflow: hidden;
+        color: #6e7681;
+        text-align: right;
+        user-select: none;
+        background: #0b1014;
+        border-right: 1px solid rgba(232, 228, 219, 0.08);
+        white-space: pre;
+      }
+      .code-pane {
+        position: relative;
+        min-width: 0;
+        height: 100%;
+      }
+      .code-hl,
+      #codeInput {
+        position: absolute;
+        inset: 0;
+        margin: 0;
+        padding: 12px 14px;
+        border: 0;
+        white-space: pre;
+        overflow: auto;
+        font: inherit;
+        line-height: inherit;
+        tab-size: inherit;
+      }
+      .code-hl {
+        pointer-events: none;
+        overflow: hidden;
+        color: #d4d4d4;
+      }
+      #codeInput {
+        z-index: 1;
+        background: transparent;
+        color: transparent;
+        caret-color: #f3efe6;
+        resize: none;
+        outline: none;
+        scrollbar-color: #3d444d #0e1318;
+      }
+      #codeInput::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      #codeInput::-webkit-scrollbar-thumb {
+        background: #3d444d;
+        border-radius: 8px;
+      }
+      .tok-cmt { color: #6a9955; }
+      .tok-str { color: #ce9178; }
+      .tok-kw { color: #c586c0; }
+      .tok-num { color: #b5cea8; }
+      .tok-fn { color: #dcdcaa; }
       iframe {
         display: block;
         width: 100%;
@@ -81,7 +138,13 @@
             <button type="button" id="resetBtn" class="secondary">Reset default</button>
           </div>
           <p class="muted" id="copyNote">Edits are saved in this browser until you reset.</p>
-          <textarea id="codeInput" spellcheck="false" aria-label="p5.js reaction-time sketch"></textarea>
+          <div class="code-wrap" id="codeWrap">
+            <pre class="code-gutter" id="codeGutter" aria-hidden="true"></pre>
+            <div class="code-pane">
+              <pre class="code-hl" id="codeHl" aria-hidden="true"></pre>
+              <textarea id="codeInput" spellcheck="false" aria-label="p5.js reaction-time sketch"></textarea>
+            </div>
+          </div>
         </section>
         <aside class="panel">
           <div class="kicker">Live task</div>
@@ -304,9 +367,85 @@ function exportCsv() {
       const STORE = "psych302-week2-rt-sketch";
       const defaultSketch = document.getElementById("defaultSketch").textContent.replace(/^\n/, "");
       const codeInput = document.getElementById("codeInput");
+      const codeHl = document.getElementById("codeHl");
+      const codeGutter = document.getElementById("codeGutter");
       const preview = document.getElementById("preview");
       const copyNote = document.getElementById("copyNote");
       const p5Url = new URL("vendor/p5.min.js", window.location.href).href;
+      const KEYWORDS = new Set([
+        "let", "const", "var", "function", "return", "if", "else", "for", "while",
+        "do", "new", "typeof", "instanceof", "true", "false", "null", "undefined",
+        "break", "continue", "this", "in", "of",
+      ]);
+
+      function escapeHtml(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      function span(kind, text) {
+        return `<span class="tok-${kind}">${escapeHtml(text)}</span>`;
+      }
+
+      function highlightJS(src) {
+        let out = "";
+        let i = 0;
+        while (i < src.length) {
+          if (src[i] === "/" && src[i + 1] === "/") {
+            const stop = src.indexOf("\n", i);
+            const end = stop === -1 ? src.length : stop;
+            out += span("cmt", src.slice(i, end));
+            i = end;
+            continue;
+          }
+          const quote = src[i];
+          if (quote === '"' || quote === "'") {
+            let j = i + 1;
+            while (j < src.length && src[j] !== quote) {
+              if (src[j] === "\\") j += 2;
+              else j += 1;
+            }
+            if (j < src.length) j += 1;
+            out += span("str", src.slice(i, j));
+            i = j;
+            continue;
+          }
+          if (/[0-9]/.test(src[i]) && (i === 0 || !/[\w$]/.test(src[i - 1]))) {
+            let j = i + 1;
+            while (j < src.length && /[0-9.]/.test(src[j])) j += 1;
+            out += span("num", src.slice(i, j));
+            i = j;
+            continue;
+          }
+          if (/[A-Za-z_$]/.test(src[i])) {
+            let j = i + 1;
+            while (j < src.length && /[\w$]/.test(src[j])) j += 1;
+            const word = src.slice(i, j);
+            let k = j;
+            while (k < src.length && /\s/.test(src[k])) k += 1;
+            if (KEYWORDS.has(word)) out += span("kw", word);
+            else if (src[k] === "(") out += span("fn", word);
+            else out += escapeHtml(word);
+            i = j;
+            continue;
+          }
+          out += escapeHtml(src[i]);
+          i += 1;
+        }
+        return out;
+      }
+
+      function paintEditor() {
+        const src = codeInput.value;
+        const lines = src.split("\n");
+        codeGutter.textContent = lines.map((_, n) => String(n + 1)).join("\n");
+        codeHl.innerHTML = highlightJS(src) + (src.endsWith("\n") ? "\n" : "");
+      }
+
+      function syncScroll() {
+        codeHl.scrollTop = codeInput.scrollTop;
+        codeHl.scrollLeft = codeInput.scrollLeft;
+        codeGutter.scrollTop = codeInput.scrollTop;
+      }
 
       function runPreview() {
         const source = codeInput.value;
@@ -328,10 +467,13 @@ ${source}
       }
 
       codeInput.value = localStorage.getItem(STORE) || defaultSketch;
+      paintEditor();
       document.getElementById("runBtn").addEventListener("click", runPreview);
       document.getElementById("resetBtn").addEventListener("click", () => {
         localStorage.removeItem(STORE);
         codeInput.value = defaultSketch;
+        paintEditor();
+        syncScroll();
         runPreview();
         copyNote.textContent = "Default sketch restored.";
       });
@@ -343,7 +485,22 @@ ${source}
           copyNote.textContent = "Copy failed. Select the text and copy it yourself.";
         }
       });
-      codeInput.addEventListener("input", () => localStorage.setItem(STORE, codeInput.value));
+      codeInput.addEventListener("input", () => {
+        localStorage.setItem(STORE, codeInput.value);
+        paintEditor();
+        syncScroll();
+      });
+      codeInput.addEventListener("scroll", syncScroll);
+      codeInput.addEventListener("keydown", (event) => {
+        if (event.key !== "Tab") return;
+        event.preventDefault();
+        const start = codeInput.selectionStart;
+        const end = codeInput.selectionEnd;
+        codeInput.value = codeInput.value.slice(0, start) + "  " + codeInput.value.slice(end);
+        codeInput.selectionStart = codeInput.selectionEnd = start + 2;
+        localStorage.setItem(STORE, codeInput.value);
+        paintEditor();
+      });
       runPreview();
     </script>
   </body>
