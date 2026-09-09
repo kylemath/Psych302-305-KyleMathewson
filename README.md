@@ -24,7 +24,7 @@ Week 0 (GitHub username): https://canvas.ualberta.ca/courses/35483/assignments/8
 | 9 | 4 Nov | Gamified research | A browser game that studies a question | [game.html](game.html) |
 | 10 | 18 Nov | Project workshop | Individual final | [project.html](project.html) |
 | 11 | 25 Nov | Project laboratory | — | [project.html](project.html) |
-| 12 | 2 Dec | Final page due | The page is the submission | [project.html](project.html) |
+| 12 | 2 Dec | Final presentations | Page + talk (not a registrar exam) | [project.html](project.html) |
 
 No class 30 September or 11 November.
 
@@ -34,7 +34,7 @@ No class 30 September or 11 November.
 
 - **50%** weekly laboratory reports (weeks 1–9, drop the lowest). Tuesday 17:00.
 - **15%** individual midterm check-in, 28 October.
-- **35%** individual final project, 2 December.
+- **35%** individual final project (running page plus in-class presentation), 2 December. There is no registrar exam.
 
 Marking schemes: [rubrics.html](rubrics.html). Official late work and letter grades: Simple Syllabus on Canvas. No graded group work and no graded peer review. Week 0 is complete/incomplete and omitted from the average.
 

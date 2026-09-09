@@ -19,7 +19,7 @@ One comparison or one expected direction, written before you collect new data.
 List the files in your repository that you will reuse (CSV, earlier report, draft page).
 
 ## What you will build by 2 December
-A page that a classmate could open and understand without you in the room.
+A page that a classmate could open and understand without you in the room, and a short in-class presentation of that page on 2 December.
 
 ## Risk
 One thing that could fail (no data, unclear claim, page that does not run).

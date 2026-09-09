@@ -2,7 +2,7 @@
 
 **Weight:** 35% of the course. Individual. Self as participant by default.
 
-The page is the submission. There is no graded presentation and no peer review.
+This is a **project**, not a registrar-scheduled exam. The last class meeting is a short in-class presentation of your page. That talk is one component of the 35%.
 
 ## Deliverables in your repository
 
@@ -10,12 +10,16 @@ The page is the submission. There is no graded presentation and no peer review.
 2. A written prediction dated before new data (the midterm check-in counts).
 3. A result: one figure or table and a sentence that states the claim.
 4. A limitation, including what your *n* can and cannot support.
-5. Data file in `data/` if you collected any.
+5. Data file in `data/` if you collected any, or the line `no new data`.
 6. AI-use disclosure.
+
+## Last class meeting · 2 December
+
+A short presentation of the running page. Everyone presents. It is part of the project score, not a separate exam and not optional extra credit.
 
 ## Allowed tools
 
-Use something already taught: simple or choice RT, the inventory, a two-condition comparison, a short report site built from your existing files, or a browser game that studies a question (zero new libraries, logged trials, the page is the submission). A game is an instrument for a question, not entertainment. No new libraries.
+Use something already taught: simple or choice RT, the inventory, a two-condition comparison, a short report site built from your existing files, or a browser game that studies a question (zero new libraries, logged trials). A game is an instrument for a question, not entertainment.
 
 ## Not required
 
@@ -23,8 +27,8 @@ Classmate data, a pair, a slide deck, or a statistical test beyond descriptives 
 
 ## Graded (35 points)
 
-See [rubrics.html](../rubrics.html). Running page 8, prediction 7, result 8, limitation 7, data 3, disclosure 2.
+See [rubrics.html](../rubrics.html). Running page 7, prediction 6, result 7, limitation 5, presentation 5, data 3, disclosure 2.
 
 ## Not graded
 
-Framework fashion, extra features for their own sake, or how long you speak in class.
+Framework fashion, extra features for their own sake, or how long you speak beyond a clear walk-through of the page.
