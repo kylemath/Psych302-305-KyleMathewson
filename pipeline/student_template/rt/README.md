@@ -3,7 +3,7 @@
 Remix on the class sandbox first:
 https://kylemath.github.io/Psych302-305-KyleMathewson/rt.html
 
-1. Change the knobs (or the drawing), click Run, try Practice.
+1. Personalize the task (look, timing, labels, or procedure — not one number), click Run, try Practice.
 2. Copy sketch.
 3. Paste it into `rt.html` here, replacing the script below the paste comment.
 4. Write a predicted mean in `lab-notes/week02.md`.

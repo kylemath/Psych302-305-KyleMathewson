@@ -5,7 +5,7 @@
 **Tool / example:**
 
 ## Code or file you changed (if any)
-Week 2: what you changed in `rt/rt.html`, and the path. Other weeks: leave blank if you only wrote the note.
+Week 2: how you personalized or modified `rt/rt.html`, and the path. Other weeks: leave blank if you only wrote the note.
 
 ## Phenomenon
 What did we measure?

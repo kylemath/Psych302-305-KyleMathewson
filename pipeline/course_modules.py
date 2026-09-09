@@ -30,7 +30,7 @@ WEEKLIES = [
         "lab": f"{BOOK}/rt.html",
         "lab_label": "Week 2 reaction time",
         "note_path": "lab-notes/week02.md",
-        "ask": "Path to your modified RT page and what you changed; predicted mean; then n, mean RT, SD, and one limitation. CSV in data/. Run the block on your copy.",
+        "ask": "Path to your modified RT page and how you personalized the task; predicted mean; then n, mean RT, SD, and one limitation. CSV in data/. Run the block on your copy.",
         "module": "Week 2 · Sketch and reaction time (9 Sep)",
         "preamble": "First hour: <a href=\"https://kylemath.github.io/Psych302-305-KyleMathewson/p5.html\">p5.html</a> (pixels, refresh, variables, stimulus, input, one timed click). Then personalize a copy of the reaction-time page and collect a block.",
     },
