@@ -17,6 +17,8 @@ python studio_pipeline.py repos-mint --apply   # create private repos + add coll
 python studio_pipeline.py repos-sync           # dry-run: missing template files on existing repos
 python studio_pipeline.py repos-sync --apply   # add missing files only; never overwrite or force-push
 python studio_pipeline.py modules-create       # Canvas modules + weekly assignment bodies
+python studio_pipeline.py assignments-update   # rewrite weekly bodies only; no student email
+python studio_pipeline.py assignments-update --notify-week 2   # same, email only Week 2
 ```
 
 `week0-pull` writes `out/week0_roster.json`: Canvas user ↔ GitHub username, Education status, repo consent.

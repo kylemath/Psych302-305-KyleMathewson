@@ -3,9 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Week 2 · Reaction time · PSYCH 302 / 305</title>
-    <link rel="stylesheet" href="studio.css" />
+    <title>My reaction-time task · PSYCH 302 / 305</title>
     <style>
+      :root { --ink: #f3efe6; --muted: #b7b1a4; --panel-border: rgba(232, 228, 219, 0.12); }
+      body { margin: 24px; background: #0b0f14; color: var(--ink); font-family: Georgia, serif; }
+      h1 { font-size: 1.6rem; }
+      .muted { color: var(--muted); }
+      button { font-family: "Segoe UI", sans-serif; margin-right: 6px; padding: 8px 12px; }
+      a { color: #e8b86d; }
+      .panel { border: 1px solid rgba(232, 228, 219, 0.12); border-radius: 14px; padding: 16px; }
+      .kicker { font-family: "Segoe UI", sans-serif; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .equation { margin: 12px 0; font-size: 1.2rem; }
+      .equation small { display: block; color: var(--muted); font-size: 0.85rem; }
+      .stat { font-size: 2rem; margin: 8px 0; }
+      .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      button.primary { background: #e8b86d; border: 0; color: #1a1408; }
+      button.secondary { background: transparent; border: 1px solid rgba(232, 228, 219, 0.24); color: var(--ink); }
       .lab-grid {
         display: grid;
         grid-template-columns: 0.9fr 1.3fr;
@@ -64,34 +77,15 @@
   </head>
   <body>
     <div class="wrap">
-      <nav class="topnav">
-        <a class="brand" href="index.html">
-          <small>Week 2 · PSYCH 302 / 305</small>
-          <strong>Reaction time</strong>
-        </a>
-        <div class="nav-links">
-          <a href="index.html">Overview</a>
-          <a href="schedule.html">Schedule</a>
-          <a href="workflow.html">Computing</a>
-          <a href="playground.html">Week 1</a>
-          <a href="labs.html">Labs</a>
-        </div>
-      </nav>
-
-      <header class="panel" style="margin-bottom: 18px">
-        <div class="kicker">Week 2 laboratory · after the p5 studio</div>
+      <header style="margin-bottom: 18px">
+        <p class="muted">Your copy · edit this file, then run a scored block on <em>this</em> page.</p>
         <h1>Collect a timed response</h1>
-        <p class="lede">
-          If you have not walked
-          <a href="p5.html">p5.html</a>
-          yet, start there. This page is the <em>class</em> instrument: a
-          fixation, a random delay, twenty trials, and a CSV. Your assignment
-          is to copy it into the private repo (<code>rt/rt.html</code>), change
-          at least one visible thing, write a predicted mean, then run a scored
-          block on <em>your</em> copy. Press space (or click) when the square
-          appears. In the choice block, gold is F and blue is J. Export the CSV
-          into <code>data/</code>. How to submit:
-          <a href="workflow.html#submit">workflow.html § How you submit</a>.
+        <p class="muted">
+          Change at least one visible thing before you collect data: the mark
+          colour or size, the keys, the delay range, the trial count, or a
+          label. Write a predicted mean first. Export the CSV into
+          <code>../data/</code>. Class instrument:
+          <a href="https://kylemath.github.io/Psych302-305-KyleMathewson/rt.html">rt.html</a>.
         </p>
       </header>
 

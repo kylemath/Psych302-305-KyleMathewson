@@ -30,9 +30,9 @@ WEEKLIES = [
         "lab": f"{BOOK}/rt.html",
         "lab_label": "Week 2 reaction time",
         "note_path": "lab-notes/week02.md",
-        "ask": "Your predicted mean, then n, mean RT, SD, and one limitation. CSV in data/. First hour is the p5 studio; the report is still the RT block.",
+        "ask": "Path to your modified RT page and what you changed; predicted mean; then n, mean RT, SD, and one limitation. CSV in data/. Run the block on your copy.",
         "module": "Week 2 · Sketch and reaction time (9 Sep)",
-        "preamble": "First hour: <a href=\"https://kylemath.github.io/Psych302-305-KyleMathewson/p5.html\">p5.html</a> (pixels, refresh, variables, stimulus, input, one timed click). Then the real instrument on the laboratory page.",
+        "preamble": "First hour: <a href=\"https://kylemath.github.io/Psych302-305-KyleMathewson/p5.html\">p5.html</a> (pixels, refresh, variables, stimulus, input, one timed click). Then personalize a copy of the reaction-time page and collect a block.",
     },
     {
         "n": 3,
@@ -45,6 +45,7 @@ WEEKLIES = [
         "note_path": "lab-notes/week03.md",
         "ask": "One subscale mean, item count, and one limitation of self-report. CSV in data/.",
         "module": "Week 3 · Inventory (16 Sep)",
+        "preamble": "Run the teaching inventory on the laboratory page, export the CSV, and report one subscale.",
     },
     {
         "n": 4,
@@ -57,6 +58,7 @@ WEEKLIES = [
         "note_path": "lab-notes/week04.md",
         "ask": "Paths to REPORT.md, summarize.py, the generated snippet, and main.tex. Name one change after the first build. Due 29 September (no class 30 September).",
         "module": "Week 4 · Research reports (23 Sep)",
+        "preamble": "Build the report from your own CSV. Do not type a mean by hand. No class 30 September.",
     },
     {
         "n": 5,
@@ -69,6 +71,7 @@ WEEKLIES = [
         "note_path": "lab-notes/week05.md",
         "ask": "The comparison you wrote before looking, two means, two ns, and whether the data agreed.",
         "module": "Week 5 · Comparison (7 Oct)",
+        "preamble": "Write the comparison <em>before</em> you look at the two means.",
     },
     {
         "n": 6,
@@ -81,6 +84,7 @@ WEEKLIES = [
         "note_path": "lab-notes/week06.md",
         "ask": "Complete reference, path or URL in papers/, and the question / method / one limit.",
         "module": "Week 6 · Citation (14 Oct)",
+        "preamble": "Find, cite, and file one paper. Put the PDF or a stable URL under <code>papers/</code>.",
     },
     {
         "n": 7,
@@ -93,6 +97,7 @@ WEEKLIES = [
         "note_path": "lab-notes/week07.md",
         "ask": "Path to your Methods file. Timing, keys, and exclusion rules in numbers.",
         "module": "Week 7 · Methods (21 Oct)",
+        "preamble": "Document a procedure you already ran so a stranger could repeat it.",
     },
     {
         "n": 8,
@@ -105,6 +110,7 @@ WEEKLIES = [
         "note_path": "lab-notes/week08.md",
         "ask": "Path to the results page and the claim. The 15% check-in is a separate assignment.",
         "module": "Week 8 · Results and check-in (28 Oct)",
+        "preamble": "One claim and one figure or table on a results page. The midterm check-in is a separate Canvas box.",
     },
     {
         "n": 9,
@@ -117,6 +123,7 @@ WEEKLIES = [
         "note_path": "lab-notes/week09.md",
         "ask": "Your question of interest, the game as the instrument, what was logged (including the Science extra variable). Last weekly report.",
         "module": "Week 9 · Gamified research (4 Nov)",
+        "preamble": "A browser game that studies a question. Last weekly report.",
     },
 ]
 
@@ -128,6 +135,56 @@ LEFTOVER_UNPUBLISH = {
     "Week 4 · Descriptives (23 Sep)",
     "Week 9 · Small n (4 Nov)",
 }
+
+
+def weekly_description(read_template, row: dict) -> str:
+    if row["n"] == 1:
+        tpl = read_template("week1_report.html")
+    elif row["n"] == 2:
+        tpl = read_template("week2_report.html")
+    else:
+        tpl = read_template("weekly_report.html")
+    return fill(tpl, **{k: str(row[k]) for k in row})
+
+
+def update_weekly_bodies(client, notify, read_template, *, notify_weeks: set[int]) -> list[dict]:
+    """Rewrite weekly (and check-in) descriptions. Notify only listed week numbers."""
+    cid = client.require_course()
+    updated = []
+    for row in WEEKLIES:
+        existing = client.find_assignment_by_name(row["name"])
+        if not existing:
+            print(f"missing assignment: {row['name']}")
+            continue
+        payload = {
+            "assignment": {
+                "description": weekly_description(read_template, row),
+                "notify_of_update": row["n"] in notify_weeks,
+            }
+        }
+        asg = notify("PUT", f"/courses/{cid}/assignments/{existing['id']}", json=payload)
+        updated.append({"n": row["n"], "id": existing["id"], "notified": row["n"] in notify_weeks})
+        print(f"week {row['n']:02d}  {existing['id']}  notify={row['n'] in notify_weeks}")
+    checkin = client.find_assignment_by_name("Midterm check-in")
+    if checkin:
+        notify(
+            "PUT",
+            f"/courses/{cid}/assignments/{checkin['id']}",
+            json={"assignment": {"description": read_template("checkin.html"), "notify_of_update": False}},
+        )
+        print(f"check-in  {checkin['id']}  notify=False")
+    notify(
+        "PUT",
+        f"/courses/{cid}/pages/introduction",
+        json={"wiki_page": {"title": "Introduction", "body": read_template("introduction.html"), "published": True, "front_page": True}},
+    )
+    notify(
+        "PUT",
+        f"/courses/{cid}/pages/schedule",
+        json={"wiki_page": {"title": "Schedule", "body": read_template("schedule_page.html"), "published": True}},
+    )
+    print("pages    introduction, schedule")
+    return updated
 
 
 def fill(template: str, **kwargs: str) -> str:
@@ -152,7 +209,7 @@ def ensure_group(notify, cid: str, groups: list[dict], name: str, weight: float,
     return notify("POST", f"/courses/{cid}/assignment_groups", json=body)
 
 
-def ensure_assignment(notify, client, cid: str, *, name: str, description: str, due_at: str, points: float, group_id: int) -> dict:
+def ensure_assignment(notify, client, cid: str, *, name: str, description: str, due_at: str, points: float, group_id: int, notify_students: bool = True) -> dict:
     existing = client.find_assignment_by_name(name)
     payload = {
         "assignment": {
@@ -166,7 +223,7 @@ def ensure_assignment(notify, client, cid: str, *, name: str, description: str, 
             "due_at": due_at,
             "assignment_group_id": group_id,
             "omit_from_final_grade": False,
-            "notify_of_update": True,
+            "notify_of_update": notify_students,
         }
     }
     if existing:
@@ -270,19 +327,17 @@ def run(client, notify, read_template, save_ids) -> dict:
     )
 
     weekly_ids = {}
-    weekly_tpl = read_template("weekly_report.html")
-    week1_tpl = read_template("week1_report.html")
     for row in WEEKLIES:
-        tpl = week1_tpl if row["n"] == 1 else weekly_tpl
         asg = ensure_assignment(
             notify,
             client,
             cid,
             name=row["name"],
-            description=fill(tpl, **{k: str(row[k]) for k in row}),
+            description=weekly_description(read_template, row),
             due_at=row["due"],
             points=10,
             group_id=g_week["id"],
+            notify_students=False,
         )
         weekly_ids[f"week{row['n']:02d}"] = {"id": asg["id"], "url": asg.get("html_url")}
 

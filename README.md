@@ -14,7 +14,7 @@ Week 0 (GitHub username): https://canvas.ualberta.ca/courses/35483/assignments/8
 | --- | --- | --- | --- | --- |
 | 0 | 2 Sep (first hour) | GitHub account | Canvas form | [week0.html](week0.html) |
 | 1 | 2 Sep (then) | Own repo, Pages, fork, PR | Make a page about you in three ways | [playground.html](playground.html) |
-| 2 | 9 Sep | p5.js pieces, then timed response + CSV | Simple / choice RT | [p5.html](p5.html), [rt.html](rt.html) |
+| 2 | 9 Sep | p5.js pieces, then personalize RT + CSV | Edit `rt/rt.html`, prediction, outcomes | [p5.html](p5.html), [rt.html](rt.html), [how you submit](workflow.html#submit) |
 | 3 | 16 Sep | Form and score | Short inventory | [inventory.html](inventory.html) |
 | 4 | 23 Sep | Markdown, Python, LaTeX loop | Report from your own CSV | [report.html](report.html) |
 | 5 | 7 Oct | Two-condition comparison | Simple vs choice, or two subscales | [compare.html](compare.html) |

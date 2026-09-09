@@ -24,33 +24,64 @@
 
       <header class="panel">
         <div class="kicker">Software</div>
-        <h1>Repository, Codespace, and AI disclosure</h1>
+        <h1>Repository, Codespace, and how you submit</h1>
         <p class="lede">
+          The private repo
+          <code>kylemath/psych302-305-USERNAME</code>
+          is where the work lives. Canvas is where you hand it in: each week
+          you paste paths (and the asked lines) on that week’s text-entry
+          assignment, then click Submit. A push that is not pasted is not
+          submitted. A file that exists only on your laptop is not submitted.
           If Week 0 is still incomplete, submit
           <a href="https://canvas.ualberta.ca/courses/35483/assignments/812211">the GitHub form</a>
-          and accept the private-repo invite. Week 1 (due Tuesday 8 September,
-          17:00) requires all four: a repository you create, GitHub Pages on
-          that repo, a fork of the <em>whole</em> class handbook
-          (<a href="https://github.com/kylemath/Psych302-305-KyleMathewson">kylemath/Psych302-305-KyleMathewson</a>)
-          with your page as that fork’s <code>index.html</code>, and a pull
-          request from the fork back to the class repo. Paste those four links
-          on Canvas — a live page is not the submission. Do not fork only your
-          new repo. Two Week 1 pages stay on the class homepage (scroll past
-          the handbook).
+          and accept the invite. Week 1 was the public homepage lab
+          (<a href="playground.html">playground.html</a>).
+          From Week 2 on, use the private repo and the loop below.
         </p>
       </header>
+
+      <section class="panel" id="submit" style="margin-top: 16px">
+        <div class="kicker">Weeks 2–9 · every Tuesday 17:00</div>
+        <h2>How you submit</h2>
+        <p class="muted">
+          GitHub holds the files. Canvas records the hand-in. The path you
+          paste must open after you push. Point-by-point marking:
+          <a href="rubrics.html">rubrics.html</a>.
+        </p>
+        <ol>
+          <li>Open your private course repo
+            <code>kylemath/psych302-305-USERNAME</code>
+            (Codespace, or press period on the GitHub page for github.dev).</li>
+          <li>Copy
+            <a href="lab-notes/TEMPLATE.md">lab-notes/TEMPLATE.md</a>
+            to <code>lab-notes/weekNN.md</code> for that week (Week 2 is
+            <code>week02.md</code>).</li>
+          <li>Do the week’s work in that repo. Data CSVs go in
+            <code>data/</code>. Week 2 also needs your edited
+            <code>rt/rt.html</code>.</li>
+          <li>Commit and <strong>push</strong>.</li>
+          <li>Open that week’s Canvas text-entry assignment (Week 2:
+            <a href="https://canvas.ualberta.ca/courses/35483/assignments/812444">assignment 812444</a>).</li>
+          <li>Paste the paths and the asked lines. Click <strong>Submit</strong>.</li>
+        </ol>
+        <p class="muted">
+          Tonight: <a href="p5.html">p5.html</a> is the lesson.
+          <a href="rt.html">rt.html</a> is the class instrument. Copy it into
+          your repo, change something visible, run a scored block on
+          <em>your</em> page, then submit prediction, outcomes, and the code.
+        </p>
+      </section>
 
       <section class="grid-3" style="margin-top: 16px">
         <article class="card">
           <div class="chip gold">Repository</div>
           <h3>One folder for the term</h3>
           <p>
-            Week 1: (1) new repo with <code>index.html</code>, (2) GitHub Pages
-            on that repo, (3) fork the entire class repo and replace only
-            <code>index.html</code>, (4) open a pull request back to the class
-            repo. Later weeks: reports in
+            Week 1 used a public repo, Pages, a handbook fork, and a pull
+            request. Weeks 2–9 use the private course repo: notes in
             <code>lab-notes/</code>, data in <code>data/</code>, generated
-            papers in <code>report/</code>.
+            papers in <code>report/</code>. Week 2 also uses
+            <code>rt/</code>.
           </p>
         </article>
         <article class="card">
@@ -129,10 +160,9 @@
           <div class="kicker">Git used in this course</div>
           <h2>Commit, push, and pull</h2>
           <p class="muted">
-            Week 1 is the first test: create a repo, turn on Pages, fork the
-            whole class repository, make your page its default
-            <code>index.html</code>, then open a pull request. Two of those
-            pages stay on the class homepage.
+            Week 1 was the first test: public repo, Pages, fork, pull request.
+            Two of those pages stay on the class homepage. From Week 2, commit
+            and push the private repo, then paste on Canvas.
             Commit history is not graded.
           </p>
         </article>
@@ -151,6 +181,8 @@
       <p class="footer">
         Account setup is the Canvas assignment
         <a href="https://canvas.ualberta.ca/courses/35483/assignments/812211">Week 0 · GitHub username</a>.
+        Weekly hand-in:
+        <a href="#submit">How you submit</a>.
       </p>
     </div>
   </body>

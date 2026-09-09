@@ -648,6 +648,32 @@ def cmd_modules_create(_: argparse.Namespace) -> None:
     run(client, lambda method, path, **kw: _notify_request(client, method, path, **kw), _read, _save_ids)
 
 
+def cmd_assignments_update(args: argparse.Namespace) -> None:
+    """Rewrite weekly assignment bodies. Does not recreate modules. Notifies only --notify-week."""
+    from course_modules import update_weekly_bodies
+
+    notify_weeks = set(args.notify_week or [])
+    client = _client()
+    update_weekly_bodies(
+        client,
+        lambda method, path, **kw: _notify_request(client, method, path, **kw),
+        _read,
+        notify_weeks=notify_weeks,
+    )
+    if 2 in notify_weeks:
+        cid = client.require_course()
+        ids = json.loads(IDS_PATH.read_text()) if IDS_PATH.exists() else {}
+        aid = ids.get("week2_tonight_announcement_id")
+        if aid:
+            _notify_request(
+                client,
+                "PUT",
+                f"/courses/{cid}/discussion_topics/{aid}",
+                json={"message": _read("week2_tonight_announcement.html")},
+            )
+            print(f"announcement  {aid}  week2 tonight (message only)")
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description="PSYCH 302/305 Canvas studio pipeline")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -669,6 +695,15 @@ def main() -> None:
     s.add_argument("--apply", action="store_true", help="Add missing template files; never overwrite or force-push")
     s.set_defaults(func=cmd_repos_sync)
     sub.add_parser("modules-create").set_defaults(func=cmd_modules_create)
+    u = sub.add_parser("assignments-update")
+    u.add_argument(
+        "--notify-week",
+        type=int,
+        action="append",
+        default=[],
+        help="Week number whose assignment update emails students (repeatable). Default: none.",
+    )
+    u.set_defaults(func=cmd_assignments_update)
     args = p.parse_args()
     args.func(args)
 

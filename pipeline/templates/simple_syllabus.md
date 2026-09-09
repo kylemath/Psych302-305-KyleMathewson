@@ -146,7 +146,7 @@ There is no extra credit and no rounding announced in advance.
 | Week | Date       | Laboratory                                           | What is due                                            |
 | ---- | ---------- | ---------------------------------------------------- | ------------------------------------------------------ |
 | 0–1  | Wed 2 Sep  | GitHub account, then a page about you                | Week 0 form that night; Week 1 report Tue 8 Sep, 17:00 |
-| 2    | Wed 9 Sep  | p5.js pieces, then reaction time + CSV               | Week 2 report Tue 15 Sep                               |
+| 2    | Wed 9 Sep  | p5.js pieces, then personalize RT page + CSV         | Week 2 report Tue 15 Sep                               |
 | 3    | Wed 16 Sep | Short inventory                                      | Week 3 report Tue 22 Sep                               |
 | 4    | Wed 23 Sep | Markdown / Python / LaTeX report loop                | Week 4 report Tue 29 Sep                               |
 | —    | Wed 30 Sep | No class (National Day for Truth and Reconciliation) | —                                                      |
