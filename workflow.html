@@ -41,34 +41,67 @@
       </header>
 
       <section class="panel" id="submit" style="margin-top: 16px">
-        <div class="kicker">Weeks 2–9 · every Tuesday 17:00</div>
-        <h2>How you submit</h2>
+        <div class="kicker">Week 2 tonight · Codespace</div>
+        <h2>How you work this week</h2>
         <p class="muted">
-          GitHub holds the files. Canvas records the hand-in. The path you
-          paste must open after you push. Point-by-point marking:
-          <a href="rubrics.html">rubrics.html</a>.
+          Yes: you edit the note, change the task, and run your own HTML page
+          <em>inside the Codespace</em>. github.dev (press period) can edit
+          files but cannot run the page. Use a Codespace for the block.
+          Everyone does the same assignment.
         </p>
         <ol>
-          <li>Open your private course repo
-            <code>kylemath/psych302-305-USERNAME</code>
-            (Codespace, or press period on the GitHub page for github.dev).</li>
-          <li>Copy
-            <a href="lab-notes/TEMPLATE.md">lab-notes/TEMPLATE.md</a>
-            to <code>lab-notes/weekNN.md</code> for that week (Week 2 is
-            <code>week02.md</code>).</li>
-          <li>Do the week’s work in that repo. Data CSVs go in
-            <code>data/</code>. Week 2 also needs your edited
-            <code>rt/rt.html</code>.</li>
-          <li>Commit and <strong>push</strong>.</li>
-          <li>Open that week’s Canvas text-entry assignment (Week 2:
-            <a href="https://canvas.ualberta.ca/courses/35483/assignments/812444">assignment 812444</a>).</li>
-          <li>Paste the paths and the asked lines. Click <strong>Submit</strong>.</li>
+          <li><strong>Open the private repo.</strong> On GitHub, go to
+            <code>kylemath/psych302-305-YOURUSERNAME</code>
+            (accept the invite first if you have not). This is not your Week 1
+            public homepage repo.</li>
+          <li><strong>Start a Codespace.</strong> Green <strong>Code</strong>
+            button → <strong>Codespaces</strong> → Create codespace on
+            <code>main</code> (2-core is enough). Wait until the file tree
+            appears on the left.</li>
+          <li><strong>Make the note.</strong> In the terminal at the bottom
+            (Terminal → New Terminal if it is hidden), run
+            <code>cp lab-notes/TEMPLATE.md lab-notes/week02.md</code>.
+            Open <code>lab-notes/week02.md</code> and write your predicted
+            mean <em>now</em>, before any scored trial.</li>
+          <li><strong>Personalize the task.</strong> Open
+            <code>rt/rt.html</code>. Change at least one visible thing: the
+            mark colour or size, a label, the keys, the delay range, or the
+            trial count. Save the file.</li>
+          <li><strong>Serve the folder.</strong> In the same terminal:
+            <code>python3 -m http.server 8765 --bind 0.0.0.0</code>.
+            When GitHub asks about port 8765, choose
+            <strong>Open in Browser</strong>. If you missed the popup: the
+            <strong>Ports</strong> tab (next to Terminal) → 8765 → the globe.
+            That tab is a real browser, which you need for Space and clicks.</li>
+          <li><strong>Run your page, not the class page.</strong> In that
+            browser tab, add <code>/rt/rt.html</code> to the end of the URL
+            if you are not already there. Click the display, start
+            <strong>Simple RT (20 trials)</strong>, then
+            <strong>Export CSV</strong>.</li>
+          <li><strong>Put the CSV in the repo.</strong> Export saves to your
+            laptop’s Downloads folder. Drag that file into the Codespace
+            <code>data/</code> folder (or right-click <code>data/</code> →
+            Upload). Rename it if you like, e.g. <code>data/week02.csv</code>.</li>
+          <li><strong>Finish the note.</strong> Add what you changed in the
+            code, then n, mean RT, SD, and one limitation from the export.</li>
+          <li><strong>Commit and push.</strong> Left sidebar Source Control
+            (branch icon) → message such as <code>week 2 rt</code> →
+            <strong>Commit</strong>, then <strong>Sync</strong> / Push. Leave
+            the server running until you have the CSV; you can stop it with
+            Control-C in the terminal.</li>
+          <li><strong>Hand in on Canvas.</strong> Open
+            <a href="https://canvas.ualberta.ca/courses/35483/assignments/812444">Week 2 · Laboratory report</a>,
+            paste the five asked lines, click <strong>Submit</strong>. A push
+            that is not pasted is not submitted.</li>
         </ol>
         <p class="muted">
-          Tonight: <a href="p5.html">p5.html</a> is the lesson.
-          <a href="rt.html">rt.html</a> is the class instrument. Copy it into
-          your repo, change something visible, run a scored block on
-          <em>your</em> page, then submit prediction, outcomes, and the code.
+          First hour is still the class
+          <a href="p5.html">p5.html</a>
+          studio (lesson only). The class
+          <a href="rt.html">rt.html</a>
+          is the demo instrument. Your grade is the copy in
+          <code>rt/rt.html</code>. Rubric:
+          <a href="rubrics.html">rubrics.html</a>.
         </p>
       </section>
 
@@ -88,9 +121,10 @@
           <div class="chip">Codespace</div>
           <h3>Editor in the browser</h3>
           <p>
-            On your repository: Code → Codespaces → Create. Use the Simple
-            Browser or port 8765 to open the laboratory page. Prefer a 2-core
-            machine. No software need be installed on your laptop.
+            Code → Codespaces → Create (2-core). A Codespace is a full editor
+            plus a small web server, so you can open <em>your</em>
+            <code>rt/rt.html</code> in a browser tab. github.dev cannot run
+            that page. No software need be installed on your laptop.
           </p>
         </article>
         <article class="card">
@@ -111,9 +145,9 @@
         <h2>Alternatives (in order)</h2>
         <ol>
           <li><strong>Codespace</strong> — preferred.</li>
-          <li><strong>github.dev</strong> — press period (.) on the repository page, or replace <code>github.com</code> with <code>github.dev</code>.</li>
+          <li><strong>github.dev</strong> — press period (.) to edit files only. It cannot run <code>rt/rt.html</code>. Come back to a Codespace for the block.</li>
           <li><strong>ZIP download</strong> — edit locally; push later with assistance if needed.</li>
-          <li><strong>Open the HTML file</strong> — use this handbook in a browser; complete the report by Tuesday.</li>
+          <li><strong>Open the HTML file on your laptop</strong> — last resort if Codespaces is down; still push the edited file and CSV into the private repo before Canvas.</li>
         </ol>
       </section>
 

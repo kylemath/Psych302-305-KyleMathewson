@@ -8,6 +8,7 @@
       "onAutoForward": "notify"
     }
   },
+  "postStartCommand": "python3 -m http.server 8765 --bind 0.0.0.0",
   "customizations": {
     "vscode": {
       "extensions": ["github.copilot", "github.copilot-chat"]
