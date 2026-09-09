@@ -82,7 +82,7 @@
         </p>
         <div class="equation">
           display → memory → input → time
-          <small>p5.js is the on-ramp. The graded block is still the reaction-time page.</small>
+          <small>p5.js is the introduction. The graded block is still the reaction-time page.</small>
         </div>
         <div class="step-row" id="stepRow" role="tablist" aria-label="Studio steps"></div>
       </header>
@@ -143,7 +143,7 @@
       <section class="grid-2" style="margin-bottom: 16px">
         <article class="panel">
           <div class="kicker">Words for tonight</div>
-          <h2>Lingo we will keep using</h2>
+          <h2>Terms we will keep using</h2>
           <ul class="muted">
             <li><strong>String</strong> — text in quotes. A label on the canvas is a string.</li>
             <li><strong>Variable</strong> — a named slot in memory (<code>let rt = 0</code>).</li>
@@ -155,14 +155,14 @@
           </ul>
         </article>
         <article class="panel">
-          <div class="kicker">Class night</div>
+          <div class="kicker">Tonight</div>
           <h2>Agenda</h2>
           <div class="agenda">
             <dl>
               <dt>18:00 Introduction</dt>
               <dd>A program is input, memory, and a display. We will name the parts before we measure.</dd>
               <dt>18:10 Studio</dt>
-              <dd>Six sketches: pixels, refresh, variables, stimulus, buttons, one timed click.</dd>
+              <dd>Six sketches: pixels, refresh, variables, a stimulus, buttons, and one timed click.</dd>
               <dt>19:15 Break</dt>
               <dd>Predicted mean for the real block, written before the first trial.</dd>
             </dl>
@@ -172,7 +172,7 @@
               <dt>20:05 Modification</dt>
               <dd><strong>Arts:</strong> the mark. <strong>Science:</strong> choice RT and the two means.</dd>
               <dt>Report</dt>
-              <dd>Still the RT report: prediction, n, mean, SD, one limit, CSV in <code>data/</code>.</dd>
+              <dd>Still the RT report: prediction, n, mean, SD, one limit, and the CSV in <code>data/</code>.</dd>
             </dl>
           </div>
         </article>
@@ -218,7 +218,7 @@
           title: "Refresh rate",
           kicker: "Step 2 · the draw loop",
           label: "The display is redrawn many times a second",
-          prose: "draw() runs over and over. frameRate(30) is a slower movie than frameRate(60). The moving square is not one object sliding; it is a new rectangle each frame. That is why a late frame can add a few milliseconds to a measured time.",
+          prose: "draw() runs repeatedly. frameRate(30) is a slower movie than frameRate(60). The moving square is not one object sliding; it is a new rectangle each frame. That is why a late frame can add a few milliseconds to a measured time.",
           source: `function setup() {
   createCanvas(640, 300);
   frameRate(60);
@@ -347,7 +347,7 @@ function draw() {
           title: "Buttons and keys",
           kicker: "Step 5 · input",
           label: "A click or a space bar is input",
-          prose: "Click Start, then press space (or click the canvas) when you like. The program reads input and writes a string back to the display. A GUI is just input and output with labels. The real lab also uses F and J for choice RT.",
+          prose: "Click Start, then press space (or click the canvas) when you like. The program reads input and writes a string back to the display. A GUI is input and output with labels. The real lab also uses F and J for choice RT.",
           source: `let started = false;
 let message = "Click Start";
 
