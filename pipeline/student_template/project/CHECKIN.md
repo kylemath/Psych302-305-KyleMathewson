@@ -1,6 +1,8 @@
 # Midterm check-in · due Wednesday 28 October 2026, in class
 
 **Weight:** 15% of the course. Individual. Graded by the instructor.
+**Points:** question 4, taught tool 3, prediction 4, existing files 2, scope and risk 2.
+See the handbook rubrics page.
 
 **Name:**
 

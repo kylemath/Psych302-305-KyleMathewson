@@ -183,6 +183,85 @@ def cmd_week0_pull(_: argparse.Namespace) -> None:
     print(f"wrote {dest}  {len(submitted)}/{len(rows)} with a username")
 
 
+URL_RE = re.compile(r"https?://[^\s<>\"']+")
+
+
+def _plain_text(body: str) -> str:
+    text = re.sub(r"<[^>]+>", "\n", body or "")
+    text = text.replace("&nbsp;", " ").replace("&amp;", "&")
+    return re.sub(r"\n+", "\n", text).strip()
+
+
+def parse_week1_body(body: str) -> dict:
+    """Pull the four GitHub links plus leftover text from a Week 1 Canvas box."""
+    raw = body or ""
+    text = _plain_text(raw)
+    urls = []
+    seen = set()
+    for match in URL_RE.findall(raw) + URL_RE.findall(text):
+        url = match.rstrip(").,;\"'")
+        if url not in seen:
+            seen.add(url)
+            urls.append(url)
+    pages, prs, forks, repos, other = [], [], [], [], []
+    for url in urls:
+        low = url.lower()
+        if ".github.io" in low:
+            pages.append(url)
+        elif "/pull/" in low:
+            prs.append(url)
+        elif "psych302-305-kylemathewson" in low:
+            forks.append(url)
+        elif "github.com" in low:
+            repos.append(url)
+        else:
+            other.append(url)
+    return {
+        "urls": urls,
+        "own_repo_urls": repos,
+        "pages_urls": pages,
+        "fork_urls": forks,
+        "pr_urls": prs,
+        "other_urls": other,
+        "text": text[:4000],
+        "has_disclosure": bool(re.search(r"copilot|no copilot|ai disclosure|used tonight", text, re.I)),
+    }
+
+
+def cmd_week1_pull(_: argparse.Namespace) -> None:
+    """Harvest Week 1 Canvas boxes. Writes out/week1_roster.json. Does not grade."""
+    client = _client()
+    ids = json.loads(IDS_PATH.read_text()) if IDS_PATH.exists() else {}
+    weekly = ids.get("weekly_assignments") or {}
+    aid = (weekly.get("week01") or {}).get("id")
+    if not aid:
+        raise SystemExit("No Week 1 assignment id in out/ids.json. Run modules-create first.")
+    rows = []
+    for sub in client.list_submissions(aid):
+        user = sub.get("user") or {}
+        parsed = parse_week1_body(sub.get("body") or "")
+        rows.append(
+            {
+                "canvasUserId": sub.get("user_id"),
+                "canvasName": user.get("name"),
+                "sortableName": user.get("sortable_name"),
+                "sisUserId": user.get("sis_user_id"),
+                "workflow": sub.get("workflow_state"),
+                "submitted_at": sub.get("submitted_at"),
+                "grade": sub.get("grade"),
+                "score": sub.get("score"),
+                **parsed,
+            }
+        )
+    OUT.mkdir(exist_ok=True)
+    dest = OUT / "week1_roster.json"
+    dest.write_text(json.dumps(rows, indent=2) + "\n")
+    submitted = [r for r in rows if r.get("submitted_at")]
+    with_pages = [r for r in submitted if r.get("pages_urls")]
+    with_pr = [r for r in submitted if r.get("pr_urls")]
+    print(f"wrote {dest}  {len(submitted)} submitted / {len(rows)} rows  pages={len(with_pages)} prs={len(with_pr)}")
+
+
 def cmd_week0_grade(args: argparse.Namespace) -> None:
     """POST complete/incomplete only. Username present and non-empty → complete."""
     roster_path = OUT / "week0_roster.json"
@@ -577,6 +656,7 @@ def main() -> None:
     c.add_argument("--replace", action="store_true")
     c.set_defaults(func=cmd_week0_create)
     sub.add_parser("week0-pull").set_defaults(func=cmd_week0_pull)
+    sub.add_parser("week1-pull").set_defaults(func=cmd_week1_pull)
     g = sub.add_parser("week0-grade")
     g.add_argument("--dry-run", action="store_true", help="Print complete/incomplete; do not PUT")
     g.set_defaults(func=cmd_week0_grade)
