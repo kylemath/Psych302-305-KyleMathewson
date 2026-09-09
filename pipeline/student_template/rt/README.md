@@ -1,13 +1,12 @@
 # Week 2 · your reaction-time page
 
-Edit this copy. Run it from the Codespace, not only the class handbook page.
+Remix on the class sandbox first:
+https://kylemath.github.io/Psych302-305-KyleMathewson/rt.html
 
-1. Copy `lab-notes/TEMPLATE.md` to `lab-notes/week02.md` and write a predicted mean first.
-2. Change at least one visible thing in `rt.html` (mark colour or size, keys, delay, trial count, or a label).
-3. In the Codespace terminal: `python3 -m http.server 8765 --bind 0.0.0.0`
-4. Ports → 8765 → Open in Browser, then go to `/rt/rt.html`.
-5. Run Simple RT (20 trials). Export CSV (it downloads to your laptop).
-6. Drag the CSV into `data/`.
-7. Commit, push, paste paths on the Week 2 Canvas assignment.
+1. Change the knobs (or the drawing), click Run, try Practice.
+2. Copy sketch.
+3. Paste it into `rt.html` here, replacing the script below the paste comment.
+4. Write a predicted mean in `lab-notes/week02.md`.
+5. Serve the repo (`python3 -m http.server 8765 --bind 0.0.0.0`), open `/rt/rt.html`, run Start, export the CSV into `data/`.
 
 Walkthrough: https://kylemath.github.io/Psych302-305-KyleMathewson/workflow.html#submit

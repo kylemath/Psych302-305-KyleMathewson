@@ -16,6 +16,8 @@ python studio_pipeline.py repos-mint           # dry-run plan (default)
 python studio_pipeline.py repos-mint --apply   # create private repos + add collaborators
 python studio_pipeline.py repos-sync           # dry-run: missing template files on existing repos
 python studio_pipeline.py repos-sync --apply   # add missing files only; never overwrite or force-push
+python studio_pipeline.py repos-replace --path rt/rt.html --path rt/README.md   # dry-run overwrite
+python studio_pipeline.py repos-replace --path rt/rt.html --path rt/README.md --apply
 python studio_pipeline.py modules-create       # Canvas modules + weekly assignment bodies
 python studio_pipeline.py assignments-update   # rewrite weekly bodies only; no student email
 python studio_pipeline.py assignments-update --notify-week 2   # same, email only Week 2

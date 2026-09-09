@@ -641,6 +641,79 @@ def cmd_repos_sync(args: argparse.Namespace) -> None:
             print(f"error                    {item['canvasName']}\t{item['repo']}\t{err[:400]}")
 
 
+def _replace_template_files(username: str, paths: list[str]) -> dict:
+    """Overwrite listed student_template files in an existing repo. Regular push only."""
+    full = _repo_full_name(username)
+    if not paths:
+        return {"action": "skip-complete", "repo": full, "replaced": []}
+    with tempfile.TemporaryDirectory() as tmp:
+        dest = Path(tmp) / f"psych302-305-{username}"
+        result = _gh("repo", "clone", full, str(dest), "--", "--depth", "1", check=False)
+        if result.returncode != 0:
+            raise RuntimeError(result.stderr or result.stdout)
+        replaced = []
+        for rel in paths:
+            src = STUDENT_TEMPLATE / rel
+            out = dest / rel
+            if not src.is_file():
+                continue
+            out.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, out)
+            replaced.append(rel)
+        if not replaced:
+            return {"action": "skip-complete", "repo": full, "replaced": []}
+        _git_local_identity(dest)
+        subprocess.run(["git", "add", "--", *replaced], cwd=dest, check=True, capture_output=True)
+        staged = subprocess.run(
+            ["git", "diff", "--cached", "--name-only"], cwd=dest, check=True, capture_output=True, text=True
+        )
+        if not staged.stdout.strip():
+            return {"action": "skip-complete", "repo": full, "replaced": []}
+        subprocess.run(
+            ["git", "commit", "-m", "Update Week 2 RT starter from the class template"],
+            cwd=dest,
+            check=True,
+            capture_output=True,
+        )
+        push = subprocess.run(["git", "push", "origin", "HEAD"], cwd=dest, check=False, capture_output=True, text=True)
+        if push.returncode != 0:
+            raise RuntimeError(push.stderr or push.stdout)
+    return {"action": "replaced", "repo": full, "replaced": replaced}
+
+
+def cmd_repos_replace(args: argparse.Namespace) -> None:
+    """Overwrite specific template files on existing repos. Regular push; never force-push."""
+    paths = [p.strip().lstrip("/") for p in (args.paths or []) if p.strip()]
+    if not paths:
+        raise SystemExit("Pass one or more --path values, e.g. --path rt/rt.html")
+    for rel in paths:
+        src = STUDENT_TEMPLATE / rel
+        if not src.is_file():
+            raise SystemExit(f"Not a template file: {rel}")
+    roster_path = OUT / "week0_roster.json"
+    if not roster_path.exists():
+        raise SystemExit("No week0_roster.json. Run week0-pull first.")
+    rows = json.loads(roster_path.read_text())
+    plan = build_mint_plan(rows)
+    targets = [item for item in plan if item["action"] == "skip-exists"]
+    print(f"replace {', '.join(paths)} on {len(targets)} existing repo(s)")
+    if not args.apply:
+        for item in targets:
+            print(f"would-replace            {item['canvasName']}\t{item['repo']}")
+        print("dry-run only. Pass --apply to overwrite those paths.")
+        return
+    for item in targets:
+        try:
+            result = _replace_template_files(item["github_username"], paths)
+            print(
+                f"{result['action']:<24} {item['canvasName']}\t{result['repo']}\t"
+                f"replaced={','.join(result.get('replaced') or []) or '—'}"
+            )
+        except (RuntimeError, subprocess.CalledProcessError) as exc:
+            err = getattr(exc, "stderr", None) or str(exc)
+            print(f"error                    {item['canvasName']}\t{item['repo']}\t{err[:400]}")
+
+
 def cmd_modules_create(_: argparse.Namespace) -> None:
     from course_modules import run
 
@@ -694,6 +767,11 @@ def main() -> None:
     s.add_argument("--dry-run", action="store_true", help="Print the plan only (default if --apply is omitted)")
     s.add_argument("--apply", action="store_true", help="Add missing template files; never overwrite or force-push")
     s.set_defaults(func=cmd_repos_sync)
+    r = sub.add_parser("repos-replace")
+    r.add_argument("--path", dest="paths", action="append", default=[], help="Template-relative file to overwrite")
+    r.add_argument("--dry-run", action="store_true")
+    r.add_argument("--apply", action="store_true")
+    r.set_defaults(func=cmd_repos_replace)
     sub.add_parser("modules-create").set_defaults(func=cmd_modules_create)
     u = sub.add_parser("assignments-update")
     u.add_argument(

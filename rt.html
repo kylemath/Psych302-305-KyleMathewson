@@ -3,62 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Week 2 · Reaction time · PSYCH 302 / 305</title>
+    <title>Week 2 · Reaction time sandbox · PSYCH 302 / 305</title>
     <link rel="stylesheet" href="studio.css" />
     <style>
-      .lab-grid {
-        display: grid;
-        grid-template-columns: 0.9fr 1.3fr;
-        gap: 18px;
-      }
-      .stage {
-        min-height: 320px;
-        border-radius: 16px;
-        background: #07090d;
-        display: grid;
-        place-items: center;
-        position: relative;
-        outline: none;
-      }
-      .stage:focus {
-        box-shadow: 0 0 0 2px rgba(232, 184, 109, 0.45);
-      }
-      .mark {
-        width: 72px;
-        height: 72px;
-        border-radius: 10px;
-        display: none;
-      }
-      .stage.waiting .fix {
-        display: block;
-        color: #b7b1a4;
-        font-size: 2rem;
-      }
-      .fix {
-        display: none;
-      }
-      .hud {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 12px;
-        font-family: "Segoe UI", sans-serif;
-        color: var(--muted);
-        font-size: 0.9rem;
-      }
-      table {
+      textarea {
         width: 100%;
-        border-collapse: collapse;
-        font-family: "Segoe UI", sans-serif;
-        font-size: 0.88rem;
+        min-height: 360px;
+        background: rgba(2, 6, 23, 0.8);
+        border: 1px solid var(--panel-border);
+        color: var(--ink);
+        border-radius: 12px;
+        padding: 12px;
+        resize: vertical;
+        font-family: "Courier New", monospace;
+        font-size: 0.82rem;
+        line-height: 1.45;
       }
-      th, td {
-        text-align: left;
-        padding: 6px 0;
-        border-bottom: 1px solid var(--panel-border);
-      }
-      @media (max-width: 900px) {
-        .lab-grid { grid-template-columns: 1fr; }
+      iframe {
+        display: block;
+        width: 100%;
+        min-height: 460px;
+        border: 0;
+        background: #07090d;
+        border-radius: 14px;
       }
     </style>
   </head>
@@ -73,318 +40,308 @@
           <a href="index.html">Overview</a>
           <a href="schedule.html">Schedule</a>
           <a href="workflow.html">Computing</a>
-          <a href="playground.html">Week 1</a>
+          <a href="p5.html">Week 2</a>
           <a href="labs.html">Labs</a>
         </div>
       </nav>
 
       <header class="panel" style="margin-bottom: 18px">
         <div class="kicker">Week 2 laboratory · after the p5 studio</div>
-        <h1>Collect a timed response</h1>
+        <h1>Remix a timed response, then keep the code</h1>
         <p class="lede">
-          If you have not walked
+          This page is a sandbox, like
           <a href="p5.html">p5.html</a>
-          yet, start there. This page is the <em>class</em> instrument: a
-          fixation, a random delay, twenty trials, and a CSV. Your assignment
-          is to copy it into the private repo (<code>rt/rt.html</code>), change
-          at least one visible thing, write a predicted mean, then run a scored
-          block on <em>your</em> copy. Press space (or click) when the square
-          appears. In the choice block, gold is F and blue is J. Export the CSV
-          into the Codespace <code>data/</code> folder. Same assignment for
-          everyone. Walkthrough:
+          with a full block. Edit the numbers or the drawing, click
+          <strong>Run</strong>, then Start in the preview. Space or click when
+          the square appears. Your edits stay in this browser. When you like
+          it, <strong>Copy sketch</strong> and paste it into
+          <code>rt/rt.html</code> in your Codespace (replace the script).
+          Write a predicted mean first. Same assignment for everyone.
+          Walkthrough:
           <a href="workflow.html#submit">workflow.html § How you work this week</a>.
         </p>
       </header>
 
-      <div class="lab-grid">
-        <aside class="panel">
-          <div class="kicker">This block</div>
-          <h2>Usable trials only</h2>
-          <p class="muted">
-            Times under 150 ms are treated as anticipations. Times over 2500 ms
-            are treated as lapses. Both are stored but excluded from the mean.
-          </p>
-          <div class="equation">
-            mean RT
-            <small>Milliseconds, correct responses in 150–2500 ms.</small>
-          </div>
-          <div class="stat" id="meanEl">—</div>
-          <p class="muted" id="summaryEl">n = 0 · SD = —</p>
-          <table>
-            <thead>
-              <tr><th>Condition</th><th>n</th><th>Mean</th></tr>
-            </thead>
-            <tbody id="meansBody">
-              <tr><td colspan="3">No trials yet.</td></tr>
-            </tbody>
-          </table>
-        </aside>
-
+      <div class="grid-2" style="margin-bottom: 16px">
         <section class="panel">
-          <div class="hud">
-            <span id="status">Click the display, then start a block.</span>
-            <span id="progress">0 / 0</span>
-          </div>
-          <div id="stage" class="stage" tabindex="0" role="application" aria-label="Reaction time display">
-            <div class="fix" aria-hidden="true">+</div>
-            <div id="mark" class="mark"></div>
-          </div>
-          <div class="actions" style="margin-top: 14px">
-            <button id="simpleBtn" class="primary">Simple RT (20 trials)</button>
-            <button id="choiceBtn" class="secondary">Choice RT (20 trials)</button>
-            <button id="demoBtn" class="secondary">6-trial practice</button>
-            <button id="exportBtn" class="secondary">Export CSV</button>
-          </div>
-          <p class="muted" style="margin-top: 12px">
-            Simple: space bar or click. Choice: F = gold, J = blue. Practice
-            means are not findings.
+          <div class="kicker">Your sketch</div>
+          <h2>Edit, run, copy</h2>
+          <p class="muted">
+            Change <code>markSize</code>, <code>markColor</code>,
+            <code>nTrials</code>, or the delay. Run after each change. The
+            square must leave after a response, and the next trial must start
+            on its own.
           </p>
+          <div class="actions" style="margin: 12px 0">
+            <button type="button" id="runBtn" class="primary">Run</button>
+            <button type="button" id="copyBtn" class="secondary">Copy sketch</button>
+            <button type="button" id="resetBtn" class="secondary">Reset default</button>
+          </div>
+          <p class="muted" id="copyNote">Edits are saved in this browser until you reset.</p>
+          <textarea id="codeInput" spellcheck="false" aria-label="p5.js reaction-time sketch"></textarea>
         </section>
+        <aside class="panel">
+          <div class="kicker">Live task</div>
+          <h2>Click the preview, then Start</h2>
+          <iframe id="preview" title="Reaction-time preview"></iframe>
+        </aside>
       </div>
     </div>
 
+    <script type="text/plain" id="defaultSketch">
+// Simple reaction time. Change the knobs, then Run.
+let nTrials = 20;
+let markSize = 72;
+let markColor = [232, 184, 109];
+let delayMin = 800;
+let delayMax = 2200;
+let rtMin = 150;
+let rtMax = 2500;
+
+let state = "idle";
+let trial = 0;
+let nWanted = 20;
+let onset = 0;
+let waitUntil = 0;
+let itiUntil = 0;
+let results = [];
+let note = "Click Start. Then space or click when the square appears.";
+
+function fitWidth() {
+  return Math.max(320, Math.min(640, windowWidth));
+}
+
+function setup() {
+  createCanvas(fitWidth(), 420);
+  textFont("system-ui, sans-serif");
+}
+
+function windowResized() {
+  resizeCanvas(fitWidth(), 420);
+}
+
+function draw() {
+  background(7, 9, 13);
+
+  if (state === "wait" && millis() >= waitUntil) {
+    state = "show";
+    onset = millis();
+  }
+  if (state === "iti" && millis() >= itiUntil) {
+    beginTrial();
+  }
+
+  if (state === "wait") {
+    fill(183, 177, 164);
+    textAlign(CENTER, CENTER);
+    textSize(48);
+    text("+", width / 2, height / 2 + 10);
+  } else if (state === "show") {
+    noStroke();
+    fill(markColor[0], markColor[1], markColor[2]);
+    rectMode(CENTER);
+    rect(width / 2, height / 2 + 10, markSize, markSize, 10);
+    rectMode(CORNER);
+  }
+
+  textAlign(LEFT, TOP);
+  textSize(14);
+  fill(183, 177, 164);
+  text(note, 16, 16);
+  text(progressLabel(), 16, 36);
+  text(statsLabel(), 16, 56);
+  drawButtons();
+}
+
+function progressLabel() {
+  if (state === "idle") return "Ready";
+  if (state === "done") return nWanted + " / " + nWanted;
+  return trial + " / " + nWanted;
+}
+
+function statsLabel() {
+  const good = results.filter((row) => row.usable && !row.practice);
+  if (!good.length) return "n = 0   mean = —   SD = —";
+  const xs = good.map((row) => row.rt);
+  const m = xs.reduce((a, b) => a + b, 0) / xs.length;
+  let sd = "—";
+  if (xs.length > 1) {
+    const v = xs.reduce((a, x) => a + (x - m) * (x - m), 0) / (xs.length - 1);
+    sd = String(Math.round(Math.sqrt(v)));
+  }
+  return "n = " + good.length + "   mean = " + Math.round(m) + " ms   SD = " + sd + " ms";
+}
+
+function btnW() {
+  return Math.min(130, (width - 48) / 3);
+}
+
+function drawButtons() {
+  const bw = btnW();
+  pill(16, height - 52, bw, 36, "Start " + nTrials);
+  pill(16 + bw + 10, height - 52, bw, 36, "Practice 6");
+  pill(16 + 2 * (bw + 10), height - 52, bw, 36, "Export CSV");
+}
+
+function pill(x, y, w, h, label) {
+  const over = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+  fill(over ? 232 : 40, over ? 184 : 44, over ? 109 : 52);
+  rect(x, y, w, h, 8);
+  fill(over ? 28 : 243, over ? 20 : 239, over ? 8 : 230);
+  textAlign(CENTER, CENTER);
+  textSize(14);
+  text(label, x + w / 2, y + h / 2);
+  textAlign(LEFT, TOP);
+}
+
+function hitButtons() {
+  const bw = btnW();
+  if (mouseY < height - 52 || mouseY > height - 16) return null;
+  if (mouseX >= 16 && mouseX <= 16 + bw) return "start";
+  if (mouseX >= 16 + bw + 10 && mouseX <= 16 + 2 * bw + 10) return "practice";
+  if (mouseX >= 16 + 2 * (bw + 10) && mouseX <= 16 + 3 * bw + 20) return "export";
+  return null;
+}
+
+function mousePressed() {
+  const hit = hitButtons();
+  if (hit === "start") {
+    startBlock(nTrials);
+    return;
+  }
+  if (hit === "practice") {
+    startBlock(6);
+    return;
+  }
+  if (hit === "export") {
+    exportCsv();
+    return;
+  }
+  handleResponse();
+}
+
+function keyPressed() {
+  if (key === " ") {
+    handleResponse();
+    return false;
+  }
+}
+
+function startBlock(n) {
+  nWanted = n;
+  results = [];
+  trial = 0;
+  note = "Wait for the square.";
+  beginTrial();
+}
+
+function beginTrial() {
+  trial += 1;
+  if (trial > nWanted) {
+    state = "done";
+    note = "Block finished. Export the CSV.";
+    return;
+  }
+  state = "wait";
+  note = "Wait for the square.";
+  waitUntil = millis() + random(delayMin, delayMax);
+}
+
+function handleResponse() {
+  if (state === "wait") {
+    results.push({
+      trial: trial,
+      rt: 0,
+      usable: 0,
+      anticipation: 1,
+      practice: nWanted <= 6 ? 1 : 0,
+    });
+    note = "Too early. Stored as an anticipation.";
+    state = "iti";
+    itiUntil = millis() + 550;
+    return;
+  }
+  if (state !== "show") return;
+  const rt = Math.round(millis() - onset);
+  const usable = rt >= rtMin && rt <= rtMax ? 1 : 0;
+  results.push({
+    trial: trial,
+    rt: rt,
+    usable: usable,
+    anticipation: 0,
+    practice: nWanted <= 6 ? 1 : 0,
+  });
+  if (rt < rtMin) note = rt + " ms — very fast; excluded from the mean.";
+  else if (rt > rtMax) note = rt + " ms — very slow; excluded from the mean.";
+  else note = rt + " ms";
+  state = "iti";
+  itiUntil = millis() + 550;
+}
+
+function exportCsv() {
+  if (!results.length) {
+    note = "No trials to export yet.";
+    return;
+  }
+  const header = "trial,rt,usable,anticipation,practice";
+  const lines = results.map((row) =>
+    [row.trial, row.rt, row.usable, row.anticipation, row.practice].join(",")
+  );
+  const blob = new Blob([header + "\n" + lines.join("\n") + "\n"], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "rt-week02.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  note = "CSV downloaded. Drag it into data/ in your Codespace.";
+}
+    </script>
+
     <script>
-      const RT_MIN = 150;
-      const RT_MAX = 2500;
-      const stage = document.getElementById("stage");
-      const mark = document.getElementById("mark");
-      const statusEl = document.getElementById("status");
-      const progressEl = document.getElementById("progress");
-      const meanEl = document.getElementById("meanEl");
-      const summaryEl = document.getElementById("summaryEl");
-      const meansBody = document.getElementById("meansBody");
+      const STORE = "psych302-week2-rt-sketch";
+      const defaultSketch = document.getElementById("defaultSketch").textContent.replace(/^\n/, "");
+      const codeInput = document.getElementById("codeInput");
+      const preview = document.getElementById("preview");
+      const copyNote = document.getElementById("copyNote");
+      const p5Url = new URL("vendor/p5.min.js", window.location.href).href;
 
-      let results = [];
-      let queue = [];
-      let index = 0;
-      let onset = 0;
-      let awaiting = false;
-      let responded = false;
-      let timer = 0;
-      let running = false;
-
-      function rand(min, max) {
-        return min + Math.random() * (max - min);
+      function runPreview() {
+        const source = codeInput.value;
+        localStorage.setItem(STORE, source);
+        preview.srcdoc = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <script src="${p5Url}"><\/script>
+  <style>html,body{margin:0;background:#07090d;color:#f3efe6} canvas{display:block;margin:0 auto}</style>
+</head>
+<body>
+<script>
+${source}
+<\/script>
+</body>
+</html>`;
+        preview.addEventListener("load", () => preview.focus(), { once: true });
       }
 
-      function mean(xs) {
-        return xs.reduce((a, b) => a + b, 0) / xs.length;
-      }
-
-      function sd(xs) {
-        if (xs.length < 2) return null;
-        const m = mean(xs);
-        return Math.sqrt(xs.reduce((a, x) => a + (x - m) ** 2, 0) / (xs.length - 1));
-      }
-
-      function usable(row) {
-        return row.correct && row.rt >= RT_MIN && row.rt <= RT_MAX;
-      }
-
-      function buildQueue(kind, n) {
-        if (kind === "simple") {
-          return Array.from({ length: n }, (_, i) => ({ kind, trial: i + 1, colour: "gold" }));
-        }
-        const half = Math.ceil(n / 2);
-        const items = [
-          ...Array.from({ length: half }, () => ({ kind, colour: "gold" })),
-          ...Array.from({ length: n - half }, () => ({ kind, colour: "blue" })),
-        ];
-        for (let i = items.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [items[i], items[j]] = [items[j], items[i]];
-        }
-        return items.map((item, i) => ({ ...item, trial: i + 1 }));
-      }
-
-      function hideMark() {
-        mark.style.display = "none";
-        stage.classList.remove("waiting");
-      }
-
-      function showFixation() {
-        hideMark();
-        stage.classList.add("waiting");
-      }
-
-      function showMark(colour) {
-        stage.classList.remove("waiting");
-        mark.style.display = "block";
-        mark.style.background = colour === "blue" ? "#7dd3fc" : "#e8b86d";
-      }
-
-      function record(correct, extra) {
-        const trial = queue[index];
-        const rt = Math.round(performance.now() - onset);
-        results.push({
-          trial: trial.trial,
-          kind: trial.kind,
-          colour: trial.colour,
-          rt,
-          correct: correct ? 1 : 0,
-          ...extra,
-        });
-        renderStats();
-      }
-
-      function finishTrial(correct, note) {
-        if (!awaiting && !responded) return;
-        window.clearTimeout(timer);
-        awaiting = false;
-        responded = true;
-        hideMark();
-        statusEl.textContent = note;
-        window.setTimeout(nextTrial, 550);
-      }
-
-      function nextTrial() {
-        index += 1;
-        if (index >= queue.length) {
-          running = false;
-          awaiting = false;
-          stage.classList.remove("waiting");
-          hideMark();
-          statusEl.textContent = "Block finished. Export the CSV.";
-          progressEl.textContent = `${queue.length} / ${queue.length}`;
-          return;
-        }
-        startTrial();
-      }
-
-      function startTrial() {
-        const trial = queue[index];
-        responded = false;
-        awaiting = false;
-        progressEl.textContent = `${index + 1} / ${queue.length}`;
-        statusEl.textContent = trial.kind === "simple"
-          ? "Wait for the square, then press space or click."
-          : "Gold = F (left). Blue = J (right).";
-        showFixation();
-        const delay = rand(800, 2200);
-        timer = window.setTimeout(() => {
-          showMark(trial.colour);
-          onset = performance.now();
-          awaiting = true;
-          responded = false;
-        }, delay);
-      }
-
-      function startBlock(kind, n) {
-        window.clearTimeout(timer);
-        queue = buildQueue(kind, n);
-        index = 0;
-        running = true;
-        if (n > 6) {
-          results = results.filter((row) => row.kind !== kind || row.practice);
-        }
-        queue.forEach((item) => { item.practice = n <= 6; });
-        stage.focus();
-        startTrial();
-      }
-
-      function handleResponse(key) {
-        if (!running) return;
-        const trial = queue[index];
-        if (!trial) return;
-
-        if (!awaiting) {
-          if (responded) return;
-          window.clearTimeout(timer);
-          record(false, { rt: 0, anticipation: 1, practice: trial.practice ? 1 : 0 });
-          results[results.length - 1].rt = 0;
-          finishTrial(false, "Too early. That trial is an anticipation.");
-          return;
-        }
-
-        awaiting = false;
-        const rt = Math.round(performance.now() - onset);
-        let correct = false;
-        if (trial.kind === "simple") {
-          correct = key === "space" || key === "click";
-        } else if (trial.colour === "gold") {
-          correct = key === "f";
-        } else {
-          correct = key === "j";
-        }
-        record(correct, { practice: trial.practice ? 1 : 0, anticipation: 0 });
-        results[results.length - 1].rt = rt;
-        if (!correct) {
-          finishTrial(false, "Wrong key. Trial stored as an error.");
-        } else if (rt < RT_MIN) {
-          finishTrial(true, "Very fast. Stored, excluded from the mean.");
-        } else if (rt > RT_MAX) {
-          finishTrial(true, "Very slow. Stored, excluded from the mean.");
-        } else {
-          finishTrial(true, rt + " ms");
-        }
-      }
-
-      function renderStats() {
-        const scored = results.filter((row) => !row.practice);
-        const good = scored.filter(usable);
-        if (!good.length) {
-          meanEl.textContent = "—";
-          summaryEl.textContent = "n = 0 · SD = —";
-        } else {
-          const m = mean(good.map((row) => row.rt));
-          const s = sd(good.map((row) => row.rt));
-          meanEl.textContent = Math.round(m) + " ms";
-          summaryEl.textContent = `n = ${good.length} · SD = ${s === null ? "—" : Math.round(s) + " ms"}`;
-        }
-        const kinds = ["simple", "choice"];
-        const rows = kinds.map((kind) => {
-          const cell = scored.filter((row) => row.kind === kind && usable(row));
-          return {
-            kind,
-            n: cell.length,
-            mean: cell.length ? Math.round(mean(cell.map((row) => row.rt))) : "—",
-          };
-        }).filter((row) => results.some((r) => r.kind === row.kind && !r.practice));
-        meansBody.innerHTML = rows.length
-          ? rows.map((row) => `<tr><td>${row.kind}</td><td>${row.n}</td><td>${row.mean}</td></tr>`).join("")
-          : "<tr><td colspan='3'>No scored trials yet. Practice is excluded from the table.</td></tr>";
-      }
-
-      function exportCsv() {
-        if (!results.length) {
-          statusEl.textContent = "No trials to export.";
-          return;
-        }
-        const header = "trial,kind,colour,rt,correct,practice,anticipation";
-        const lines = results.map((row) =>
-          [row.trial, row.kind, row.colour, row.rt, row.correct, row.practice ? 1 : 0, row.anticipation ? 1 : 0].join(",")
-        );
-        const blob = new Blob([header + "\n" + lines.join("\n") + "\n"], { type: "text/csv" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "rt-week02.csv";
-        a.click();
-        URL.revokeObjectURL(a.href);
-      }
-
-      document.getElementById("simpleBtn").addEventListener("click", () => startBlock("simple", 20));
-      document.getElementById("choiceBtn").addEventListener("click", () => startBlock("choice", 20));
-      document.getElementById("demoBtn").addEventListener("click", () => startBlock("simple", 6));
-      document.getElementById("exportBtn").addEventListener("click", exportCsv);
-
-      stage.addEventListener("click", () => {
-        stage.focus();
-        if (running) handleResponse("click");
+      codeInput.value = localStorage.getItem(STORE) || defaultSketch;
+      document.getElementById("runBtn").addEventListener("click", runPreview);
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        localStorage.removeItem(STORE);
+        codeInput.value = defaultSketch;
+        runPreview();
+        copyNote.textContent = "Default sketch restored.";
       });
-
-      window.addEventListener("keydown", (event) => {
-        if (!running) return;
-        const key = event.key.toLowerCase();
-        if (event.code === "Space") {
-          event.preventDefault();
-          handleResponse("space");
-        } else if (key === "f" || key === "j") {
-          event.preventDefault();
-          handleResponse(key);
+      document.getElementById("copyBtn").addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(codeInput.value);
+          copyNote.textContent = "Sketch copied. In your Codespace, open rt/rt.html and replace the script with this.";
+        } catch (err) {
+          copyNote.textContent = "Copy failed. Select the text and copy it yourself.";
         }
       });
-
-      renderStats();
+      codeInput.addEventListener("input", () => localStorage.setItem(STORE, codeInput.value));
+      runPreview();
     </script>
   </body>
 </html>

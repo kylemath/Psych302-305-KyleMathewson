@@ -4,380 +4,229 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My reaction-time task · PSYCH 302 / 305</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
     <style>
-      :root { --ink: #f3efe6; --muted: #b7b1a4; --panel-border: rgba(232, 228, 219, 0.12); }
-      body { margin: 24px; background: #0b0f14; color: var(--ink); font-family: Georgia, serif; }
-      h1 { font-size: 1.6rem; }
-      .muted { color: var(--muted); }
-      button { font-family: "Segoe UI", sans-serif; margin-right: 6px; padding: 8px 12px; }
+      html, body { margin: 0; background: #0b0f14; color: #f3efe6; font-family: Georgia, serif; }
+      p { max-width: 640px; margin: 16px auto; color: #b7b1a4; padding: 0 16px; }
       a { color: #e8b86d; }
-      .panel { border: 1px solid rgba(232, 228, 219, 0.12); border-radius: 14px; padding: 16px; }
-      .kicker { font-family: "Segoe UI", sans-serif; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-      .equation { margin: 12px 0; font-size: 1.2rem; }
-      .equation small { display: block; color: var(--muted); font-size: 0.85rem; }
-      .stat { font-size: 2rem; margin: 8px 0; }
-      .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-      button.primary { background: #e8b86d; border: 0; color: #1a1408; }
-      button.secondary { background: transparent; border: 1px solid rgba(232, 228, 219, 0.24); color: var(--ink); }
-      .lab-grid {
-        display: grid;
-        grid-template-columns: 0.9fr 1.3fr;
-        gap: 18px;
-      }
-      .stage {
-        min-height: 320px;
-        border-radius: 16px;
-        background: #07090d;
-        display: grid;
-        place-items: center;
-        position: relative;
-        outline: none;
-      }
-      .stage:focus {
-        box-shadow: 0 0 0 2px rgba(232, 184, 109, 0.45);
-      }
-      .mark {
-        width: 72px;
-        height: 72px;
-        border-radius: 10px;
-        display: none;
-      }
-      .stage.waiting .fix {
-        display: block;
-        color: #b7b1a4;
-        font-size: 2rem;
-      }
-      .fix {
-        display: none;
-      }
-      .hud {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 12px;
-        font-family: "Segoe UI", sans-serif;
-        color: var(--muted);
-        font-size: 0.9rem;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: "Segoe UI", sans-serif;
-        font-size: 0.88rem;
-      }
-      th, td {
-        text-align: left;
-        padding: 6px 0;
-        border-bottom: 1px solid var(--panel-border);
-      }
-      @media (max-width: 900px) {
-        .lab-grid { grid-template-columns: 1fr; }
-      }
+      canvas { display: block; margin: 0 auto 24px; }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <header style="margin-bottom: 18px">
-        <p class="muted">Your copy · edit this file, then run a scored block on <em>this</em> page.</p>
-        <h1>Collect a timed response</h1>
-        <p class="muted">
-          Change at least one visible thing before you collect data: the mark
-          colour or size, the keys, the delay range, the trial count, or a
-          label. Write a predicted mean first. Export the CSV into
-          <code>../data/</code>. Class instrument:
-          <a href="https://kylemath.github.io/Psych302-305-KyleMathewson/rt.html">rt.html</a>.
-        </p>
-      </header>
-
-      <div class="lab-grid">
-        <aside class="panel">
-          <div class="kicker">This block</div>
-          <h2>Usable trials only</h2>
-          <p class="muted">
-            Times under 150 ms are treated as anticipations. Times over 2500 ms
-            are treated as lapses. Both are stored but excluded from the mean.
-          </p>
-          <div class="equation">
-            mean RT
-            <small>Milliseconds, correct responses in 150–2500 ms.</small>
-          </div>
-          <div class="stat" id="meanEl">—</div>
-          <p class="muted" id="summaryEl">n = 0 · SD = —</p>
-          <table>
-            <thead>
-              <tr><th>Condition</th><th>n</th><th>Mean</th></tr>
-            </thead>
-            <tbody id="meansBody">
-              <tr><td colspan="3">No trials yet.</td></tr>
-            </tbody>
-          </table>
-        </aside>
-
-        <section class="panel">
-          <div class="hud">
-            <span id="status">Click the display, then start a block.</span>
-            <span id="progress">0 / 0</span>
-          </div>
-          <div id="stage" class="stage" tabindex="0" role="application" aria-label="Reaction time display">
-            <div class="fix" aria-hidden="true">+</div>
-            <div id="mark" class="mark"></div>
-          </div>
-          <div class="actions" style="margin-top: 14px">
-            <button id="simpleBtn" class="primary">Simple RT (20 trials)</button>
-            <button id="choiceBtn" class="secondary">Choice RT (20 trials)</button>
-            <button id="demoBtn" class="secondary">6-trial practice</button>
-            <button id="exportBtn" class="secondary">Export CSV</button>
-          </div>
-          <p class="muted" style="margin-top: 12px">
-            Simple: space bar or click. Choice: F = gold, J = blue. Practice
-            means are not findings.
-          </p>
-        </section>
-      </div>
-    </div>
-
+    <p>
+      Your Week 2 task. Remix on the class
+      <a href="https://kylemath.github.io/Psych302-305-KyleMathewson/rt.html">sandbox</a>,
+      then paste that sketch over the script below. Write a predicted mean
+      before the scored block. Export the CSV into <code>../data/</code>.
+    </p>
     <script>
-      const RT_MIN = 150;
-      const RT_MAX = 2500;
-      const stage = document.getElementById("stage");
-      const mark = document.getElementById("mark");
-      const statusEl = document.getElementById("status");
-      const progressEl = document.getElementById("progress");
-      const meanEl = document.getElementById("meanEl");
-      const summaryEl = document.getElementById("summaryEl");
-      const meansBody = document.getElementById("meansBody");
+// === paste your sandbox sketch below this line ===
+// Simple reaction time. Change the knobs, then reload the page.
+let nTrials = 20;
+let markSize = 72;
+let markColor = [232, 184, 109];
+let delayMin = 800;
+let delayMax = 2200;
+let rtMin = 150;
+let rtMax = 2500;
 
-      let results = [];
-      let queue = [];
-      let index = 0;
-      let onset = 0;
-      let awaiting = false;
-      let responded = false;
-      let timer = 0;
-      let running = false;
+let state = "idle";
+let trial = 0;
+let nWanted = 20;
+let onset = 0;
+let waitUntil = 0;
+let itiUntil = 0;
+let results = [];
+let note = "Click Start. Then space or click when the square appears.";
 
-      function rand(min, max) {
-        return min + Math.random() * (max - min);
-      }
+function fitWidth() {
+  return Math.max(320, Math.min(640, windowWidth));
+}
 
-      function mean(xs) {
-        return xs.reduce((a, b) => a + b, 0) / xs.length;
-      }
+function setup() {
+  createCanvas(fitWidth(), 420);
+  textFont("system-ui, sans-serif");
+}
 
-      function sd(xs) {
-        if (xs.length < 2) return null;
-        const m = mean(xs);
-        return Math.sqrt(xs.reduce((a, x) => a + (x - m) ** 2, 0) / (xs.length - 1));
-      }
+function windowResized() {
+  resizeCanvas(fitWidth(), 420);
+}
 
-      function usable(row) {
-        return row.correct && row.rt >= RT_MIN && row.rt <= RT_MAX;
-      }
+function draw() {
+  background(7, 9, 13);
 
-      function buildQueue(kind, n) {
-        if (kind === "simple") {
-          return Array.from({ length: n }, (_, i) => ({ kind, trial: i + 1, colour: "gold" }));
-        }
-        const half = Math.ceil(n / 2);
-        const items = [
-          ...Array.from({ length: half }, () => ({ kind, colour: "gold" })),
-          ...Array.from({ length: n - half }, () => ({ kind, colour: "blue" })),
-        ];
-        for (let i = items.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [items[i], items[j]] = [items[j], items[i]];
-        }
-        return items.map((item, i) => ({ ...item, trial: i + 1 }));
-      }
+  if (state === "wait" && millis() >= waitUntil) {
+    state = "show";
+    onset = millis();
+  }
+  if (state === "iti" && millis() >= itiUntil) {
+    beginTrial();
+  }
 
-      function hideMark() {
-        mark.style.display = "none";
-        stage.classList.remove("waiting");
-      }
+  if (state === "wait") {
+    fill(183, 177, 164);
+    textAlign(CENTER, CENTER);
+    textSize(48);
+    text("+", width / 2, height / 2 + 10);
+  } else if (state === "show") {
+    noStroke();
+    fill(markColor[0], markColor[1], markColor[2]);
+    rectMode(CENTER);
+    rect(width / 2, height / 2 + 10, markSize, markSize, 10);
+    rectMode(CORNER);
+  }
 
-      function showFixation() {
-        hideMark();
-        stage.classList.add("waiting");
-      }
+  textAlign(LEFT, TOP);
+  textSize(14);
+  fill(183, 177, 164);
+  text(note, 16, 16);
+  text(progressLabel(), 16, 36);
+  text(statsLabel(), 16, 56);
+  drawButtons();
+}
 
-      function showMark(colour) {
-        stage.classList.remove("waiting");
-        mark.style.display = "block";
-        mark.style.background = colour === "blue" ? "#7dd3fc" : "#e8b86d";
-      }
+function progressLabel() {
+  if (state === "idle") return "Ready";
+  if (state === "done") return nWanted + " / " + nWanted;
+  return trial + " / " + nWanted;
+}
 
-      function record(correct, extra) {
-        const trial = queue[index];
-        const rt = Math.round(performance.now() - onset);
-        results.push({
-          trial: trial.trial,
-          kind: trial.kind,
-          colour: trial.colour,
-          rt,
-          correct: correct ? 1 : 0,
-          ...extra,
-        });
-        renderStats();
-      }
+function statsLabel() {
+  const good = results.filter((row) => row.usable && !row.practice);
+  if (!good.length) return "n = 0   mean = —   SD = —";
+  const xs = good.map((row) => row.rt);
+  const m = xs.reduce((a, b) => a + b, 0) / xs.length;
+  let sd = "—";
+  if (xs.length > 1) {
+    const v = xs.reduce((a, x) => a + (x - m) * (x - m), 0) / (xs.length - 1);
+    sd = String(Math.round(Math.sqrt(v)));
+  }
+  return "n = " + good.length + "   mean = " + Math.round(m) + " ms   SD = " + sd + " ms";
+}
 
-      function finishTrial(correct, note) {
-        if (!awaiting && !responded) return;
-        window.clearTimeout(timer);
-        awaiting = false;
-        responded = true;
-        hideMark();
-        statusEl.textContent = note;
-        window.setTimeout(nextTrial, 550);
-      }
+function btnW() {
+  return Math.min(130, (width - 48) / 3);
+}
 
-      function nextTrial() {
-        index += 1;
-        if (index >= queue.length) {
-          running = false;
-          awaiting = false;
-          stage.classList.remove("waiting");
-          hideMark();
-          statusEl.textContent = "Block finished. Export the CSV.";
-          progressEl.textContent = `${queue.length} / ${queue.length}`;
-          return;
-        }
-        startTrial();
-      }
+function drawButtons() {
+  const bw = btnW();
+  pill(16, height - 52, bw, 36, "Start " + nTrials);
+  pill(16 + bw + 10, height - 52, bw, 36, "Practice 6");
+  pill(16 + 2 * (bw + 10), height - 52, bw, 36, "Export CSV");
+}
 
-      function startTrial() {
-        const trial = queue[index];
-        responded = false;
-        awaiting = false;
-        progressEl.textContent = `${index + 1} / ${queue.length}`;
-        statusEl.textContent = trial.kind === "simple"
-          ? "Wait for the square, then press space or click."
-          : "Gold = F (left). Blue = J (right).";
-        showFixation();
-        const delay = rand(800, 2200);
-        timer = window.setTimeout(() => {
-          showMark(trial.colour);
-          onset = performance.now();
-          awaiting = true;
-          responded = false;
-        }, delay);
-      }
+function pill(x, y, w, h, label) {
+  const over = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+  fill(over ? 232 : 40, over ? 184 : 44, over ? 109 : 52);
+  rect(x, y, w, h, 8);
+  fill(over ? 28 : 243, over ? 20 : 239, over ? 8 : 230);
+  textAlign(CENTER, CENTER);
+  textSize(14);
+  text(label, x + w / 2, y + h / 2);
+  textAlign(LEFT, TOP);
+}
 
-      function startBlock(kind, n) {
-        window.clearTimeout(timer);
-        queue = buildQueue(kind, n);
-        index = 0;
-        running = true;
-        if (n > 6) {
-          results = results.filter((row) => row.kind !== kind || row.practice);
-        }
-        queue.forEach((item) => { item.practice = n <= 6; });
-        stage.focus();
-        startTrial();
-      }
+function hitButtons() {
+  const bw = btnW();
+  if (mouseY < height - 52 || mouseY > height - 16) return null;
+  if (mouseX >= 16 && mouseX <= 16 + bw) return "start";
+  if (mouseX >= 16 + bw + 10 && mouseX <= 16 + 2 * bw + 10) return "practice";
+  if (mouseX >= 16 + 2 * (bw + 10) && mouseX <= 16 + 3 * bw + 20) return "export";
+  return null;
+}
 
-      function handleResponse(key) {
-        if (!running) return;
-        const trial = queue[index];
-        if (!trial) return;
+function mousePressed() {
+  const hit = hitButtons();
+  if (hit === "start") {
+    startBlock(nTrials);
+    return;
+  }
+  if (hit === "practice") {
+    startBlock(6);
+    return;
+  }
+  if (hit === "export") {
+    exportCsv();
+    return;
+  }
+  handleResponse();
+}
 
-        if (!awaiting) {
-          if (responded) return;
-          window.clearTimeout(timer);
-          record(false, { rt: 0, anticipation: 1, practice: trial.practice ? 1 : 0 });
-          results[results.length - 1].rt = 0;
-          finishTrial(false, "Too early. That trial is an anticipation.");
-          return;
-        }
+function keyPressed() {
+  if (key === " ") {
+    handleResponse();
+    return false;
+  }
+}
 
-        awaiting = false;
-        const rt = Math.round(performance.now() - onset);
-        let correct = false;
-        if (trial.kind === "simple") {
-          correct = key === "space" || key === "click";
-        } else if (trial.colour === "gold") {
-          correct = key === "f";
-        } else {
-          correct = key === "j";
-        }
-        record(correct, { practice: trial.practice ? 1 : 0, anticipation: 0 });
-        results[results.length - 1].rt = rt;
-        if (!correct) {
-          finishTrial(false, "Wrong key. Trial stored as an error.");
-        } else if (rt < RT_MIN) {
-          finishTrial(true, "Very fast. Stored, excluded from the mean.");
-        } else if (rt > RT_MAX) {
-          finishTrial(true, "Very slow. Stored, excluded from the mean.");
-        } else {
-          finishTrial(true, rt + " ms");
-        }
-      }
+function startBlock(n) {
+  nWanted = n;
+  results = [];
+  trial = 0;
+  note = "Wait for the square.";
+  beginTrial();
+}
 
-      function renderStats() {
-        const scored = results.filter((row) => !row.practice);
-        const good = scored.filter(usable);
-        if (!good.length) {
-          meanEl.textContent = "—";
-          summaryEl.textContent = "n = 0 · SD = —";
-        } else {
-          const m = mean(good.map((row) => row.rt));
-          const s = sd(good.map((row) => row.rt));
-          meanEl.textContent = Math.round(m) + " ms";
-          summaryEl.textContent = `n = ${good.length} · SD = ${s === null ? "—" : Math.round(s) + " ms"}`;
-        }
-        const kinds = ["simple", "choice"];
-        const rows = kinds.map((kind) => {
-          const cell = scored.filter((row) => row.kind === kind && usable(row));
-          return {
-            kind,
-            n: cell.length,
-            mean: cell.length ? Math.round(mean(cell.map((row) => row.rt))) : "—",
-          };
-        }).filter((row) => results.some((r) => r.kind === row.kind && !r.practice));
-        meansBody.innerHTML = rows.length
-          ? rows.map((row) => `<tr><td>${row.kind}</td><td>${row.n}</td><td>${row.mean}</td></tr>`).join("")
-          : "<tr><td colspan='3'>No scored trials yet. Practice is excluded from the table.</td></tr>";
-      }
+function beginTrial() {
+  trial += 1;
+  if (trial > nWanted) {
+    state = "done";
+    note = "Block finished. Export the CSV.";
+    return;
+  }
+  state = "wait";
+  note = "Wait for the square.";
+  waitUntil = millis() + random(delayMin, delayMax);
+}
 
-      function exportCsv() {
-        if (!results.length) {
-          statusEl.textContent = "No trials to export.";
-          return;
-        }
-        const header = "trial,kind,colour,rt,correct,practice,anticipation";
-        const lines = results.map((row) =>
-          [row.trial, row.kind, row.colour, row.rt, row.correct, row.practice ? 1 : 0, row.anticipation ? 1 : 0].join(",")
-        );
-        const blob = new Blob([header + "\n" + lines.join("\n") + "\n"], { type: "text/csv" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "rt-week02.csv";
-        a.click();
-        URL.revokeObjectURL(a.href);
-      }
+function handleResponse() {
+  if (state === "wait") {
+    results.push({
+      trial: trial,
+      rt: 0,
+      usable: 0,
+      anticipation: 1,
+      practice: nWanted <= 6 ? 1 : 0,
+    });
+    note = "Too early. Stored as an anticipation.";
+    state = "iti";
+    itiUntil = millis() + 550;
+    return;
+  }
+  if (state !== "show") return;
+  const rt = Math.round(millis() - onset);
+  const usable = rt >= rtMin && rt <= rtMax ? 1 : 0;
+  results.push({
+    trial: trial,
+    rt: rt,
+    usable: usable,
+    anticipation: 0,
+    practice: nWanted <= 6 ? 1 : 0,
+  });
+  if (rt < rtMin) note = rt + " ms — very fast; excluded from the mean.";
+  else if (rt > rtMax) note = rt + " ms — very slow; excluded from the mean.";
+  else note = rt + " ms";
+  state = "iti";
+  itiUntil = millis() + 550;
+}
 
-      document.getElementById("simpleBtn").addEventListener("click", () => startBlock("simple", 20));
-      document.getElementById("choiceBtn").addEventListener("click", () => startBlock("choice", 20));
-      document.getElementById("demoBtn").addEventListener("click", () => startBlock("simple", 6));
-      document.getElementById("exportBtn").addEventListener("click", exportCsv);
-
-      stage.addEventListener("click", () => {
-        stage.focus();
-        if (running) handleResponse("click");
-      });
-
-      window.addEventListener("keydown", (event) => {
-        if (!running) return;
-        const key = event.key.toLowerCase();
-        if (event.code === "Space") {
-          event.preventDefault();
-          handleResponse("space");
-        } else if (key === "f" || key === "j") {
-          event.preventDefault();
-          handleResponse(key);
-        }
-      });
-
-      renderStats();
+function exportCsv() {
+  if (!results.length) {
+    note = "No trials to export yet.";
+    return;
+  }
+  const header = "trial,rt,usable,anticipation,practice";
+  const lines = results.map((row) =>
+    [row.trial, row.rt, row.usable, row.anticipation, row.practice].join(",")
+  );
+  const blob = new Blob([header + "\n" + lines.join("\n") + "\n"], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "rt-week02.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  note = "CSV downloaded. Drag it into data/ in your Codespace.";
+}
     </script>
   </body>
 </html>
