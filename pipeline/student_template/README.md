@@ -10,7 +10,7 @@ If you do not have this repository yet, use the public handbook tonight and subm
 2. Copilot is in the Codespace if GitHub Education is approved. **Do not buy Copilot.**
 3. Weekly lab notes live in `lab-notes/`. Copy `lab-notes/TEMPLATE.md` for a new week.
 4. Data files (CSV) go in `data/`. Do not commit classmate names.
-5. Week 2: remix https://kylemath.github.io/Psych302-305-KyleMathewson/rt.html , paste the sketch into `rt/rt.html`, run a scored block from the Codespace, export the CSV into `data/`. https://kylemath.github.io/Psych302-305-KyleMathewson/workflow.html#submit
+5. Week 2: personalize https://kylemath.github.io/Psych302-305-KyleMathewson/rt.html , paste the sketch into `rt/rt.html`, run a scored block from the Codespace, export the CSV into `data/`. https://kylemath.github.io/Psych302-305-KyleMathewson/workflow.html#submit
 6. Week 4 report loop: `report/` (Markdown, `scripts/summarize.py`, `main.tex`). Do not type a mean by hand.
 7. Week 6 annotation: `lab-notes/ANNOTATION.md`. File the paper under `papers/`.
 8. Week 7 methods: `lab-notes/METHODS.md`.
