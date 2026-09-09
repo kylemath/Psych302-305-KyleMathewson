@@ -121,7 +121,7 @@ WEEKLIES = [
         "lab": f"{BOOK}/game.html",
         "lab_label": "Week 9 gamified research",
         "note_path": "lab-notes/week09.md",
-        "ask": "Your question of interest, the game as the instrument, what was logged (including the Science extra variable). Last weekly report.",
+        "ask": "Your question of interest, the game as the instrument, what was logged (including the extra logged variable). Last weekly report.",
         "module": "Week 9 · Gamified research (4 Nov)",
         "preamble": "A browser game that studies a question. Last weekly report.",
     },

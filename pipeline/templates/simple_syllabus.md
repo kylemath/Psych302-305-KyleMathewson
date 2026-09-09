@@ -55,7 +55,7 @@ By the end of the course, students will be able to:
 
 ## Course format
 
-One three-hour Wednesday laboratory. Typical night: introduction and a written prediction, instructor demonstration, exercise, break, results sentence, Arts/Science modification, brief discussion. Weekly reports are due the following Tuesday at 17:00. The handbook is the working laboratory:
+One three-hour Wednesday laboratory. Typical night: introduction and a written prediction, instructor demonstration, exercise, break, results sentence, shared modification, brief discussion. Weekly reports are due the following Tuesday at 17:00. The handbook is the working laboratory:
 
 [https://kylemath.github.io/Psych302-305-KyleMathewson/](https://kylemath.github.io/Psych302-305-KyleMathewson/)
 
@@ -107,7 +107,7 @@ A small study on a page you already know how to build, using a tool taught in th
 
 Marking (35 points): running page 7, prediction 6, result 7, limitation 5, presentation 5, data 3, disclosure 2. Full scheme: [https://kylemath.github.io/Psych302-305-KyleMathewson/rubrics.html](https://kylemath.github.io/Psych302-305-KyleMathewson/rubrics.html)
 
-Arts and Science use the same points. They differ only in the Wednesday modification hour (presentation vs a number or comparison).
+Arts and Science use the same points and the same Wednesday modification hour.
 
 ---
 
