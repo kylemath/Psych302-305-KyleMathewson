@@ -4,17 +4,20 @@ Private workspace for University of Alberta PSYCH 302/305, Fall 2026.
 
 ## Start here
 
+Work on your laptop in Visual Studio Code. GitHub Codespaces is not used this term.
+
 If you do not have this repository yet, use the public handbook tonight and submit Week 0 on Canvas.
 
-1. Open this repository in a GitHub Codespace: **Code → Codespaces → Create codespace**.
-2. Copilot is in the Codespace if GitHub Education is approved. **Do not buy Copilot.**
-3. Weekly lab notes live in `lab-notes/`. Copy `lab-notes/TEMPLATE.md` for a new week.
-4. Data files (CSV) go in `data/`. Do not commit classmate names.
-5. Week 2: personalize https://kylemath.github.io/Psych302-305-KyleMathewson/rt.html , paste the sketch into `rt/rt.html`, run a scored block from the Codespace, export the CSV into `data/`. https://kylemath.github.io/Psych302-305-KyleMathewson/workflow.html#submit
-6. Week 4 report loop: `report/` (Markdown, `scripts/summarize.py`, `main.tex`). Do not type a mean by hand.
-7. Week 6 annotation: `lab-notes/ANNOTATION.md`. File the paper under `papers/`.
-8. Week 7 methods: `lab-notes/METHODS.md`.
-9. Project: `project/CHECKIN.md` (28 October) and `project/FINAL.md` (2 December).
+1. Install VS Code, Git, and Python 3: https://kylemath.github.io/Psych302-305-KyleMathewson/workflow.html#install
+2. Clone this repository in VS Code: **View → Command Palette → Git: Clone**. Sign in to GitHub when asked. If VS Code asks to Reopen in Container, choose **Don’t Reopen**.
+3. Copilot in VS Code is optional if GitHub Education is approved. **Do not buy Copilot.**
+4. Weekly lab notes live in `lab-notes/`. Copy `lab-notes/TEMPLATE.md` for a new week.
+5. Data files (CSV) go in `data/`. Do not commit classmate names.
+6. Week 2: personalize https://kylemath.github.io/Psych302-305-KyleMathewson/rt.html , paste the sketch into `rt/rt.html`, run `python3 -m http.server 8765` (Windows: `py -3 -m http.server 8765`), open http://127.0.0.1:8765/rt/rt.html , export the CSV into `data/`. https://kylemath.github.io/Psych302-305-KyleMathewson/workflow.html#submit
+7. Week 4 report loop: `report/` (Markdown, `scripts/summarize.py`, `main.tex`). Do not type a mean by hand.
+8. Week 6 annotation: `lab-notes/ANNOTATION.md`. File the paper under `papers/`.
+9. Week 7 methods: `lab-notes/METHODS.md`.
+10. Project: `project/CHECKIN.md` (28 October) and `project/FINAL.md` (2 December).
 
 **Handbook:** https://kylemath.github.io/Psych302-305-KyleMathewson/  
 **Canvas:** https://canvas.ualberta.ca/courses/35483

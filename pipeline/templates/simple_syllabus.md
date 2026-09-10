@@ -29,7 +29,7 @@ Use one of the Simple Syllabus English options for the University of Alberta
 
 ## Course description
 
-Introduction to computational methods used in psychological research. Students keep a GitHub repository, edit in the browser (Codespaces), collect a small behavioural data file, and write short reports generated from a script. Examples are ordinary psychology: reaction time, a short inventory, a two-condition comparison, citation, Methods and Results, and an optional browser game that studies a question. PSYCH 302 (Science) and PSYCH 305 (Arts) meet together and share assessments. The course is not a survey of mathematical psychology.
+Introduction to computational methods used in psychological research. Students keep a GitHub repository, edit in Visual Studio Code on their laptop, collect a small behavioural data file, and write short reports generated from a script. Examples are ordinary psychology: reaction time, a short inventory, a two-condition comparison, citation, Methods and Results, and an optional browser game that studies a question. PSYCH 302 (Science) and PSYCH 305 (Arts) meet together and share assessments. The course is not a survey of mathematical psychology.
 
 **Catalogue window:** 1 September–8 December 2026.
 
@@ -67,7 +67,7 @@ Canvas holds assignments, grades, and announcements. This Simple Syllabus is the
 
 ## Required materials and fees
 
-- Laptop that can run a current browser. No local software install is required.
+- Laptop with Visual Studio Code, Git, and Python 3 installed (all free). Steps: [https://kylemath.github.io/Psych302-305-KyleMathewson/workflow.html#install](https://kylemath.github.io/Psych302-305-KyleMathewson/workflow.html#install). GitHub Codespaces is not used.
 - Free GitHub account. Start the free GitHub Education application in Week 0. **Do not buy Copilot or enter a credit card.**
 - No textbook. No course fee. Sample data and laboratory pages are on the handbook.
 

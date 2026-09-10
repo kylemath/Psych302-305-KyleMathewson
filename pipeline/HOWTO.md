@@ -27,10 +27,12 @@ python studio_pipeline.py assignments-update --notify-week 2   # same, email onl
 
 `week0-grade` PUTs Canvas `complete` / `incomplete` only. Complete = parsed GitHub username present and non-empty. Do not invent points. Assignment is `pass_fail` and omitted from the final grade.
 
-`repos-mint` copies `student_template/` (lab-notes, `report/`, `papers/`, project checklists, `.devcontainer`, short README). It never copies `pipeline/` or `.env`. Repos are `kylemath/psych302-305-<github_username>`, private. The student is added as a `push` collaborator (write, not admin); kylemath stays owner/admin. Mint only when the username parses **and** `repo_consent=yes`. Default is dry-run. Same-name repos are not overwritten and are never force-pushed; an existing repo only gets a collaborator check.
+`repos-mint` copies `student_template/` (lab-notes, `report/`, `papers/`, project checklists, `.devcontainer`, short README). It never copies `pipeline/` or `.env`. Repos are `kylemath/psych302-305-<github_username>`, private. The student is added as a `push` collaborator (write, not admin); kylemath stays owner/admin. Mint only when the username parses **and** `repo_consent=yes`. Default is dry-run. Same-name repos are not overwritten and are never force-pushed; an existing repo only gets a collaborator check. Students clone locally in VS Code; they do not use Codespaces.
 
 `repos-sync` is for repos that already exist (for example after a later template addition such as `report/`). Default is dry-run. `--apply` clones each existing consented repo, copies only files that are still missing, commits, and does a regular `git push`. It never overwrites a file the student already has and never force-pushes.
 
 To the agent: **`plant week0`** means create (or confirm) the assignment and announcement. **`pull week0`** means harvest usernames. **`grade week0`** means complete/incomplete. **`pull week1`** means harvest the four GitHub links from Canvas (do not invent scores). **`mint repos`** means dry-run first, then `--apply` for eligible students only. **`sync repos`** means dry-run first, then `--apply` to add missing template files only.
 
 Week 1 is due Tuesday 17:00. Do not post Week 1 grades before the due date. GitHub forks/PRs are evidence of work; Canvas paste is the official submission.
+
+Students work in **VS Code on their laptops** (GitHub Codespaces is not used). After a handbook push, rewrite Canvas weeklies with `assignments-update` (no student email unless `--notify-week`). Post `templates/week2_vscode_announcement.html` as a new announcement. Existing student repos do not get README overwrites from `repos-sync`; use `repos-replace --path README.md` (and other listed paths) if a live file must change.

@@ -2,7 +2,7 @@
 
 University of Alberta, Fall 2026. Cross-listed Science (302) and Arts (305). Wednesday 18:00–21:00.
 
-The course teaches **computing tools** (repository, Codespace, git, data files, generated reports) using **ordinary psychology** as the examples (reaction time, inventories, a report pipeline, documentation). It is not a survey of mathematical psychology.
+The course teaches **computing tools** (repository, VS Code on your laptop, git, data files, generated reports) using **ordinary psychology** as the examples (reaction time, inventories, a report pipeline, documentation). It is not a survey of mathematical psychology.
 
 **Canvas** is the official course: https://canvas.ualberta.ca/courses/35483
 

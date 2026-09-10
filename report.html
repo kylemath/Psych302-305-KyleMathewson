@@ -152,12 +152,19 @@
           If your studio repo does not yet have a <code>report/</code> folder,
           copy it from this handbook
           (<a href="report/README.md">report/README.md</a>).
-          Put your CSV in <code>data/</code>. In a Codespace:
+          Put your CSV in <code>data/</code>. In the VS Code terminal:
         </p>
         <pre class="snippet">cd report
 python3 -m venv .venv
 source .venv/bin/activate
 bash build.sh ../data/YOURFILE.csv</pre>
+        <p class="muted" style="margin-top: 12px">
+          Windows (PowerShell): <code>py -3 -m venv .venv</code>, then
+          <code>.\.venv\Scripts\Activate.ps1</code>, then
+          <code>py -3 scripts/summarize.py --csv ../data/YOURFILE.csv --out output --report REPORT.md</code>.
+          If Git is installed, <code>bash build.sh ../data/YOURFILE.csv</code>
+          also works.
+        </p>
         <p class="muted" style="margin-top: 12px">
           Read the generated block in <code>REPORT.md</code>. Change one
           sentence, or one line of the script (exclusion bounds, or a second

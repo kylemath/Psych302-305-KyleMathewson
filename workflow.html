@@ -24,63 +24,105 @@
 
       <header class="panel">
         <div class="kicker">Software</div>
-        <h1>Repository, Codespace, and how you submit</h1>
+        <h1>Repository, VS Code, and how you submit</h1>
         <p class="lede">
           The private repo
           <code>kylemath/psych302-305-USERNAME</code>
-          is where the work lives. Canvas is where you hand it in: each week
-          you paste paths (and the asked lines) on that week’s text-entry
-          assignment, then click Submit. A push that is not pasted is not
-          submitted. A file that exists only on your laptop is not submitted.
-          If Week 0 is still incomplete, submit
+          is where the work lives. You clone it to your laptop and edit in
+          <strong>Visual Studio Code</strong>. Canvas is where you hand it in:
+          each week you paste paths (and the asked lines) on that week’s
+          text-entry assignment, then click Submit. A push that is not pasted
+          is not submitted. A file that exists only on your laptop is not
+          submitted. If Week 0 is still incomplete, submit
           <a href="https://canvas.ualberta.ca/courses/35483/assignments/812211">the GitHub form</a>
           and accept the invite. Week 1 was the public homepage lab
           (<a href="playground.html">playground.html</a>).
           From Week 2 on, use the private repo and the loop below.
+          GitHub Codespaces is not used this term.
         </p>
       </header>
 
-      <section class="panel" id="submit" style="margin-top: 16px">
-        <div class="kicker">Week 2 tonight · Codespace</div>
-        <h2>How you work this week</h2>
+      <section class="panel" id="install" style="margin-top: 16px">
+        <div class="kicker">Once, on your laptop</div>
+        <h2>Install VS Code, Git, and Python 3</h2>
         <p class="muted">
-          Yes: you edit the note, change the task, and run your own HTML page
-          <em>inside the Codespace</em>. github.dev (press period) can edit
-          files but cannot run the page. Use a Codespace for the block.
-          Everyone does the same assignment.
+          All three are free. Do not buy Copilot or enter a credit card.
+          Install before you start Week 2.
         </p>
         <ol>
-          <li><strong>Open the private repo.</strong> On GitHub, go to
+          <li><strong>Visual Studio Code.</strong>
+            Download from
+            <a href="https://code.visualstudio.com/">code.visualstudio.com</a>
+            and install. Open it once so it finishes setup. If it later asks
+            to Reopen in Container, choose <strong>Don’t Reopen</strong> —
+            we work on the laptop, not in a container.</li>
+          <li><strong>Git.</strong>
+            <a href="https://git-scm.com/downloads">git-scm.com/downloads</a>.
+            On a Mac, if Terminal asks you to install command-line tools,
+            agree. On Windows, the default options are fine.</li>
+          <li><strong>Python 3.</strong>
+            <a href="https://www.python.org/downloads/">python.org/downloads</a>.
+            On Windows, tick <strong>Add python.exe to PATH</strong> before
+            you click Install. In VS Code: Terminal → New Terminal. Check
+            with <code>python3 --version</code> (Mac / Linux) or
+            <code>py -3 --version</code> (Windows). You need 3.10 or newer.</li>
+        </ol>
+      </section>
+
+      <section class="panel" id="clone" style="margin-top: 16px">
+        <div class="kicker">Once per laptop</div>
+        <h2>Clone the private repository</h2>
+        <ol>
+          <li>On GitHub, open
             <code>kylemath/psych302-305-YOURUSERNAME</code>
-            (accept the invite first if you have not). This is not your Week 1
+            and accept the invite if you have not. This is not your Week 1
             public homepage repo.</li>
-          <li><strong>Start a Codespace.</strong> Green <strong>Code</strong>
-            button → <strong>Codespaces</strong> → Create codespace on
-            <code>main</code> (2-core is enough). Wait until the file tree
-            appears on the left.</li>
-          <li><strong>Make the note.</strong> In the terminal at the bottom
-            (Terminal → New Terminal if it is hidden), run
-            <code>cp lab-notes/TEMPLATE.md lab-notes/week02.md</code>.
-            Open <code>lab-notes/week02.md</code> and write your predicted
-            mean <em>now</em>, before any scored trial.</li>
+          <li>In VS Code: <strong>View → Command Palette</strong>
+            (Mac: Command-Shift-P, Windows: Control-Shift-P) →
+            <strong>Git: Clone</strong>. Paste
+            <code>https://github.com/kylemath/psych302-305-YOURUSERNAME</code>.
+            Sign in to GitHub when asked. Choose a folder you can find again
+            (Documents is fine). Open the cloned folder when prompted.</li>
+          <li>The file tree on the left should show
+            <code>lab-notes/</code>, <code>data/</code>, and
+            <code>rt/</code>. That folder is your copy of the repo.</li>
+        </ol>
+      </section>
+
+      <section class="panel" id="submit" style="margin-top: 16px">
+        <div class="kicker">Week 2 · VS Code on your laptop</div>
+        <h2>How you work this week</h2>
+        <p class="muted">
+          You edit the note, change the task, and run your own HTML page
+          from the cloned folder. Everyone does the same assignment.
+        </p>
+        <ol>
+          <li><strong>Open the cloned repo</strong> in VS Code (File → Open
+            Folder if it is not already open).</li>
+          <li><strong>Make the note.</strong> Open
+            <code>lab-notes/TEMPLATE.md</code>, then File → Save As
+            <code>lab-notes/week02.md</code>. Write your predicted mean
+            <em>now</em>, before any scored trial.</li>
           <li><strong>Personalize the task.</strong> Open
             <a href="rt.html">rt.html</a>
             (this handbook). Modify the sketch so it is clearly yours — look,
             timing, labels, or procedure — then <strong>Run</strong> and try
             Practice. A single number change is not enough.
             <strong>Copy sketch</strong> when you are happy.</li>
-          <li><strong>Paste into the Codespace.</strong> Open
+          <li><strong>Paste into your copy.</strong> In VS Code, open
             <code>rt/rt.html</code> and replace the script (below the paste
             comment) with what you copied. Save.</li>
-          <li><strong>Serve your copy.</strong> In the Codespace terminal:
-            <code>python3 -m http.server 8765 --bind 0.0.0.0</code>.
-            Ports → 8765 → Open in Browser, then go to
-            <code>/rt/rt.html</code>. Click the page, Start, run the scored
-            block, Export CSV.</li>
+          <li><strong>Serve your copy.</strong> Terminal → New Terminal (leave the working directory at the repo root, the folder that contains <code>lab-notes</code> and <code>rt</code>), then:
+            <code>python3 -m http.server 8765</code>
+            (Windows: <code>py -3 -m http.server 8765</code>).
+            In your browser open
+            <a href="http://127.0.0.1:8765/rt/rt.html">http://127.0.0.1:8765/rt/rt.html</a>.
+            Click the page, Start, run the scored block, Export CSV.</li>
           <li><strong>Put the CSV in the repo.</strong> Export saves to your
-            laptop’s Downloads folder. Drag that file into the Codespace
-            <code>data/</code> folder (or right-click <code>data/</code> →
-            Upload). Rename it if you like, e.g. <code>data/week02.csv</code>.</li>
+            laptop’s Downloads folder. Drag that file into the
+            <code>data/</code> folder in VS Code (or copy it there in Finder /
+            File Explorer). Rename it if you like, e.g.
+            <code>data/week02.csv</code>.</li>
           <li><strong>Finish the note.</strong> Say how you personalized the
             task, then n, mean RT, SD, and one limitation from the export.</li>
           <li><strong>Commit and push.</strong> Left sidebar Source Control
@@ -117,13 +159,14 @@
           </p>
         </article>
         <article class="card">
-          <div class="chip">Codespace</div>
-          <h3>Editor in the browser</h3>
+          <div class="chip">VS Code</div>
+          <h3>Editor on your laptop</h3>
           <p>
-            Code → Codespaces → Create (2-core). A Codespace is a full editor
-            plus a small web server, so you can open <em>your</em>
-            <code>rt/rt.html</code> in a browser tab. github.dev cannot run
-            that page. No software need be installed on your laptop.
+            Clone the private repo, edit files, run
+            <code>python3 -m http.server 8765</code> in the terminal, then
+            open <em>your</em> <code>rt/rt.html</code> at
+            <code>http://127.0.0.1:8765/rt/rt.html</code>. Commit and Sync
+            from the Source Control sidebar.
           </p>
         </article>
         <article class="card">
@@ -140,13 +183,21 @@
       </section>
 
       <section class="panel session" style="margin-top: 16px">
-        <div class="kicker">If Codespaces is unavailable</div>
-        <h2>Alternatives (in order)</h2>
+        <div class="kicker">If something is stuck</div>
+        <h2>Fallbacks (in order)</h2>
         <ol>
-          <li><strong>Codespace</strong> — preferred.</li>
-          <li><strong>github.dev</strong> — press period (.) to edit files only. It cannot run <code>rt/rt.html</code>. Come back to a Codespace for the block.</li>
-          <li><strong>ZIP download</strong> — edit locally; push later with assistance if needed.</li>
-          <li><strong>Open the HTML file on your laptop</strong> — last resort if Codespaces is down; still push the edited file and CSV into the private repo before Canvas.</li>
+          <li><strong>VS Code on your laptop</strong> — preferred. See
+            <a href="#install">install</a> and <a href="#clone">clone</a>.</li>
+          <li><strong>GitHub Desktop</strong> — clone, commit, and push if
+            Source Control in VS Code will not sign in. Still edit files in
+            VS Code and still run the Python server there.</li>
+          <li><strong>Open the HTML file directly</strong> — double-click
+            <code>rt/rt.html</code> if the server will not start. Still put
+            the CSV in <code>data/</code> and still commit and push before
+            Canvas.</li>
+          <li><strong>github.dev</strong> — press period (.) on GitHub to
+            edit files only. It cannot run the scored block. Come back to
+            VS Code on your laptop for the block.</li>
         </ol>
       </section>
 
@@ -195,7 +246,7 @@
           <p class="muted">
             Week 1 was the first test: public repo, Pages, fork, pull request.
             Two of those pages stay on the class homepage. From Week 2, commit
-            and push the private repo, then paste on Canvas.
+            and push the private repo from VS Code, then paste on Canvas.
             Commit history is not graded.
           </p>
         </article>
@@ -214,6 +265,8 @@
       <p class="footer">
         Account setup is the Canvas assignment
         <a href="https://canvas.ualberta.ca/courses/35483/assignments/812211">Week 0 · GitHub username</a>.
+        Install and clone:
+        <a href="#install">VS Code on your laptop</a>.
         Weekly hand-in:
         <a href="#submit">How you submit</a>.
       </p>

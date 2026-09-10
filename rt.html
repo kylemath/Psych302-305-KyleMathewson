@@ -114,7 +114,7 @@
           is not enough. Click <strong>Run</strong>, then Start in the
           preview. Space or click when the mark appears. When you like it,
           <strong>Copy sketch</strong> and paste it into
-          <code>rt/rt.html</code> in your Codespace. Write a predicted mean
+          <code>rt/rt.html</code> in VS Code. Write a predicted mean
           first. Same assignment for everyone.
           Walkthrough:
           <a href="workflow.html#submit">workflow.html § How you work this week</a>.
@@ -359,7 +359,7 @@ function exportCsv() {
   a.download = "rt-week02.csv";
   a.click();
   URL.revokeObjectURL(a.href);
-  note = "CSV downloaded. Drag it into data/ in your Codespace.";
+  note = "CSV downloaded. Drag it into data/ in VS Code.";
 }
     </script>
 
@@ -480,7 +480,7 @@ ${source}
       document.getElementById("copyBtn").addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(codeInput.value);
-          copyNote.textContent = "Sketch copied. In your Codespace, open rt/rt.html and replace the script with this.";
+          copyNote.textContent = "Sketch copied. In VS Code, open rt/rt.html and replace the script with this.";
         } catch (err) {
           copyNote.textContent = "Copy failed. Select the text and copy it yourself.";
         }

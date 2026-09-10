@@ -16,7 +16,7 @@ report/
 
 ## Run once
 
-From this folder, in a Codespace terminal:
+From this folder, in the VS Code terminal:
 
 ```bash
 python3 -m venv .venv
@@ -24,6 +24,16 @@ source .venv/bin/activate
 python scripts/summarize.py --csv ../data/YOURFILE.csv
 bash build.sh ../data/YOURFILE.csv
 ```
+
+Windows (VS Code PowerShell):
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+py -3 scripts/summarize.py --csv ../data/YOURFILE.csv --out output --report REPORT.md
+```
+
+If Git for Windows is installed, `bash build.sh ../data/YOURFILE.csv` also works.
 
 `summarize.py` uses only the Python standard library. The virtual environment is so later packages (if you add any) stay off the system Python. Do not `pip install` unless the instructor says to.
 
