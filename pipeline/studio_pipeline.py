@@ -732,6 +732,8 @@ def cmd_assignments_update(args: argparse.Namespace) -> None:
         lambda method, path, **kw: _notify_request(client, method, path, **kw),
         _read,
         notify_weeks=notify_weeks,
+        from_week=args.from_week,
+        update_pages=not args.no_pages,
     )
     if 2 in notify_weeks:
         cid = client.require_course()
@@ -780,6 +782,17 @@ def main() -> None:
         action="append",
         default=[],
         help="Week number whose assignment update emails students (repeatable). Default: none.",
+    )
+    u.add_argument(
+        "--from-week",
+        type=int,
+        default=1,
+        help="Rewrite weeklies from this week number onward (inclusive). Default: 1.",
+    )
+    u.add_argument(
+        "--no-pages",
+        action="store_true",
+        help="Do not rewrite the Introduction or Schedule wiki pages.",
     )
     u.set_defaults(func=cmd_assignments_update)
     args = p.parse_args()

@@ -45,7 +45,7 @@ WEEKLIES = [
         "note_path": "lab-notes/week03.md",
         "ask": "One subscale mean, item count, and one limitation of self-report. CSV in data/.",
         "module": "Week 3 · Inventory (16 Sep)",
-        "preamble": "Run the teaching inventory on the laboratory page, export the CSV, and report one subscale.",
+        "preamble": "From this week, work in Visual Studio Code on your laptop (GitHub Codespaces is not used). Run the teaching inventory on the laboratory page, export the CSV into <code>data/</code>, and report one subscale.",
     },
     {
         "n": 4,
@@ -58,7 +58,7 @@ WEEKLIES = [
         "note_path": "lab-notes/week04.md",
         "ask": "Paths to REPORT.md, summarize.py, the generated snippet, and main.tex. Name one change after the first build. Due 29 September (no class 30 September).",
         "module": "Week 4 · Research reports (23 Sep)",
-        "preamble": "Build the report from your own CSV. Do not type a mean by hand. No class 30 September.",
+        "preamble": "In the VS Code terminal, build the report from your own CSV. Do not type a mean by hand. No class 30 September.",
     },
     {
         "n": 5,
@@ -147,11 +147,21 @@ def weekly_description(read_template, row: dict) -> str:
     return fill(tpl, **{k: str(row[k]) for k in row})
 
 
-def update_weekly_bodies(client, notify, read_template, *, notify_weeks: set[int]) -> list[dict]:
-    """Rewrite weekly (and check-in) descriptions. Notify only listed week numbers."""
+def update_weekly_bodies(
+    client,
+    notify,
+    read_template,
+    *,
+    notify_weeks: set[int],
+    from_week: int = 1,
+    update_pages: bool = True,
+) -> list[dict]:
+    """Rewrite weekly (and check-in / final) descriptions. Notify only listed week numbers."""
     cid = client.require_course()
     updated = []
     for row in WEEKLIES:
+        if row["n"] < from_week:
+            continue
         existing = client.find_assignment_by_name(row["name"])
         if not existing:
             print(f"missing assignment: {row['name']}")
@@ -162,28 +172,39 @@ def update_weekly_bodies(client, notify, read_template, *, notify_weeks: set[int
                 "notify_of_update": row["n"] in notify_weeks,
             }
         }
-        asg = notify("PUT", f"/courses/{cid}/assignments/{existing['id']}", json=payload)
+        notify("PUT", f"/courses/{cid}/assignments/{existing['id']}", json=payload)
         updated.append({"n": row["n"], "id": existing["id"], "notified": row["n"] in notify_weeks})
         print(f"week {row['n']:02d}  {existing['id']}  notify={row['n'] in notify_weeks}")
-    checkin = client.find_assignment_by_name("Midterm check-in")
-    if checkin:
+    if from_week <= 8:
+        checkin = client.find_assignment_by_name("Midterm check-in")
+        if checkin:
+            notify(
+                "PUT",
+                f"/courses/{cid}/assignments/{checkin['id']}",
+                json={"assignment": {"description": read_template("checkin.html"), "notify_of_update": False}},
+            )
+            print(f"check-in  {checkin['id']}  notify=False")
+    if from_week <= 12:
+        final = client.find_assignment_by_name("Final project")
+        if final:
+            notify(
+                "PUT",
+                f"/courses/{cid}/assignments/{final['id']}",
+                json={"assignment": {"description": read_template("final.html"), "notify_of_update": False}},
+            )
+            print(f"final     {final['id']}  notify=False")
+    if update_pages:
         notify(
             "PUT",
-            f"/courses/{cid}/assignments/{checkin['id']}",
-            json={"assignment": {"description": read_template("checkin.html"), "notify_of_update": False}},
+            f"/courses/{cid}/pages/introduction",
+            json={"wiki_page": {"title": "Introduction", "body": read_template("introduction.html"), "published": True, "front_page": True}},
         )
-        print(f"check-in  {checkin['id']}  notify=False")
-    notify(
-        "PUT",
-        f"/courses/{cid}/pages/introduction",
-        json={"wiki_page": {"title": "Introduction", "body": read_template("introduction.html"), "published": True, "front_page": True}},
-    )
-    notify(
-        "PUT",
-        f"/courses/{cid}/pages/schedule",
-        json={"wiki_page": {"title": "Schedule", "body": read_template("schedule_page.html"), "published": True}},
-    )
-    print("pages    introduction, schedule")
+        notify(
+            "PUT",
+            f"/courses/{cid}/pages/schedule",
+            json={"wiki_page": {"title": "Schedule", "body": read_template("schedule_page.html"), "published": True}},
+        )
+        print("pages    introduction, schedule")
     return updated
 
 

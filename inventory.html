@@ -56,7 +56,9 @@
           Ten statements, two in each of five familiar domains. Answer as you
           usually are, not as you wish you were. Write a predicted range for
           one subscale before you start. This is a teaching instrument, not a
-          diagnosis and not a published Big Five test.
+          diagnosis and not a published Big Five test. Put the CSV in
+          <code>data/</code> in VS Code, then commit and push.
+          <a href="workflow.html">How you work</a>.
         </p>
       </header>
 
@@ -139,7 +141,7 @@
           const cell = rows.filter((r) => r.domain === domain);
           return `<tr><td>${domain}</td><td>${mean(cell.map((r) => r.scored)).toFixed(2)}</td></tr>`;
         }).join("");
-        document.getElementById("status").textContent = "Scored. Export the CSV into data/.";
+        document.getElementById("status").textContent = "Scored. Export the CSV into data/ in VS Code.";
         return rows;
       }
 

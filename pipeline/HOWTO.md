@@ -20,6 +20,7 @@ python studio_pipeline.py repos-replace --path rt/rt.html --path rt/README.md   
 python studio_pipeline.py repos-replace --path rt/rt.html --path rt/README.md --apply
 python studio_pipeline.py modules-create       # Canvas modules + weekly assignment bodies
 python studio_pipeline.py assignments-update   # rewrite weekly bodies only; no student email
+python studio_pipeline.py assignments-update --from-week 3 --no-pages   # weeks 3+ only; leave intro/schedule
 python studio_pipeline.py assignments-update --notify-week 2   # same, email only Week 2
 ```
 
@@ -35,4 +36,4 @@ To the agent: **`plant week0`** means create (or confirm) the assignment and ann
 
 Week 1 is due Tuesday 17:00. Do not post Week 1 grades before the due date. GitHub forks/PRs are evidence of work; Canvas paste is the official submission.
 
-Students work in **VS Code on their laptops** (GitHub Codespaces is not used). After a handbook push, rewrite Canvas weeklies with `assignments-update` (no student email unless `--notify-week`). Post `templates/week2_vscode_announcement.html` as a new announcement. Existing student repos do not get README overwrites from `repos-sync`; use `repos-replace --path README.md` (and other listed paths) if a live file must change.
+Students work in **VS Code on their laptops** (GitHub Codespaces is not used). After a handbook push, rewrite Canvas weeklies from Week 3 onward with `assignments-update --from-week 3 --no-pages` (no student email unless `--notify-week`). Existing student repos do not get README overwrites from `repos-sync`; use `repos-replace --path report/README.md --path report/build.sh` for later-week files.
