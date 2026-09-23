@@ -787,10 +787,19 @@ def main() -> None:
     c.set_defaults(func=cmd_week0_create)
     sub.add_parser("week0-pull").set_defaults(func=cmd_week0_pull)
     sub.add_parser("week1-pull").set_defaults(func=cmd_week1_pull)
-    from weekly_ops import cmd_roster_pull, cmd_week1_grade, cmd_week2_grade, cmd_week2_pull, cmd_repos_cleanup
+    from weekly_ops import (
+        cmd_repos_cleanup,
+        cmd_roster_pull,
+        cmd_week1_grade,
+        cmd_week2_grade,
+        cmd_week2_pull,
+        cmd_week3_grade,
+        cmd_week3_pull,
+    )
 
     sub.add_parser("roster-pull").set_defaults(func=cmd_roster_pull)
     sub.add_parser("week2-pull").set_defaults(func=cmd_week2_pull)
+    sub.add_parser("week3-pull").set_defaults(func=cmd_week3_pull)
     g = sub.add_parser("week0-grade")
     g.add_argument("--dry-run", action="store_true", help="Print complete/incomplete; do not PUT")
     g.set_defaults(func=cmd_week0_grade)
@@ -804,6 +813,11 @@ def main() -> None:
     w2g.add_argument("--apply", action="store_true", help="PUT rubric scores on Canvas")
     w2g.add_argument("--force", action="store_true", help="Overwrite a score that is already posted")
     w2g.set_defaults(func=cmd_week2_grade)
+    w3g = sub.add_parser("week3-grade")
+    w3g.add_argument("--dry-run", action="store_true", help="Print scores only (default if --apply is omitted)")
+    w3g.add_argument("--apply", action="store_true", help="PUT rubric scores on Canvas")
+    w3g.add_argument("--force", action="store_true", help="Overwrite a score that is already posted")
+    w3g.set_defaults(func=cmd_week3_grade)
     cl = sub.add_parser("repos-cleanup")
     cl.add_argument("--dry-run", action="store_true", help="Print the plan only (default if --apply is omitted)")
     cl.add_argument("--apply", action="store_true", help="Archive private repos whose week0 owner dropped")

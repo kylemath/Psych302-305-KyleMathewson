@@ -97,7 +97,8 @@
           <li><strong>Open a pull request back to the class repo.</strong>
             From your fork, open a PR into
             <a href="https://github.com/kylemath/Psych302-305-KyleMathewson">kylemath/Psych302-305-KyleMathewson</a>.
-            This is practice — and a contest. Two pages stay on the class homepage (scroll past the handbook): Isaac’s pond and Joshua’s fleeing-button card.</li>
+            This is practice — and a contest. Two pages from this class stay as examples
+            <a href="#examples">below</a>: Isaac’s pond and Joshua’s fleeing-button card.</li>
         </ol>
         <p class="muted">
           <strong>GitHub is the work. Canvas is the hand-in.</strong>
@@ -144,7 +145,11 @@ AI disclosure: no Copilot tonight</pre>
         </section>
         <section class="panel">
           <h2>Preview</h2>
-          <iframe id="preview" title="Preview of the web page"></iframe>
+          <iframe
+            id="preview"
+            title="Preview of the web page"
+            sandbox="allow-scripts allow-modals allow-forms allow-popups allow-downloads"
+          ></iframe>
         </section>
       </div>
 
@@ -156,6 +161,36 @@ AI disclosure: no Copilot tonight</pre>
           <a href="workflow.html#agentic">agentic coding</a>:
           you stay the author.
       </p>
+
+      <section class="panel" id="examples" style="margin-top: 18px">
+        <div class="kicker">Examples · this class</div>
+        <h2>Two Week 1 pages that stayed</h2>
+        <p class="muted">
+          Same starter card as the editor above. Isaac painted a pond; Joshua
+          made the button run away. Open either page on its own if the frame
+          feels small.
+        </p>
+        <div class="grid-2" style="margin-top: 16px">
+          <article>
+            <div class="chip gold">Isaac Abimbola</div>
+            <h3 style="margin: 8px 0 10px"><a href="homes/isaac.html">A pond you can paint</a></h3>
+            <iframe
+              src="homes/isaac.html"
+              title="Isaac Abimbola, Week 1 homepage"
+              style="width: 100%; height: 420px; border: 0; border-radius: 14px; background: #07090d"
+            ></iframe>
+          </article>
+          <article>
+            <div class="chip">Joshua Tokarsky</div>
+            <h3 style="margin: 8px 0 10px"><a href="homes/joshua.html">A button that flees</a></h3>
+            <iframe
+              src="homes/joshua.html"
+              title="Joshua Tokarsky, Week 1 homepage"
+              style="width: 100%; height: 420px; border: 0; border-radius: 14px; background: #07090d"
+            ></iframe>
+          </article>
+        </div>
+      </section>
     </div>
 
     <script>
@@ -210,9 +245,17 @@ AI disclosure: no Copilot tonight</pre>
 
       const codeInput = document.getElementById("codeInput");
       const preview = document.getElementById("preview");
+      let previewUrl = "";
 
       function renderPreview() {
-        preview.srcdoc = codeInput.value;
+        // Blob URL, not srcdoc: a document written as srcdoc is an opaque
+        // origin, so injected extension scripts throw "Unexpected end of
+        // input" / "Access to storage is not allowed from this context"
+        // and the preview stays blank.
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        const blob = new Blob([codeInput.value], { type: "text/html;charset=utf-8" });
+        previewUrl = URL.createObjectURL(blob);
+        preview.src = previewUrl;
       }
 
       document.getElementById("runButton").addEventListener("click", renderPreview);

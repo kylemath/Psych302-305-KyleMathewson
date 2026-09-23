@@ -823,6 +823,379 @@ def cmd_week2_grade(args: object) -> None:
     _grade_week(args, 2, "week2_roster.json", score_week2, "week2_grades.json")
 
 
+WEEK3_DIR = "week03-inventory"
+WEEK3_STOP_MARKER = "STOP EDITING HERE"
+WEEK3_CSV_HEADER = "item,domain,reverse,response,scored"
+TEDIUM_RE = re.compile(
+    r"tedi|repetitiv|annoy|boring|painful|error.?prone|time.?consuming|manageable|hand.?edit|editing (ten|10|all)",
+    re.I,
+)
+PREDICTION_RE = re.compile(r"predict|expect|guess|hypothes|i think i", re.I)
+ITEM_FIELD_RE = r"""{key}\s*:\s*(?P<q>["'`])(?P<v>(?:\\.|(?!(?P=q)).)*)(?P=q)"""
+
+
+def _items_block(html: str) -> str:
+    start = re.search(r"\bITEMS\s*=\s*\[", html or "")
+    if not start:
+        return ""
+    rest = html[start.end():]
+    stop = rest.find(WEEK3_STOP_MARKER)
+    if stop >= 0:
+        return rest[:stop]
+    end = re.search(r"\n\s*\]\s*;", rest)
+    return rest[: end.start()] if end else rest[:8000]
+
+
+def parse_inventory_items(html: str) -> list[dict]:
+    """Pull {domain, reverse, text} objects out of a student's ITEMS array."""
+    items = []
+    for obj in re.finditer(r"\{(.*?)\}", _items_block(html), re.S):
+        body = obj.group(1)
+        domain = re.search(ITEM_FIELD_RE.format(key="domain"), body, re.S)
+        text = re.search(ITEM_FIELD_RE.format(key="text"), body, re.S)
+        reverse = re.search(r"reverse\s*:\s*(\d+|true|false)", body, re.I)
+        if not text:
+            continue
+        rev = (reverse.group(1).lower() if reverse else "0")
+        items.append(
+            {
+                "domain": domain.group("v").strip() if domain else "",
+                "reverse": 1 if rev in ("1", "true") else 0,
+                "text": text.group("v").strip(),
+            }
+        )
+    return items
+
+
+def _norm_text(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", (value or "").lower()).strip()
+
+
+def _week3_defaults() -> list[str]:
+    from studio_pipeline import STUDENT_TEMPLATE
+
+    html = (STUDENT_TEMPLATE / WEEK3_DIR / "inventory.html").read_text(encoding="utf-8")
+    return [_norm_text(i["text"]) for i in parse_inventory_items(html)]
+
+
+def _is_rewritten(text: str, defaults: list[str]) -> bool:
+    from difflib import SequenceMatcher
+
+    norm = _norm_text(text)
+    if not norm:
+        return False
+    return all(SequenceMatcher(None, norm, d).ratio() < 0.8 for d in defaults)
+
+
+def _script_tail(html: str) -> str:
+    idx = (html or "").find(WEEK3_STOP_MARKER)
+    return re.sub(r"\s+", "", html[idx:]) if idx >= 0 else ""
+
+
+def _readme_sections(md: str) -> dict[str, str]:
+    sections: dict[str, str] = {}
+    current = ""
+    for line in (md or "").splitlines():
+        m = re.match(r"^\s*##(?!#)\s*(.+?)\s*$", line)
+        if m:
+            current = m.group(1).strip().lower()
+            sections[current] = ""
+            continue
+        if current:
+            sections[current] += line + "\n"
+    return sections
+
+
+def _filled_sections(md: str, template_md: str) -> dict[str, str]:
+    """Section → student text left after removing the template's prompt lines."""
+    template = _readme_sections(template_md)
+    out = {}
+    for name, body in _readme_sections(md).items():
+        prompt = {_norm_text(l) for l in (template.get(name) or "").splitlines() if _norm_text(l)}
+        kept = [l for l in body.splitlines() if _norm_text(l) and _norm_text(l) not in prompt]
+        text = "\n".join(kept).strip()
+        if len(re.findall(r"[A-Za-z0-9]", text)) >= 3:
+            out[name] = text
+    return out
+
+
+def _section(filled: dict[str, str], *keys: str) -> str:
+    for name, text in filled.items():
+        if any(k in name for k in keys):
+            return text
+    return ""
+
+
+def _week3_commit_after_due(full: str, due_at: str) -> str:
+    """ISO date of the newest week03-inventory commit if it landed after the due date."""
+    from studio_pipeline import _gh
+
+    if not due_at:
+        return ""
+    result = _gh(
+        "api",
+        f"repos/{full}/commits?path={WEEK3_DIR}&since={due_at}&per_page=1",
+        "--jq",
+        ".[0].commit.committer.date // empty",
+        check=False,
+    )
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def _inspect_week3_repo(full: str, due_at: str = "") -> dict:
+    from studio_pipeline import STUDENT_TEMPLATE, _repo_exists, _repo_file_paths
+
+    empty = {"repo": full, "exists": False, "html_path": "", "css_ok": False, "readme_path": "", "csv_paths": []}
+    if not full or not _repo_exists(full):
+        return empty
+    try:
+        files = sorted(_repo_file_paths(full))
+    except RuntimeError as exc:
+        return {**empty, "exists": True, "error": str(exc)[:200]}
+    htmls = [p for p in files if p.lower().endswith("inventory.html")]
+    html_path = next((p for p in htmls if p.startswith(f"{WEEK3_DIR}/")), htmls[0] if htmls else "")
+    folder = html_path.rsplit("/", 1)[0] if "/" in html_path else ""
+    prefix = f"{folder}/" if folder else ""
+    readme_path = next(
+        (p for p in (f"{WEEK3_DIR}/README.md", f"{prefix}README.md") if p in files and p != "README.md"),
+        "",
+    )
+    csv_paths = [
+        p
+        for p in files
+        if p.lower().endswith(".csv") and (p.startswith(f"{WEEK3_DIR}/") or "inventory" in p.lower())
+    ]
+    html = _repo_raw(full, html_path) if html_path else ""
+    script_paths = []
+    for src in re.findall(r"""<script[^>]*\bsrc\s*=\s*["']([^"':]+?\.js)["']""", html or "", re.I):
+        path = f"{prefix}{src.lstrip('./')}"
+        if path in files:
+            script_paths.append(path)
+            html += "\n" + (_repo_raw(full, path) or "")
+    items = parse_inventory_items(html or "")
+    defaults = _week3_defaults()
+    template_html = (STUDENT_TEMPLATE / WEEK3_DIR / "inventory.html").read_text(encoding="utf-8")
+    readme = _repo_raw(full, readme_path) if readme_path else ""
+    template_md = (STUDENT_TEMPLATE / WEEK3_DIR / "README.md").read_text(encoding="utf-8")
+    csv_header_ok = False
+    for path in csv_paths:
+        body = _repo_raw(full, path) or ""
+        if WEEK3_CSV_HEADER in body[:200]:
+            csv_header_ok = True
+            break
+    domains: dict[str, list[int]] = {}
+    for item in items:
+        domains.setdefault(item["domain"], []).append(item["reverse"])
+    return {
+        "repo": full,
+        "exists": True,
+        "html_path": html_path,
+        "script_paths": script_paths,
+        "css_ok": f"{prefix}inventory.css" in files,
+        "readme_path": readme_path,
+        "csv_paths": csv_paths,
+        "csv_header_ok": csv_header_ok,
+        "items": items,
+        "rewritten": sum(1 for i in items if _is_rewritten(i["text"], defaults)),
+        "domain_shape": {d: {"n": len(r), "reverse": sum(r)} for d, r in domains.items()},
+        "tail_intact": bool(html) and _script_tail(html) == _script_tail(template_html),
+        "readme_filled": _filled_sections(readme or "", template_md) if readme else {},
+        "late_commit": _week3_commit_after_due(full, due_at),
+    }
+
+
+def cmd_week3_pull(_: object) -> None:
+    """Harvest Week 3 Canvas boxes and inspect each private week03-inventory folder. Does not grade."""
+    from studio_pipeline import OUT, _client, _plain_text, _repo_full_name, _weekly_assignment_id
+
+    client = _client()
+    aid = _weekly_assignment_id(client, 3)
+    due_at = (client.get_assignment(aid) or {}).get("due_at") or ""
+    week0 = _load_week0_by_id()
+    rows = []
+    for sub in client.list_submissions(aid):
+        user = sub.get("user") or {}
+        raw = sub.get("body") or ""
+        text = _plain_text(raw)
+        row = {
+            "canvasUserId": sub.get("user_id"),
+            "canvasName": user.get("name"),
+            "sortableName": user.get("sortable_name"),
+            "sisUserId": user.get("sis_user_id"),
+            "workflow": sub.get("workflow_state"),
+            "submitted_at": sub.get("submitted_at"),
+            "late": bool(sub.get("late")),
+            "due_at": due_at,
+            "grade": sub.get("grade"),
+            "score": sub.get("score"),
+            "github_username": _username_for({"canvasUserId": sub.get("user_id")}, week0),
+            "text": text[:4000],
+            "urls": parse_week2_body(raw).get("urls") or [],
+        }
+        if _skip_row(row):
+            continue
+        own = _repo_full_name(row["github_username"]) if row["github_username"] else ""
+        inspect = _inspect_week3_repo(own, due_at) if own else {"repo": None, "exists": False}
+        if not inspect.get("html_path"):
+            for url in row["urls"]:
+                if CLASS_DEMO_RE.search(url):
+                    continue
+                m = BLOB_RE.search(url) or re.search(r"github\.com/([^/]+)/([^/?#]+)", url, re.I)
+                if not m:
+                    continue
+                other = f"{m.group(1)}/{m.group(2).removesuffix('.git')}"
+                if other.lower() == (own or "").lower():
+                    continue
+                alt = _inspect_week3_repo(other, due_at)
+                if alt.get("html_path"):
+                    inspect = {**alt, "not_own_repo": True}
+                    break
+        row["repo_inspect"] = inspect
+        rows.append(row)
+    OUT.mkdir(exist_ok=True)
+    dest = OUT / "week3_roster.json"
+    dest.write_text(json.dumps(rows, indent=2) + "\n")
+    submitted = [r for r in rows if r.get("submitted_at")]
+    pages = [r for r in submitted if (r.get("repo_inspect") or {}).get("html_path")]
+    full = [r for r in submitted if (r.get("repo_inspect") or {}).get("rewritten") == 10]
+    notes = [r for r in submitted if (r.get("repo_inspect") or {}).get("readme_path")]
+    csvs = [r for r in submitted if (r.get("repo_inspect") or {}).get("csv_paths")]
+    print(
+        f"wrote {dest}  {len(submitted)} submitted / {len(rows)} rows  "
+        f"pages={len(pages)} all-ten-rewritten={len(full)} notes={len(notes)} csvs={len(csvs)}"
+    )
+
+
+def score_week3(row: dict) -> dict:
+    zero = {"items": 0, "structure": 0, "files": 0, "prediction": 0, "tedium": 0, "disclosure": 0}
+    if not row.get("submitted_at"):
+        return {
+            "score": 0,
+            "parts": zero,
+            "comment": "No Canvas submission by the Tuesday due date.",
+            "needs_review": False,
+            "reasons": ["unsubmitted"],
+        }
+    inspect = row.get("repo_inspect") or {}
+    text = row.get("text") or ""
+    filled = inspect.get("readme_filled") or {}
+    items = inspect.get("items") or []
+    rewritten = int(inspect.get("rewritten") or 0)
+    review = []
+
+    if rewritten >= 10:
+        items_pts = 3
+    elif rewritten >= 5:
+        items_pts = 2
+    elif rewritten >= 1:
+        items_pts = 1
+    else:
+        items_pts = 0
+    if 0 < rewritten < 10:
+        review.append(f"{rewritten}/10 items rewritten")
+
+    shape = inspect.get("domain_shape") or {}
+    shape_ok = (
+        len(items) == 10
+        and len(shape) == 5
+        and all(v["n"] == 2 and v["reverse"] == 1 for v in shape.values())
+    )
+    css_ok = bool(inspect.get("css_ok"))
+    tail_ok = bool(inspect.get("tail_intact"))
+    if not inspect.get("html_path"):
+        struct_pts = 0
+    elif shape_ok and css_ok:
+        struct_pts = 2
+    else:
+        struct_pts = 1
+    if inspect.get("html_path") and not tail_ok:
+        review.append("scoring code below STOP EDITING differs from the template")
+
+    readme_ok = bool(inspect.get("readme_path")) and bool(filled)
+    csv_ok = bool(inspect.get("csv_paths"))
+    files_pts = (1 if readme_ok else 0) + (1 if csv_ok else 0)
+    if csv_ok and not inspect.get("csv_header_ok"):
+        review.append("CSV header is not the inventory export")
+    if csv_ok and not any(p.startswith(f"{WEEK3_DIR}/") for p in inspect.get("csv_paths") or []):
+        review.append("CSV is outside week03-inventory/")
+
+    pred = _section(filled, "predict")
+    pred_pts = 1 if (pred or PREDICTION_RE.search(text)) else 0
+    tedium = _section(filled, "tedium")
+    tedium_pts = 1 if (tedium or TEDIUM_RE.search(text)) else 0
+    disclosure = _section(filled, "disclosure", "copilot")
+    disc_pts = 1 if (disclosure or DISCLOSURE_RE.search(text)) else 0
+
+    if inspect.get("not_own_repo"):
+        review.append(f"graded from pasted repo {inspect.get('repo')}")
+    if inspect.get("error"):
+        review.append(inspect["error"])
+    if row.get("late"):
+        review.append("Canvas marks the submission late")
+    if inspect.get("late_commit"):
+        review.append(f"week03-inventory commit after due: {inspect['late_commit']}")
+
+    parts = {
+        "items": items_pts,
+        "structure": struct_pts,
+        "files": files_pts,
+        "prediction": pred_pts,
+        "tedium": tedium_pts,
+        "disclosure": disc_pts,
+    }
+    score = sum(parts.values())
+    shape_txt = ",".join(f"{d}:{v['n']}/{v['reverse']}r" for d, v in shape.items()) or "—"
+    reasons = [
+        f"html={inspect.get('html_path') or '—'} scripts={','.join(inspect.get('script_paths') or []) or '—'} "
+        f"rewritten={rewritten}/{len(items)} pts={items_pts}",
+        f"shape={shape_txt} css={css_ok} tail={tail_ok} pts={struct_pts}",
+        f"readme={inspect.get('readme_path') or '—'} filled={','.join(filled) or '—'} csvs={','.join(inspect.get('csv_paths') or []) or '—'} pts={files_pts}",
+        f"prediction={pred_pts} tedium={tedium_pts} disclosure={disc_pts}",
+    ]
+    comment = (
+        f"Week 3: items rewritten {parts['items']}, structure {parts['structure']}, "
+        f"note+CSV {parts['files']}, prediction {parts['prediction']}, "
+        f"tedium {parts['tedium']}, disclosure {parts['disclosure']}. Total {score}/10."
+    )
+    return {
+        "score": score,
+        "parts": parts,
+        "comment": comment,
+        "needs_review": bool(review),
+        "reasons": reasons + ([f"review: {'; '.join(review)}"] if review else []),
+    }
+
+
+WEEK3_STYLE_BONUS = 0.5
+
+
+def _load_week3_bonus() -> dict[int, str]:
+    """Instructor-confirmed style bonus: out/week3_bonus.json maps canvasUserId → what changed."""
+    from studio_pipeline import OUT
+
+    path = OUT / "week3_bonus.json"
+    if not path.exists():
+        return {}
+    return {int(k): v for k, v in json.loads(path.read_text()).items()}
+
+
+def cmd_week3_grade(args: object) -> None:
+    """Score Week 3 from Canvas text + private week03-inventory files. Default dry-run."""
+    bonus = _load_week3_bonus()
+
+    def score(row: dict) -> dict:
+        scored = score_week3(row)
+        what = bonus.get(int(row["canvasUserId"])) if row.get("canvasUserId") is not None else None
+        if what and row.get("submitted_at"):
+            scored["score"] = scored["score"] + WEEK3_STYLE_BONUS
+            scored["parts"]["style_bonus"] = WEEK3_STYLE_BONUS
+            scored["comment"] += f" Style bonus +{WEEK3_STYLE_BONUS} ({what}). Final {scored['score']}."
+            scored["reasons"].append(f"style bonus: {what}")
+        return scored
+
+    _grade_week(args, 3, "week3_roster.json", score, "week3_grades.json")
+
+
 def _list_studio_repos() -> list[str]:
     from studio_pipeline import GITHUB_OWNER, _gh
 
