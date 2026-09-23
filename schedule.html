@@ -192,34 +192,34 @@
           <div class="when">Week 4 · Wednesday 23 September 2026</div>
           <a href="report.html">report.html</a>
         </div>
-        <h2>Tool: a report from Markdown, a script, and LaTeX</h2>
+        <h2>Tool: a report from Python and Typst</h2>
         <p class="muted">
           Example: your Week 2 reaction times or Week 3 inventory scores.
           In <code>week04-report/</code>, write the paper in
-          <code>REPORT.md</code>, compute with
-          <code>scripts/summarize.py</code>, typeset with
-          <code>main.tex</code>. Run, read, change, run again.
+          <code>main.typ</code>, analyze the CSV and draw a figure with
+          <code>scripts/summarize.py</code>, compile with
+          <code>typst compile</code>. Run, read the PDF, change, run again.
           Do not type the mean by hand.
         </p>
         <div class="agenda">
           <dl>
             <dt>18:00 Introduction</dt>
-            <dd>A report is a pipeline. The number in the paper must come from a file the script can read again.</dd>
+            <dd>A report is a pipeline. The number in the PDF must come from a file the script can read again.</dd>
             <dt>18:25 Demonstration</dt>
-            <dd>Instructor runs <code>build.sh</code> on a sample CSV, reads the output, changes one line, runs it again.</dd>
+            <dd>Instructor runs <code>build.sh</code> on a sample CSV, opens the PDF, changes one line, compiles again.</dd>
             <dt>18:40 Exercise</dt>
-            <dd>Copy the starter if needed. Point the script at your CSV. Write the prediction first.</dd>
+            <dd>Install Typst if needed. First build on the sample. Then point the script at your CSV. Write the prediction first.</dd>
           </dl>
           <dl>
             <dt>19:25 Results</dt>
-            <dd>The generated block and one limitation. No draft exchange.</dd>
+            <dd>The PDF (or the generated table) and one limitation. No draft exchange.</dd>
             <dt>20:05 Modification</dt>
-            <dd>Rewrite the sentences until a stranger can state the claim, then change the exclusion rule or add a second descriptive and rebuild.</dd>
+            <dd>Rewrite the sentences until a stranger can state the claim, then change the exclusion rule or add a second descriptive and rebuild the PDF.</dd>
             <dt>Reading</dt>
             <dd><a href="report/README.md">report/README.md</a> and <a href="workflow.html#agentic">agentic coding</a>.</dd>
           </dl>
         </div>
-        <p class="muted"><strong>Report:</strong> in the VS Code terminal, paths to the Markdown, the script, the generated snippet, and the <code>.tex</code>. Name one iteration. Due Tuesday 29 September (no class on the 30th).</p>
+        <p class="muted"><strong>Report:</strong> paths to the README, <code>main.typ</code>, the generated snippet, the figure, and <code>output/main.pdf</code>. The CSV you used. Name one iteration. Due Tuesday 29 September (no class on the 30th).</p>
       </article>
 
       <article class="panel meeting dark-week">

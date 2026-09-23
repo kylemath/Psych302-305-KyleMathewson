@@ -148,7 +148,7 @@ There is no extra credit and no rounding announced in advance.
 | 0–1  | Wed 2 Sep  | GitHub account, then a page about you                | Week 0 form that night; Week 1 report Tue 8 Sep, 17:00 |
 | 2    | Wed 9 Sep  | p5.js pieces, then personalize RT page + CSV         | Week 2 report Tue 15 Sep                               |
 | 3    | Wed 16 Sep | Short inventory                                      | Week 3 report Tue 22 Sep                               |
-| 4    | Wed 23 Sep | Markdown / Python / LaTeX report loop                | Week 4 report Tue 29 Sep                               |
+| 4    | Wed 23 Sep | Python / Typst report loop                           | Week 4 report Tue 29 Sep                               |
 | —    | Wed 30 Sep | No class (National Day for Truth and Reconciliation) | —                                                      |
 | 5    | Wed 7 Oct  | Two-condition comparison                             | Week 5 report Tue 13 Oct                               |
 | 6    | Wed 14 Oct | Cite and file a paper                                | Week 6 report Tue 20 Oct                               |

@@ -19,7 +19,7 @@
         font-size: 0.88rem;
       }
       textarea {
-        min-height: 88px;
+        min-height: 72px;
         resize: vertical;
         font-family: "Courier New", monospace;
         line-height: 1.45;
@@ -42,7 +42,7 @@
         background: rgba(2, 6, 23, 0.65);
         border: 1px solid var(--panel-border);
         white-space: pre-wrap;
-        font-size: 0.82rem;
+        font-size: 0.78rem;
         color: var(--ink);
       }
       .paper-sheet {
@@ -67,6 +67,33 @@
         color: #3f3a32;
         line-height: 1.6;
         margin: 0 0 10px;
+      }
+      .paper-sheet table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: "Segoe UI", sans-serif;
+        font-size: 0.88rem;
+        margin: 12px 0 16px;
+      }
+      .paper-sheet canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: 8px 0 16px;
+        background: #f4efe6;
+      }
+      .paper-caption {
+        font-family: "Segoe UI", sans-serif;
+        font-size: 0.78rem;
+        color: #6b6458;
+        margin: -8px 0 16px;
+      }
+      .paper-sheet th,
+      .paper-sheet td {
+        text-align: left;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(28, 25, 21, 0.12);
+        color: #3f3a32;
       }
       .paper-meta {
         font-family: "Segoe UI", sans-serif;
@@ -101,16 +128,24 @@
 
       <header class="panel" style="margin-bottom: 18px">
         <div class="kicker">Week 4 laboratory</div>
-        <h1>Write the paper from files, then rebuild</h1>
+        <h1>Python calculates the numbers. Typst makes the PDF.</h1>
         <p class="lede">
-          A research report is not a number you type once. It is three files
-          that stay in sync: Markdown you write, a Python script that computes,
-          and a LaTeX document that typesets. Tonight you run that loop on
-          your Week 2 or Week 3 CSV.
+          This page shows the Week 4 loop so you can see how the pieces fit
+          together. Your graded files live in your private repo, in the folder
+          <code>week04-report/</code>.
+          A Python script reads your CSV and writes two files:
+          <code>output/numbers.typ</code> (the results sentence and the table)
+          and <code>output/figure.png</code> (the graph).
+          You then run <code>typst compile main.typ</code>, and Typst turns
+          <code>main.typ</code> into <code>output/main.pdf</code>.
+          The preview lower on this page runs in the browser so you can try
+          the idea in class. The work you turn in is the PDF you compile on
+          your own computer.
+          <a href="workflow.html#typst">Install Typst</a> before lab if you can.
         </p>
         <div class="equation">
-          edit → run the script → read the output → edit again
-          <small>Do not type a mean by hand. If the number is wrong, fix the script or the file.</small>
+          edit your writing or the script → run the script → compile the PDF → read it → edit again
+          <small>The mean in the paper comes from the script. If a number looks wrong, change the script or the CSV and run it again.</small>
         </div>
       </header>
 
@@ -119,9 +154,10 @@
           <div class="chip gold">Markdown</div>
           <h3>What you claim</h3>
           <p>
-            <a href="report/REPORT.md">report/REPORT.md</a>
-            is the readable paper. Prediction and limitation are yours.
-            The results block is generated.
+            <code>week04-report/README.md</code>
+            is the short lab note you paste on Canvas. You write the prediction,
+            what you changed, and anything a reader should know about the data.
+            The script fills in the results.
           </p>
         </article>
         <article class="card">
@@ -129,57 +165,74 @@
           <h3>What you compute</h3>
           <p>
             <a href="report/scripts/summarize.py">report/scripts/summarize.py</a>
-            reads the CSV and writes
-            <code>output/numbers.md</code> and
-            <code>output/numbers.tex</code>. Standard library only.
+            reads the CSV, writes
+            <code>output/numbers.typ</code>, and draws
+            <code>output/figure.png</code>.
+            The script uses matplotlib. Install it inside this project's
+            <code>.venv</code> folder so it stays with the lab.
           </p>
         </article>
         <article class="card">
-          <div class="chip">LaTeX</div>
+          <div class="chip">Typst</div>
           <h3>What you typeset</h3>
           <p>
-            <a href="report/main.tex">report/main.tex</a>
-            <code>\input</code>s the generated snippet. A PDF is a bonus if
-            <code>pdflatex</code> is present; the <code>.tex</code> is enough.
+            <a href="report/main.typ">report/main.typ</a>
+            pulls in the generated snippet (the table and the figure) with
+            <code>#include</code>.
+            Run
+            <code>typst compile main.typ output/main.pdf</code>
+            to make the paper. Turn in that PDF along with the source files.
           </p>
         </article>
       </section>
 
       <section class="panel" style="margin-bottom: 16px">
         <div class="kicker">In the private repository</div>
-        <h2>Copy the starter, then run the loop</h2>
+        <h2>Install Typst, then run the loop</h2>
         <p class="muted">
-          If your studio repo does not yet have <code>week04-report/</code>,
-          copy the starter files from this handbook
-          (<a href="report/README.md">report/README.md</a>)
-          into that folder. Put your CSV in the same folder (or point the script at
-          <code>../week02-rt/</code> or <code>../week03-inventory/</code>).
-          In the VS Code terminal:
+          Copy the starter from
+          <a href="report/README.md">report/</a>
+          into a folder named <code>week04-report/</code> in your private repo.
+          Run the first build on <code>sample-rt.csv</code> so you can see that
+          the compiler works. Then point the script at your Week 2 or
+          Week 3 CSV. In the VS Code terminal:
         </p>
         <pre class="snippet">cd week04-report
 python3 -m venv .venv
 source .venv/bin/activate
-bash build.sh YOURFILE.csv</pre>
+bash build.sh sample-rt.csv
+# then, on your own file:
+bash build.sh ../week02-rt/YOURFILE.csv</pre>
         <p class="muted" style="margin-top: 12px">
           Windows (PowerShell): <code>py -3 -m venv .venv</code>, then
           <code>.\.venv\Scripts\Activate.ps1</code>, then
-          <code>py -3 scripts/summarize.py --csv YOURFILE.csv --out output --report REPORT.md</code>.
+          <code>py -3 -m pip install -r requirements.txt</code>, then
+          <code>py -3 scripts/summarize.py --csv YOURFILE.csv --out output --report README.md</code>,
+          then <code>typst compile main.typ output/main.pdf</code>.
           If Git is installed, <code>bash build.sh YOURFILE.csv</code>
           also works.
         </p>
         <p class="muted" style="margin-top: 12px">
-          Read the generated block in <code>REPORT.md</code>. Change one
-          sentence, or one line of the script (exclusion bounds, or a second
-          statistic). Run <code>build.sh</code> again. The optional
-          <a href="stats.html">descriptives page</a> is still here if you want
-          a histogram; it is not this week’s report.
+          On a Mac, install Typst with <code>brew install typst</code>.
+          On Windows, use <code>winget install --id Typst.Typst</code>.
+          Check that it worked with <code>typst --version</code>.
+          The longer note is on <a href="workflow.html#typst">workflow.html#typst</a>.
         </p>
       </section>
 
       <div class="grid-2" style="margin-bottom: 16px">
         <section class="panel">
-          <div class="kicker">Practice loop · on this page</div>
-          <h2>Run, read, change, run</h2>
+          <div class="kicker">Practice loop · runs in the browser</div>
+          <h2>See what the script writes</h2>
+          <p class="muted">
+            The first code box is the results snippet the script would write
+            (<code>output/numbers.typ</code>).
+            The second box is the whole paper
+            (<code>main.typ</code>): the title, the prediction, the included
+            results, and a limitation.
+            The page on the right is a browser preview of how that paper looks.
+            Compile on your laptop when you want the real PDF.
+          </p>
           <div class="controls">
             <label>CSV file <input type="file" id="fileEl" accept=".csv,text/csv" /></label>
             <label>Exclude below <input type="number" id="minEl" value="150" /></label>
@@ -189,27 +242,27 @@ bash build.sh YOURFILE.csv</pre>
               <textarea class="prose" id="predEl">Mean usable RT will be under 350 ms.</textarea>
             </label>
             <label>Limitation
-              <textarea class="prose" id="limitEl">This is one person and one evening. A classroom mean is not a finding about people in general.</textarea>
+              <textarea class="prose" id="limitEl">This is one person and one evening. The mean describes this sitting, for this person.</textarea>
             </label>
           </div>
           <div class="actions">
             <button type="button" id="rtBtn" class="secondary">Load sample RT</button>
             <button type="button" id="invBtn" class="secondary">Load sample inventory</button>
-            <button type="button" id="buildBtn" class="primary">Rebuild report</button>
+            <button type="button" id="buildBtn" class="primary">Rebuild preview</button>
           </div>
-          <p class="loop-log" id="statusEl" style="margin-top: 12px">Load a file, write a prediction, then rebuild.</p>
-          <h3 style="margin-top: 18px">Generated Markdown</h3>
-          <pre class="snippet" id="mdEl">Run the script to fill this block.</pre>
-          <h3 style="margin-top: 14px">Generated LaTeX</h3>
-          <pre class="snippet" id="texEl">\input{output/numbers}</pre>
+          <p class="loop-log" id="statusEl" style="margin-top: 12px">Load a file, write a prediction, then rebuild the preview.</p>
+          <h3 style="margin-top: 18px">Generated snippet · <code>output/numbers.typ</code></h3>
+          <pre class="snippet" id="typEl">Run the preview to fill this block.</pre>
+          <h3 style="margin-top: 14px">Full paper source · <code>main.typ</code></h3>
+          <pre class="snippet" id="mainEl">The compiled PDF includes the title, the prediction, the results, and the limitation.</pre>
         </section>
         <aside class="panel">
-          <div class="kicker">Compiled page</div>
+          <div class="kicker">Browser preview of the paper</div>
           <h2>What a reader sees</h2>
           <div class="paper-sheet" id="paperEl">
-            <p class="paper-meta">Rebuild to typeset</p>
+            <p class="paper-meta">Rebuild to preview</p>
             <h1>Untitled report</h1>
-            <p>Load a CSV and press Rebuild report.</p>
+            <p>Load a CSV and press Rebuild preview. This shows roughly how the paper will look. The real PDF comes from Typst on your computer.</p>
           </div>
         </aside>
       </div>
@@ -219,23 +272,30 @@ bash build.sh YOURFILE.csv</pre>
           <div class="kicker">Remix</div>
           <h2>Modification</h2>
           <p class="muted">
-            After the first build, rewrite the title, prediction, and
-            limitation until a stranger can state the claim in one sentence.
-            Change the exclusion rule or add a second descriptive (median, or
-            first half versus second half). Rebuild so <code>output/</code>
-            updates. Paste the old and new generated sentences in the report.
-            Do not invent a prettier mean.
+            After the first PDF, rewrite the title, prediction, and
+            limitation in <code>main.typ</code> until another student can
+            say your claim in one sentence.
+            Then change something the script controls: which trials you leave
+            out, how the figure is drawn (how the bars are grouped, or the
+            first half of the trials versus the second half), or a second
+            summary number.
+            Run the build again so <code>output/main.pdf</code> updates.
+            In the README, quote the old results sentence and the new one.
+            Keep the mean the script calculated.
           </p>
         </article>
         <article class="panel">
           <div class="kicker">Weekly report</div>
           <h2>What to submit</h2>
           <p class="muted">
-            Paths to <code>week04-report/README.md</code> (and <code>REPORT.md</code> if you kept a long paper),
-            <code>week04-report/scripts/summarize.py</code>,
-            the generated snippet, and <code>week04-report/main.tex</code>.
-            Name one change you made after the first build. Due Tuesday
-            29 September (no class on the 30th).
+            Turn in the paths to <code>week04-report/README.md</code>,
+            <code>week04-report/main.typ</code>,
+            <code>week04-report/output/numbers.typ</code>,
+            <code>week04-report/output/figure.png</code>,
+            and <code>week04-report/output/main.pdf</code>,
+            plus the path to the CSV you used.
+            Also name one change you made after the first build, and say what
+            changed in the PDF. Due Tuesday 29 September. There is no class on the 30th.
           </p>
         </article>
       </section>
@@ -246,37 +306,37 @@ bash build.sh YOURFILE.csv</pre>
         <div class="agenda">
           <dl>
             <dt>18:00 Introduction</dt>
-            <dd>A report is a pipeline. The number in the paper must come from a file the script can read again.</dd>
+            <dd>A report is a set of steps you can run again. The number in the PDF comes from a file the script reads.</dd>
             <dt>18:25 Demonstration</dt>
-            <dd>Instructor runs <code>build.sh</code> on a sample CSV, reads the PDF or Markdown, changes one line, runs it again.</dd>
+            <dd>The instructor runs <code>build.sh</code> on a sample CSV, opens the PDF, changes one line, and compiles again.</dd>
             <dt>18:40 Exercise</dt>
-            <dd>Copy the starter if needed. Point the script at your own CSV. Write the prediction first.</dd>
+            <dd>Install Typst if you still need it. Build the sample first. Then point the script at your own CSV. Write the prediction before you look at the mean.</dd>
           </dl>
           <dl>
             <dt>19:25 Results</dt>
-            <dd>Show the generated block and one limitation. No draft exchange.</dd>
+            <dd>Show the class the PDF (or the generated table) and one limitation.</dd>
             <dt>20:05 Modification</dt>
-            <dd>Rewrite the sentences until a stranger can state the claim, then change the exclusion rule or add a second descriptive and rebuild.</dd>
+            <dd>Rewrite the sentences until someone else can state your claim. Then change the exclusion rule or add a second summary number, and rebuild the PDF.</dd>
             <dt>Reading</dt>
             <dd><a href="report/README.md">report/README.md</a> and the note on <a href="workflow.html#agentic">agentic coding</a>.</dd>
           </dl>
         </div>
         <p class="muted">
-          <strong>Report:</strong> the four paths, and one iteration you can
-          describe. The mean you typed by hand does not count.
+          <strong>Report:</strong> the file paths, the CSV you used, and one
+          change you can describe. The mean in the paper comes from the script.
         </p>
       </section>
     </div>
     <script>
       const statusEl = document.getElementById("statusEl");
-      const mdEl = document.getElementById("mdEl");
-      const texEl = document.getElementById("texEl");
+      const typEl = document.getElementById("typEl");
+      const mainEl = document.getElementById("mainEl");
       const paperEl = document.getElementById("paperEl");
       let rows = [];
       let headers = [];
       let fileName = "table.csv";
       let builds = 0;
-      let lastMd = "";
+      let lastTyp = "";
 
       function mean(xs) {
         return xs.reduce((a, b) => a + b, 0) / xs.length;
@@ -299,7 +359,7 @@ bash build.sh YOURFILE.csv</pre>
           return obj;
         });
         fileName = name || "table.csv";
-        statusEl.textContent = `${rows.length} rows from ${fileName}. Write a prediction, then rebuild.`;
+        statusEl.textContent = `${rows.length} rows from ${fileName}. Write a prediction, then rebuild the preview.`;
       }
 
       function detectColumn() {
@@ -331,6 +391,50 @@ bash build.sh YOURFILE.csv</pre>
           .replace(/>/g, "&gt;");
       }
 
+      function typstRaw(text) {
+        return "#raw(" + JSON.stringify(text) + ")";
+      }
+
+      function drawHist(canvas, xs, m, col) {
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = "#f4efe6";
+        ctx.fillRect(0, 0, w, h);
+        const lo = Math.min(...xs);
+        const hi = Math.max(...xs);
+        const bins = 8;
+        const counts = Array(bins).fill(0);
+        const span = hi - lo || 1;
+        xs.forEach((x) => {
+          const i = Math.min(bins - 1, Math.floor(((x - lo) / span) * bins));
+          counts[i] += 1;
+        });
+        const maxC = Math.max(...counts, 1);
+        const pad = 28;
+        counts.forEach((c, i) => {
+          const barW = (w - pad * 2) / bins;
+          const barH = ((h - pad * 2) * c) / maxC;
+          ctx.fillStyle = "#c4a574";
+          ctx.strokeStyle = "#1c1915";
+          ctx.fillRect(pad + i * barW + 2, h - pad - barH, barW - 4, barH);
+          ctx.strokeRect(pad + i * barW + 2, h - pad - barH, barW - 4, barH);
+        });
+        const xMean = pad + ((m - lo) / span) * (w - pad * 2);
+        ctx.strokeStyle = "#1c1915";
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        ctx.moveTo(xMean, pad);
+        ctx.lineTo(xMean, h - pad);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#6b6458";
+        ctx.font = "12px Segoe UI, sans-serif";
+        ctx.fillText(col === "rt" ? "RT" : col, pad, 16);
+      }
+
       function rebuild() {
         if (!rows.length) {
           statusEl.textContent = "Load a CSV or a sample first.";
@@ -339,8 +443,8 @@ bash build.sh YOURFILE.csv</pre>
         const { col, lo, hi, xs } = usable();
         if (!xs.length) {
           statusEl.textContent = "No usable values in that range.";
-          mdEl.textContent = "No usable values.";
-          texEl.textContent = "No usable values.";
+          typEl.textContent = "No usable values.";
+          mainEl.textContent = "No usable values.";
           return;
         }
         const m = mean(xs);
@@ -351,40 +455,74 @@ bash build.sh YOURFILE.csv</pre>
           col === "rt"
             ? `times under ${lo} ms or over ${hi} ms were excluded`
             : `values outside ${lo}–${hi} were excluded`;
+        const unit = col === "rt" ? " ms" : "";
+        const typMean = col === "rt" ? String(Math.round(m)) : m.toFixed(2);
+        const typSd = s === null ? null : col === "rt" ? String(Math.round(s)) : s.toFixed(2);
         const md =
           `File \`${fileName}\`: ${xs.length} usable values of ${kind} ` +
           `(column \`${col}\`). Mean = ${formatMean(m, col)}` +
           (s === null ? "" : `, SD = ${formatMean(s, col)}`) +
           `. ${excluded} row(s) excluded; ${rangeText}.`;
-        const unit = col === "rt" ? "~ms" : "";
-        const texMean = col === "rt" ? String(Math.round(m)) : m.toFixed(2);
-        const texSd = s === null ? "---" : col === "rt" ? String(Math.round(s)) : s.toFixed(2);
-        const tex =
-          `File \\texttt{${fileName}}: $n=${xs.length}$ usable values. ` +
-          `Mean = $${texMean}$${unit}` +
-          (s === null ? "" : `, $SD=${texSd}$${unit}`) +
-          `. ${excluded} row(s) excluded.`;
-        mdEl.textContent = md;
-        texEl.textContent = tex;
+        const typ =
+          `File ${typstRaw(fileName)}: $n=${xs.length}$ usable values of ${kind} ` +
+          `(column ${typstRaw(col)}). Mean = $${typMean}$${unit}` +
+          (typSd === null ? "" : `, SD = $${typSd}$${unit}`) +
+          `. ${excluded} row(s) excluded; ${rangeText}.\n\n` +
+          `#table(\n` +
+          `  columns: (auto, auto),\n` +
+          `  inset: 6pt,\n` +
+          `  stroke: 0.4pt,\n` +
+          `  [*Statistic*], [*Value*],\n` +
+          `  [$n$], [${xs.length}],\n` +
+          `  [Mean], [${typMean}${unit}],\n` +
+          `  [SD], [${typSd === null ? "—" : typSd + unit}],\n` +
+          `  [Excluded], [${excluded}],\n` +
+          `)\n\n` +
+          `#figure(\n` +
+          `  image("figure.png", width: 90%),\n` +
+          `  caption: [Distribution of usable values. The dashed line is the mean.],\n` +
+          `)`;
         const title = document.getElementById("titleEl").value.trim() || "Untitled report";
         const pred = document.getElementById("predEl").value.trim() || "No prediction yet.";
         const limit = document.getElementById("limitEl").value.trim() || "State a limitation.";
-        const changed = builds > 0 && md !== lastMd;
+        const mainTyp =
+          `#set document(title: "${title.replace(/"/g, '\\"')}")\n` +
+          `#set page(margin: 1in)\n` +
+          `#set text(size: 11pt)\n\n` +
+          `#align(center)[\n  #text(16pt, weight: "bold")[${title}]\n]\n\n` +
+          `= Prediction\n${pred}\n\n` +
+          `= Results\n#include "output/numbers.typ"\n\n` +
+          `= Limitation\n${limit}\n`;
+        typEl.textContent = typ;
+        mainEl.textContent = mainTyp;
+        const changed = builds > 0 && typ !== lastTyp;
         builds += 1;
-        lastMd = md;
+        lastTyp = typ;
         paperEl.innerHTML = `
-          <p class="paper-meta">Build ${builds} · generated results · do not type the mean</p>
+          <p class="paper-meta">Browser preview ${builds}</p>
           <h1>${escapeHtml(title)}</h1>
           <h2>Prediction</h2>
           <p>${escapeHtml(pred)}</p>
           <h2>Results</h2>
           <p>${escapeHtml(md)}</p>
+          <table>
+            <thead><tr><th>Statistic</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td>n</td><td>${xs.length}</td></tr>
+              <tr><td>Mean</td><td>${escapeHtml(formatMean(m, col))}</td></tr>
+              <tr><td>SD</td><td>${s === null ? "—" : escapeHtml(formatMean(s, col))}</td></tr>
+              <tr><td>Excluded</td><td>${excluded}</td></tr>
+            </tbody>
+          </table>
+          <canvas id="previewFig" width="560" height="200" aria-label="Preview histogram"></canvas>
+          <p class="paper-caption">Preview of the histogram. On your computer, the Python script saves this graph as output/figure.png.</p>
           <h2>Limitation</h2>
           <p>${escapeHtml(limit)}</p>
         `;
+        drawHist(document.getElementById("previewFig"), xs, m, col);
         statusEl.textContent = changed
-          ? `Build ${builds}: the generated numbers changed. That is an iteration.`
-          : `Build ${builds}: paper rebuilt. Change the range or the script idea, then rebuild again.`;
+          ? `Preview ${builds}: the numbers changed. On your laptop, the PDF should change too.`
+          : `Preview ${builds}. Compile main.typ on your computer to get the real paper.`;
       }
 
       async function loadUrl(url, name, minV, maxV) {

@@ -16,7 +16,7 @@ Week 0 (GitHub username): https://canvas.ualberta.ca/courses/35483/assignments/8
 | 1 | 2 Sep (then) | Own repo, Pages, fork, PR | Make a page about you in three ways | [playground.html](playground.html) |
 | 2 | 9 Sep | p5.js pieces, then personalize RT + CSV | Edit `week02-rt/rt.html` (was `rt/rt.html`) | [p5.html](p5.html), [rt.html](rt.html) |
 | 3 | 16 Sep | VS Code folders, then rewrite your own inventory items | `week03-inventory/README.md` | [inventory.html](inventory.html) (class demo), [how you work](workflow.html#arrange) |
-| 4 | 23 Sep | Markdown, Python, LaTeX loop | Report from your own CSV | [report.html](report.html) |
+| 4 | 23 Sep | Python + Typst report loop | Analyze CSV, draw a figure, compile a PDF | [report.html](report.html) |
 | 5 | 7 Oct | Two-condition comparison | Simple vs choice, or two subscales | [compare.html](compare.html) |
 | 6 | 14 Oct | Cite and file a paper | Donders or a scale primer | [cite.html](cite.html) |
 | 7 | 21 Oct | Methods section | Procedure already run | [methods.html](methods.html) |

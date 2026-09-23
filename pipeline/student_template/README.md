@@ -14,8 +14,8 @@ One folder per week. **The report is that folder’s `README.md`.** Put the CSV 
 | Folder | When |
 | --- | --- |
 | `week02-rt/` | Week 2 reaction-time page, CSV, report |
-| `week03-inventory/` | Week 3 inventory CSV and report (this week) |
-| `week04-report/` | Week 4 (later — do not make it yet) |
+| `week03-inventory/` | Week 3 inventory CSV and report |
+| `week04-report/` | Week 4: Python + Typst report (this week) |
 | `week05-compare/` | Week 5 |
 | `week06-cite/` | Week 6 |
 | `week07-methods/` | Week 7 |

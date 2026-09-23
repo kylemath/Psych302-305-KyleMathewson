@@ -56,9 +56,9 @@ WEEKLIES = [
         "lab": f"{BOOK}/report.html",
         "lab_label": "Week 4 research reports",
         "note_path": "week04-report/README.md",
-        "ask": "Paths to the Markdown, the script, the generated snippet, and main.tex, all under week04-report/. Name one change after the first build. Due 29 September (no class 30 September).",
+        "ask": "Paths to main.typ, output/numbers.typ, output/figure.png, and output/main.pdf, all under week04-report/. Path to the CSV you used. Name one change after the first build that changed the PDF. Due 29 September (no class 30 September).",
         "module": "Week 4 · Research reports (23 Sep)",
-        "preamble": "Make <code>week04-report/</code> in VS Code. Build the report from your own CSV. Do not type a mean by hand. No class 30 September.",
+        "preamble": "Python analyzes your CSV and draws a figure; Typst compiles the PDF. Do not type a mean by hand. No class 30 September.",
     },
     {
         "n": 5,
@@ -144,6 +144,8 @@ def weekly_description(read_template, row: dict) -> str:
         tpl = read_template("week2_report.html")
     elif row["n"] == 3:
         tpl = read_template("week3_report.html")
+    elif row["n"] == 4:
+        tpl = read_template("week4_report.html")
     else:
         tpl = read_template("weekly_report.html")
     return fill(tpl, **{k: str(row[k]) for k in row})

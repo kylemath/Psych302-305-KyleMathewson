@@ -52,7 +52,8 @@
           <tbody>
             <tr><td><code>week02-rt/</code></td><td>Your RT page, CSV, and the Week 2 report</td></tr>
             <tr><td><code>week03-inventory/</code></td><td>Inventory CSV and the Week 3 report</td></tr>
-            <tr><td><code>week04-report/</code> … <code>week09-game/</code></td><td>Later weeks; make the folder when we get there</td></tr>
+            <tr><td><code>week04-report/</code></td><td>Python + Typst report and the compiled PDF</td></tr>
+            <tr><td><code>week05-compare/</code> … <code>week09-game/</code></td><td>Later weeks; make the folder when we get there</td></tr>
             <tr><td><code>week10-project/</code></td><td>Check-in and final (October–December)</td></tr>
           </tbody>
         </table>
@@ -84,6 +85,46 @@
             with <code>python3 --version</code> (Mac / Linux) or
             <code>py -3 --version</code> (Windows). You need 3.10 or newer.</li>
         </ol>
+      </section>
+
+      <section class="panel" id="typst" style="margin-top: 16px">
+        <div class="kicker">Week 4, on your laptop</div>
+        <h2>Install Typst</h2>
+        <p class="muted">
+          Typst is one free compiler. It turns <code>main.typ</code> into a
+          PDF. It is not a website and it is not LaTeX. Check first with
+          <code>typst --version</code> in the VS Code terminal.
+        </p>
+        <ol>
+          <li><strong>macOS.</strong>
+            If you have Homebrew:
+            <code>brew install typst</code>.
+            If not, download the
+            <code>aarch64-apple-darwin</code> (Apple silicon) or
+            <code>x86_64-apple-darwin</code> (Intel) archive from
+            <a href="https://github.com/typst/typst/releases">GitHub releases</a>
+            and put the <code>typst</code> binary somewhere on your PATH
+            (for example <code>/usr/local/bin</code>).</li>
+          <li><strong>Windows.</strong>
+            In PowerShell:
+            <code>winget install --id Typst.Typst</code>.
+            Close and reopen the VS Code terminal, then
+            <code>typst --version</code>.
+            If winget is missing, download the Windows zip from the same
+            releases page and add that folder to PATH.</li>
+          <li><strong>Compile.</strong>
+            From <code>week04-report/</code>:
+            <code>typst compile main.typ output/main.pdf</code>.
+            Open that PDF. The Results table and figure must come from
+            <code>output/numbers.typ</code> and
+            <code>output/figure.png</code>, which the Python script writes
+            after <code>pip install -r requirements.txt</code> in the local
+            <code>.venv</code> — not on the system Python.</li>
+        </ol>
+        <p class="muted" style="margin-top: 12px">
+          The VS Code extension <em>Tinymist Typst</em> is optional. You do
+          not need it if the terminal command works.
+        </p>
       </section>
 
       <section class="panel" id="clone" style="margin-top: 16px">
