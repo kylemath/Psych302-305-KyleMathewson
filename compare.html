@@ -6,7 +6,7 @@
     <title>Week 5 · Comparison · PSYCH 302 / 305</title>
     <link rel="stylesheet" href="studio.css" />
     <style>
-      select {
+      select, textarea {
         background: #0b0f14;
         color: var(--ink);
         border: 1px solid var(--panel-border);
@@ -14,10 +14,26 @@
         padding: 8px;
         font-family: "Segoe UI", sans-serif;
       }
+      textarea { width: 100%; min-height: 64px; resize: vertical; box-sizing: border-box; }
+      textarea:disabled { opacity: 0.75; }
       .controls { display: grid; gap: 10px; margin: 12px 0; font-family: "Segoe UI", sans-serif; font-size: 0.88rem; color: var(--muted); }
       table { width: 100%; border-collapse: collapse; font-family: "Segoe UI", sans-serif; font-size: 0.88rem; }
       th, td { text-align: left; padding: 6px 0; border-bottom: 1px solid var(--panel-border); }
-      svg { width: 100%; height: 200px; }
+      svg { width: 100%; height: auto; margin-top: 12px; }
+      pre.code {
+        background: #0e1318;
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        overflow-x: auto;
+        font-size: 12.5px;
+        line-height: 1.5;
+      }
+      .step ol { padding-left: 20px; }
+      .step li { margin-bottom: 8px; }
+      .steps { display: grid; gap: 18px; margin-top: 18px; }
+      .steps > *, .step li { min-width: 0; }
+      .step a { overflow-wrap: anywhere; }
     </style>
   </head>
   <body>
@@ -37,59 +53,174 @@
       </nav>
 
       <header class="panel" style="margin-bottom: 18px">
-        <div class="kicker">Week 5 laboratory</div>
-        <h1>Two conditions, one sentence</h1>
+        <div class="kicker">Week 5 laboratory · 7 October</div>
+        <h1>Does one change to the task change your speed?</h1>
         <p class="lede">
-          Write the predicted direction before you look. Then compare two groups
-          from a CSV: simple versus choice reaction time, or two inventory
-          subscales. Report two means, two ns, and whether the difference
-          matched the prediction.
+          Tonight you edit your Week 2 reaction-time page so it runs two
+          versions of the task, A and B. You predict which one will be slower,
+          run both, and compare them. Two averages are not enough: you also
+          look at how spread out the trials are and how much the two sets
+          overlap.
         </p>
       </header>
 
       <div class="grid-2">
         <section class="panel">
-          <div class="kicker">Input</div>
-          <h2>Split a table</h2>
+          <div class="kicker">Compare tool</div>
+          <h2>Load your CSV</h2>
           <div class="controls">
-            <label>CSV file <input type="file" id="fileEl" accept=".csv,text/csv" /></label>
+            <label>1 · Your prediction (write it before you load anything)
+              <textarea id="predEl" placeholder="B will be slower than A by about ___ ms, because …"></textarea>
+            </label>
+            <label>2 · CSV file <input type="file" id="fileEl" accept=".csv,text/csv" /></label>
             <label>Value column <select id="valEl"></select></label>
-            <label>Group column <select id="grpEl"></select></label>
-            <label>Group A <select id="aEl"></select></label>
-            <label>Group B <select id="bEl"></select></label>
+            <label>Condition column <select id="grpEl"></select></label>
+            <label>Condition A <select id="aEl"></select></label>
+            <label>Condition B <select id="bEl"></select></label>
           </div>
           <div class="actions">
-            <button type="button" id="rtBtn" class="secondary">Sample: simple vs choice</button>
-            <button type="button" id="invBtn" class="secondary">Sample: two subscales</button>
+            <button type="button" id="rtBtn" class="secondary">Try the sample: simple vs choice</button>
           </div>
           <p class="muted" style="margin-top: 12px" id="status">Write your prediction first, then load data.</p>
         </section>
         <aside class="panel">
           <div class="kicker">Difference = B − A</div>
-          <h2>Comparison</h2>
+          <h2>Result</h2>
           <div class="stat" id="diffEl">—</div>
-          <p class="muted" id="summaryEl">No groups yet.</p>
+          <p class="muted" id="summaryEl">No data yet.</p>
           <table>
-            <thead><tr><th>Group</th><th>n</th><th>Mean</th><th>SD</th></tr></thead>
+            <thead><tr><th>Condition</th><th>n</th><th>Mean</th><th>SD</th></tr></thead>
             <tbody id="cmpBody"><tr><td colspan="4">Load a file.</td></tr></tbody>
           </table>
-          <svg id="bars" viewBox="0 0 640 200" role="img" aria-label="Two means"></svg>
+          <p class="muted" id="overlapEl"></p>
+          <svg id="dots" viewBox="0 0 640 150" role="img" aria-label="Each trial as a dot, A on top and B below"></svg>
+          <div class="actions" style="margin-top: 10px">
+            <button type="button" id="copyBtn" class="secondary">Copy table for your README</button>
+          </div>
+          <p class="muted" id="copyNote"></p>
         </aside>
       </div>
+
+      <section class="steps">
+        <article class="panel step">
+          <div class="kicker">Step 1 · everyone · about 60 minutes</div>
+          <h2>Make your page run two conditions</h2>
+          <ol>
+            <li>In VS Code, make a folder <code>week05-compare/</code> in your private repo. Copy your <code>week02-rt/rt.html</code> into it. Copy the <a href="https://github.com/kylemath/Psych302-305-KyleMathewson/blob/main/pipeline/student_template/week05-compare/README.md">Week 5 README</a> into it too.</li>
+            <li><strong>Before you change any code,</strong> fill in the Prediction section of the README: which condition will be slower, by roughly how many ms, and why. Commit it. The commit time is your proof it came first.</li>
+            <li>Pick <strong>one</strong> thing to change between A and B that you think will change speed: square size (72 vs 20 pixels), waiting time (always 1000 ms vs random 800–2200 ms), or brightness (bright vs dim). Not a colour you just like.</li>
+            <li>Edit the code. You need all five changes:
+              <pre class="code">// (a) near the top: which condition is running
+let condition = "A";
+
+// (b) in keyPressed(): A and B keys switch condition
+if (key === "a" || key === "b") {
+  condition = key.toUpperCase();
+  note = "Condition " + condition + ". Click Start.";
+}
+
+// (c) in draw() or beginTrial(): make B different. Example for size:
+const size = condition === "A" ? markSize : 20;
+rect(width / 2, height / 2 + 10, size, size, 10);
+
+// (d) add condition to BOTH results.push({...}) calls,
+//     to the CSV header, and to the .join(",") list
+condition: condition,
+
+// (e) in startBlock(): delete  results = [];
+//     so block B does not erase block A</pre>
+            </li>
+            <li>Run it: Practice 6, press <kbd>a</kbd>, Start 20, press <kbd>b</kbd>, Start 20, Export. You should get one CSV with a <code>condition</code> column and at least 40 scored rows. Rename it <code>rt-week05.csv</code> and put it in <code>week05-compare/</code>.</li>
+            <li>Load it above. Value column <code>rt</code>, condition column <code>condition</code>. Copy the table into your README and write one sentence: did the data agree with your prediction?</li>
+          </ol>
+          <p class="muted">The tool leaves out practice trials, anticipations, rows marked <code>usable = 0</code>, wrong answers (<code>correct = 0</code>), and times outside 150–2500 ms.</p>
+        </article>
+
+        <article class="panel step">
+          <div class="kicker">Step 2 · harder</div>
+          <h2>Make condition B a choice</h2>
+          <p>
+            In A, one square, one key (simple reaction time). In B, the square
+            appears on the left or the right at random. Press <kbd>f</kbd> for
+            left and <kbd>j</kbd> for right. This is the comparison Donders made
+            in 1868; you will read about it next week.
+          </p>
+          <ol>
+            <li>In <code>beginTrial()</code>, pick a side: <code>side = random() &lt; 0.5 ? "left" : "right";</code> (declare <code>let side;</code> at the top).</li>
+            <li>In <code>draw()</code>, in B draw the square at <code>width * 0.25</code> or <code>width * 0.75</code> instead of the middle.</li>
+            <li>In <code>keyPressed()</code>, in B send <kbd>f</kbd> and <kbd>j</kbd> to <code>handleResponse(key)</code>; in A keep the space bar.</li>
+            <li>In <code>handleResponse(k)</code>, work out <code>correct</code> (always 1 in A). Add <code>side</code> and <code>correct</code> to the results and the CSV.</li>
+            <li>Run new blocks. Report how many errors you made in B. Errors are left out of the mean.</li>
+          </ol>
+        </article>
+
+        <article class="panel step">
+          <div class="kicker">Step 3 · hardest</div>
+          <h2>Do the comparison in Python</h2>
+          <p>
+            Copy <code>week04-report/scripts/summarize.py</code> to
+            <code>week05-compare/compare.py</code> and change it so that it:
+          </p>
+          <ol>
+            <li>keeps only scored trials (same rules as this page);</li>
+            <li>splits the rows by the <code>condition</code> column and prints n, mean, and SD for A and for B, then B − A;</li>
+            <li>prints the overlap number: out of every possible pair of one A trial and one B trial, the percentage where B is slower;</li>
+            <li>saves <code>compare.png</code> with both conditions on one figure.</li>
+          </ol>
+          <p class="muted">Check: your Python numbers must match this page. If they do not, find out why and say so in the README.</p>
+        </article>
+
+        <article class="panel">
+          <div class="kicker">Tonight</div>
+          <h2>Agenda</h2>
+          <div class="agenda">
+            <dl>
+              <dt>18:00 Why compare?</dt>
+              <dd>A difference means something only with a prediction and a spread. Write your prediction.</dd>
+              <dt>18:20 Demo</dt>
+              <dd>The sample file on this page, and what the overlap number means.</dd>
+              <dt>18:35 Step 1</dt>
+              <dd>Edit the code, run both blocks, load the CSV.</dd>
+            </dl>
+            <dl>
+              <dt>19:35 Steps 2 and 3</dt>
+              <dd>Go as far as you can. Finish at home before Tuesday.</dd>
+              <dt>20:15 Project ideas</dt>
+              <dd>Bring one question you could answer with something from Weeks 2–5. We talk them through in small groups. Nothing to hand in.</dd>
+            </dl>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="kicker">Weekly report · due Tuesday 13 October, 17:00</div>
+          <h2>What to submit</h2>
+          <p class="muted">
+            Push <code>week05-compare/</code> with your edited <code>rt.html</code>,
+            your CSV, and the filled <code>README.md</code> (plus
+            <code>compare.py</code> and <code>compare.png</code> if you did Step 3).
+            On Canvas, paste the folder path, your prediction, the two ns and
+            means, the difference, and your AI disclosure. Step 1 done well is
+            worth 8 of 10; Steps 2 and 3 are worth one point each.
+            <a href="rubrics.html#week5">Rubric</a>.
+          </p>
+        </article>
+      </section>
     </div>
     <script>
       let rows = [];
       let headers = [];
-
+      const $ = (id) => document.getElementById(id);
       function mean(xs) { return xs.reduce((a, b) => a + b, 0) / xs.length; }
       function sd(xs) {
         if (xs.length < 2) return null;
         const m = mean(xs);
         return Math.sqrt(xs.reduce((a, x) => a + (x - m) ** 2, 0) / (xs.length - 1));
       }
+      function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
+      function options(list) { return list.map((h) => `<option value="${esc(h)}">${esc(h)}</option>`).join(""); }
 
       function parseCsv(text) {
-        const lines = text.trim().split(/\r?\n/).filter((line) => line && !line.startsWith("#"));
+        const lines = text.trim().split(/\r?\n/).filter((line) => line.trim() && !line.startsWith("#"));
         headers = lines[0].split(",").map((h) => h.trim());
         rows = lines.slice(1).map((line) => {
           const cells = line.split(",");
@@ -98,83 +229,120 @@
           return obj;
         });
         const numeric = headers.filter((h) => rows.some((r) => r[h] !== "" && !Number.isNaN(Number(r[h]))));
-        const cats = headers.filter((h) => !numeric.includes(h) || h === "kind" || h === "domain" || h === "colour");
-        document.getElementById("valEl").innerHTML = numeric.map((h) => `<option value="${h}">${h}</option>`).join("");
-        document.getElementById("grpEl").innerHTML = cats.map((h) => `<option value="${h}">${h}</option>`).join("");
-        if (numeric.includes("rt")) document.getElementById("valEl").value = "rt";
-        if (numeric.includes("scored") && !numeric.includes("rt")) document.getElementById("valEl").value = "scored";
-        if (cats.includes("kind")) document.getElementById("grpEl").value = "kind";
-        if (cats.includes("domain")) document.getElementById("grpEl").value = "domain";
+        const cats = headers.filter((h) => !numeric.includes(h) || ["condition", "kind", "domain"].includes(h));
+        $("valEl").innerHTML = options(numeric);
+        $("grpEl").innerHTML = options(cats);
+        if (numeric.includes("rt")) $("valEl").value = "rt";
+        const grp = ["condition", "kind", "domain"].find((h) => cats.includes(h));
+        if (grp) $("grpEl").value = grp;
+        const pred = $("predEl");
+        if (pred.value.trim()) pred.disabled = true;
         fillGroups();
         render();
       }
 
       function fillGroups() {
-        const grp = document.getElementById("grpEl").value;
+        const grp = $("grpEl").value;
         const levels = [...new Set(rows.map((r) => r[grp]).filter(Boolean))];
-        const opts = levels.map((v) => `<option value="${v}">${v}</option>`).join("");
-        document.getElementById("aEl").innerHTML = opts;
-        document.getElementById("bEl").innerHTML = opts;
-        if (levels.includes("simple")) document.getElementById("aEl").value = "simple";
-        if (levels.includes("choice")) document.getElementById("bEl").value = "choice";
-        if (levels.includes("extraversion")) document.getElementById("aEl").value = "extraversion";
-        if (levels.includes("conscientiousness")) document.getElementById("bEl").value = "conscientiousness";
+        $("aEl").innerHTML = options(levels);
+        $("bEl").innerHTML = options(levels);
+        const pick = (el, wanted) => { const v = wanted.find((w) => levels.includes(w)); if (v) $(el).value = v; };
+        pick("aEl", ["A", "simple"]);
+        pick("bEl", ["B", "choice"]);
+        if ($("aEl").value === $("bEl").value && levels.length > 1) $("bEl").value = levels[1];
+      }
+
+      // A row is scored unless a flag column says otherwise.
+      function scored(r) {
+        if (r.practice === "1" || r.anticipation === "1") return false;
+        if (r.usable === "0" || r.correct === "0") return false;
+        return true;
       }
 
       function groupVals(label) {
-        const val = document.getElementById("valEl").value;
-        const grp = document.getElementById("grpEl").value;
+        const val = $("valEl").value;
+        const grp = $("grpEl").value;
         return rows
-          .filter((r) => r[grp] === label)
+          .filter((r) => r[grp] === label && scored(r))
           .map((r) => Number(r[val]))
           .filter((x) => Number.isFinite(x) && !(val === "rt" && (x < 150 || x > 2500)));
       }
 
+      // Out of every (A, B) pair, the share where B is larger. Ties count half.
+      function overlap(a, b) {
+        let wins = 0;
+        for (const x of a) for (const y of b) wins += y > x ? 1 : y === x ? 0.5 : 0;
+        return wins / (a.length * b.length);
+      }
+
+      let lastTable = "";
       function render() {
-        const aName = document.getElementById("aEl").value;
-        const bName = document.getElementById("bEl").value;
+        const aName = $("aEl").value;
+        const bName = $("bEl").value;
         const a = groupVals(aName);
         const b = groupVals(bName);
+        const grp = $("grpEl").value;
+        const inGroups = rows.filter((r) => r[grp] === aName || r[grp] === bName).length;
+        $("status").textContent = `${rows.length} rows loaded. ${inGroups - a.length - b.length} left out (practice, anticipations, errors, or out of range).`;
         if (!a.length || !b.length) {
-          document.getElementById("diffEl").textContent = "—";
-          document.getElementById("summaryEl").textContent = "Need usable values in both groups.";
+          $("diffEl").textContent = "—";
+          $("summaryEl").textContent = "Need scored values in both conditions.";
+          $("overlapEl").textContent = "";
+          $("dots").innerHTML = "";
           return;
         }
-        const ma = mean(a);
-        const mb = mean(b);
-        const diff = mb - ma;
-        document.getElementById("diffEl").textContent = (Math.abs(diff) >= 10 ? Math.round(diff) : diff.toFixed(2));
-        document.getElementById("summaryEl").textContent = `${bName} minus ${aName}. RT exclusions 150–2500 ms still apply when the value column is rt.`;
-        const fmt = (xs) => {
-          const s = sd(xs);
-          return { n: xs.length, m: mean(xs), s };
-        };
-        const A = fmt(a);
-        const B = fmt(b);
-        document.getElementById("cmpBody").innerHTML = [ [aName, A], [bName, B] ].map(([name, st]) =>
-          `<tr><td>${name}</td><td>${st.n}</td><td>${st.m.toFixed(2)}</td><td>${st.s === null ? "—" : st.s.toFixed(2)}</td></tr>`
+        const stats = (xs) => ({ n: xs.length, m: mean(xs), s: sd(xs) });
+        const A = stats(a);
+        const B = stats(b);
+        const diff = B.m - A.m;
+        const unit = $("valEl").value === "rt" ? " ms" : "";
+        $("diffEl").textContent = (Math.abs(diff) >= 10 ? Math.round(diff) : diff.toFixed(2)) + unit;
+        $("summaryEl").textContent = `${bName} minus ${aName}. Positive means ${bName} is higher (slower, for reaction time).`;
+        const fmt = (x) => (x === null ? "—" : x.toFixed(1));
+        $("cmpBody").innerHTML = [[aName, A], [bName, B]].map(([name, st]) =>
+          `<tr><td>${esc(name)}</td><td>${st.n}</td><td>${fmt(st.m)}</td><td>${fmt(st.s)}</td></tr>`
         ).join("");
-        const maxM = Math.max(A.m, B.m, 1);
-        const bar = (x, y, h, label) =>
-          `<rect x="${x}" y="${200 - h - 24}" width="80" height="${h}" fill="#e8b86d"></rect>
-           <text x="${x + 40}" y="190" fill="#b7b1a4" font-size="12" text-anchor="middle">${label}</text>`;
-        document.getElementById("bars").innerHTML =
-          bar(180, 0, (A.m / maxM) * 140, aName) + bar(360, 0, (B.m / maxM) * 140, bName);
-        document.getElementById("status").textContent = `${rows.length} rows loaded.`;
+        const p = Math.round(overlap(a, b) * 100);
+        $("overlapEl").textContent = `Overlap: pick one ${aName} trial and one ${bName} trial at random. ${bName} is higher ${p}% of the time. 50% means the two sets are the same; 100% means every ${bName} trial beats every ${aName} trial.`;
+        lastTable =
+          `| Condition | n | Mean${unit} | SD${unit} |\n|---|---|---|---|\n` +
+          `| ${aName} | ${A.n} | ${fmt(A.m)} | ${fmt(A.s)} |\n| ${bName} | ${B.n} | ${fmt(B.m)} | ${fmt(B.s)} |\n\n` +
+          `Difference (${bName} − ${aName}) = ${diff.toFixed(1)}${unit}. ${bName} higher in ${p}% of pairs.\n`;
+        drawDots(a, b, A.m, B.m, aName, bName);
       }
 
-      async function loadUrl(url) {
-        parseCsv(await fetch(url).then((r) => r.text()));
+      function drawDots(a, b, ma, mb, aName, bName) {
+        const all = a.concat(b);
+        const lo = Math.min(...all);
+        const hi = Math.max(...all);
+        const x = (v) => 70 + ((v - lo) / (hi - lo || 1)) * 550;
+        const row = (xs, y, m, name) =>
+          `<text x="0" y="${y + 4}" fill="#b7b1a4" font-size="12">${esc(name)}</text>` +
+          xs.map((v, i) => `<circle cx="${x(v)}" cy="${y + ((i % 5) - 2) * 4}" r="4" fill="#e8b86d" fill-opacity="0.55"></circle>`).join("") +
+          `<line x1="${x(m)}" x2="${x(m)}" y1="${y - 18}" y2="${y + 18}" stroke="#f3efe6" stroke-width="2"></line>`;
+        $("dots").innerHTML =
+          row(a, 35, ma, aName) + row(b, 95, mb, bName) +
+          `<text x="70" y="145" fill="#b7b1a4" font-size="11">${Math.round(lo)}</text>` +
+          `<text x="620" y="145" fill="#b7b1a4" font-size="11" text-anchor="end">${Math.round(hi)}</text>`;
       }
 
-      document.getElementById("fileEl").addEventListener("change", (event) => {
+      async function loadUrl(url) { parseCsv(await fetch(url).then((r) => r.text())); }
+      $("fileEl").addEventListener("change", (event) => {
         const file = event.target.files[0];
         if (file) file.text().then(parseCsv);
       });
-      ["valEl", "aEl", "bEl"].forEach((id) => document.getElementById(id).addEventListener("change", render));
-      document.getElementById("grpEl").addEventListener("change", () => { fillGroups(); render(); });
-      document.getElementById("rtBtn").addEventListener("click", () => loadUrl("data/sample-rt.csv"));
-      document.getElementById("invBtn").addEventListener("click", () => loadUrl("data/sample-inventory.csv"));
+      ["valEl", "aEl", "bEl"].forEach((id) => $(id).addEventListener("change", render));
+      $("grpEl").addEventListener("change", () => { fillGroups(); render(); });
+      $("rtBtn").addEventListener("click", () => loadUrl("data/sample-rt.csv"));
+      $("copyBtn").addEventListener("click", async () => {
+        if (!lastTable) { $("copyNote").textContent = "Load a file first."; return; }
+        try {
+          await navigator.clipboard.writeText(lastTable);
+          $("copyNote").textContent = "Copied. Paste it under Results in your README.";
+        } catch (err) {
+          $("copyNote").textContent = "Copy failed. Select the table and copy it yourself.";
+        }
+      });
     </script>
   </body>
 </html>

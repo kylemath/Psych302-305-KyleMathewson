@@ -69,9 +69,9 @@ WEEKLIES = [
         "lab": f"{BOOK}/compare.html",
         "lab_label": "Week 5 comparison",
         "note_path": "week05-compare/README.md",
-        "ask": "The comparison you wrote before looking, two means, two ns, and whether the data agreed.",
+        "ask": "Your committed prediction; n and mean for A and B, the difference, and the overlap percentage; which steps you did (1, 2, 3).",
         "module": "Week 5 · Comparison (7 Oct)",
-        "preamble": "Write the comparison <em>before</em> you look at the two means.",
+        "preamble": "Edit your Week 2 RT page so it runs two conditions. Step 1 everyone; Step 2 a choice task; Step 3 Python. Commit the prediction before the code change.",
     },
     {
         "n": 6,
@@ -146,6 +146,8 @@ def weekly_description(read_template, row: dict) -> str:
         tpl = read_template("week3_report.html")
     elif row["n"] == 4:
         tpl = read_template("week4_report.html")
+    elif row["n"] == 5:
+        tpl = read_template("week5_report.html")
     else:
         tpl = read_template("weekly_report.html")
     return fill(tpl, **{k: str(row[k]) for k in row})
@@ -159,12 +161,13 @@ def update_weekly_bodies(
     notify_weeks: set[int],
     from_week: int = 1,
     update_pages: bool = True,
+    only_week: int | None = None,
 ) -> list[dict]:
     """Rewrite weekly (and check-in / final) descriptions. Notify only listed week numbers."""
     cid = client.require_course()
     updated = []
     for row in WEEKLIES:
-        if row["n"] < from_week:
+        if row["n"] < from_week or (only_week is not None and row["n"] != only_week):
             continue
         existing = client.find_assignment_by_name(row["name"])
         if not existing:
@@ -179,6 +182,8 @@ def update_weekly_bodies(
         notify("PUT", f"/courses/{cid}/assignments/{existing['id']}", json=payload)
         updated.append({"n": row["n"], "id": existing["id"], "notified": row["n"] in notify_weeks})
         print(f"week {row['n']:02d}  {existing['id']}  notify={row['n'] in notify_weeks}")
+    if only_week is not None:
+        return updated
     if from_week <= 8:
         checkin = client.find_assignment_by_name("Midterm check-in")
         if checkin:
