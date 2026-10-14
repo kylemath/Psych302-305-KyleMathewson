@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Week 6 · Citation · PSYCH 302 / 305</title>
     <link rel="stylesheet" href="studio.css" />
+    <style>
+      .steps { display: grid; gap: 18px; margin-top: 18px; }
+      .steps > *, .steps li { min-width: 0; }
+      .steps ol, .steps ul { padding-left: 20px; }
+      .steps li { margin-bottom: 8px; }
+      .steps a { overflow-wrap: anywhere; }
+      table { width: 100%; border-collapse: collapse; font-family: "Segoe UI", sans-serif; font-size: 0.88rem; }
+      th, td { text-align: left; padding: 6px 8px 6px 0; border-bottom: 1px solid var(--panel-border); vertical-align: top; }
+    </style>
   </head>
   <body>
     <div class="wrap">
@@ -22,91 +31,182 @@
         </div>
       </nav>
 
-      <header class="panel">
-        <div class="kicker">Week 6 laboratory</div>
-        <h1>Find, cite, and file a paper</h1>
+      <header class="panel" style="margin-bottom: 18px">
+        <div class="kicker">Week 6 laboratory · 14 October</div>
+        <h1>Find, cite, and summarize papers, by hand and with a tool</h1>
         <p class="lede">
-          Locate one methods paper, write a complete reference, store a PDF or
-          a stable URL in <code>week06-cite/</code>, and write a half-page annotation
-          in that folder’s <code>README.md</code>.
-          Use the library. Do not accept a chatbot bibliography you have not opened.
+          Locate one methods paper, write a complete reference, file it in
+          <code>week06-cite/</code>, and summarize it yourself. Then summarize
+          five papers with an automated tool and check what the tool got right.
+          Tonight's guest, Devon Yanitski, built a tool for exactly this problem.
         </p>
       </header>
 
+      <section class="grid-2">
+        <article class="panel">
+          <div class="kicker">Guest · 18:20</div>
+          <h2>Devon Yanitski</h2>
+          <p class="muted">
+            Devon is a PhD student in Psychology at the University of Alberta, in
+            the Computational Memory Lab. Their research covers psychometrics from
+            language embeddings, the neural correlates of memory, and LLM
+            interpretability methods applied to human minds.
+            <a href="https://devon7y.com/">devon7y.com</a>
+          </p>
+          <ul class="muted">
+            <li><a href="https://github.com/devon7y/AP-RAG">AP-RAG</a>: search a
+              library of research PDFs and get answers built only from those
+              papers, each passage with its paper, page and citation.</li>
+            <li>AP-RAG Papers Atlas: a 3D map of the 10,000+ papers in Devon's
+              database, laid out by topic.</li>
+            <li><a href="https://cran.r-project.org/web/packages/semanticfa/index.html">semanticfa</a>
+              (R, with Chris Westbury): factor analysis of questionnaire items from
+              their wording alone. Compare it with the Week 3 inventory.</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <div class="kicker">Why it matters tonight</div>
+          <h2>Searched, not memorized</h2>
+          <p class="muted">
+            A chatbot asked for references writes them from memory. Authors, years
+            and titles can each be real and still not belong together. AP-RAG works
+            the other way round: it can only answer from passages it pulled out of
+            papers on disk, and every passage points to a page you can open.
+          </p>
+          <ol class="muted">
+            <li><strong>Ingest.</strong> Each PDF's text is extracted with page
+              numbers kept, then split by section and paragraph.</li>
+            <li><strong>Contextualize.</strong> A model notes where each chunk sits
+              in its paper, so "this effect" stays findable.</li>
+            <li><strong>Index.</strong> Chunks are embedded for similarity search and
+              linked in a graph of authors, methods, theories and findings.</li>
+            <li><strong>Ask.</strong> A person or an AI agent queries it and gets
+              passages with page-level citations.</li>
+          </ol>
+        </article>
+      </section>
+
       <section class="grid-2" style="margin-top: 16px">
         <article class="panel">
+          <div class="kicker">18:00 · introduction</div>
+          <h2>What belongs in a citation</h2>
+          <ol class="muted">
+            <li><strong>A complete reference:</strong> authors, year, title, journal
+              or publisher, volume, issue, pages, and a DOI.</li>
+            <li><strong>The DOI is the check.</strong> Paste it after
+              <code>https://doi.org/</code>. If it does not open this paper, the
+              reference is wrong, however polished it looks.</li>
+            <li><strong>Library search first.</strong> Start from the U of A
+              library or Google Scholar with library links, then open the PDF.
+              Reading the abstract is not reading the methods.</li>
+            <li><strong>Reference managers are optional.</strong>
+              <a href="https://www.zotero.org/">Zotero</a> is free: a browser button
+              saves the record and PDF and formats APA. The requirement here is a
+              complete reference in your README.</li>
+            <li><strong>Keep the source next to the reference.</strong> The paper
+              goes in your repository folder so both travel together.</li>
+          </ol>
+        </article>
+        <article class="panel">
           <div class="kicker">Suggested starting points</div>
-          <h2>One paper is enough</h2>
+          <h2>One paper for Part 1</h2>
           <ul class="muted">
             <li>Donders, F. C. (1868/1969). On the speed of mental processes. <em>Acta Psychologica</em>, 30, 412–431. (translation often reprinted)</li>
             <li>A short primer on the Big Five or on writing self-report items, assigned in class.</li>
+            <li>A paper on your own project topic that passes the audit below.</li>
           </ul>
-          <p class="muted">
-            Copy the annotation headings into
-            <code>week06-cite/README.md</code>. File the source in the same folder.
-          </p>
         </article>
-        <article class="panel">
-          <div class="kicker">What the annotation must contain</div>
-          <h2>Question, method, limit</h2>
-          <p class="muted">
-            Five to eight sentences. Name the dependent measure. State one
-            thing the paper cannot support. A complete reference is required;
-            a hanging-indent polish is not.
-          </p>
+      </section>
+
+      <section class="steps">
+        <article class="panel step">
+          <div class="kicker">Warm-up · 19:15 · 10 minutes</div>
+          <h2>Citation audit</h2>
+          <ol class="muted">
+            <li>Ask Copilot or any chatbot: "Give me three APA references for
+              empirical papers on [your project topic], with DOIs."</li>
+            <li>For each reference, mark yes or no: the DOI resolves; it resolves
+              to this title; the authors match; the paper is about what the
+              chatbot said.</li>
+            <li>We tally the class: how many passed all four checks, and how many
+              do not exist?</li>
+            <li>Use one reference that passed every check, or find one in the
+              library instead, for Part 1.</li>
+          </ol>
+        </article>
+
+        <article class="panel step">
+          <div class="kicker">Part 1 · by hand · tonight</div>
+          <h2>Summarize one paper yourself</h2>
+          <ol class="muted">
+            <li>File the PDF, or a <code>SOURCE.md</code> with a stable URL, in
+              <code>week06-cite/</code>.</li>
+            <li>In <code>week06-cite/README.md</code>, copy the headings from
+              <code>lab-notes/ANNOTATION.md</code>: complete reference, question,
+              method, one limit, and the Copilot disclosure.</li>
+            <li>Write five to eight sentences. Name the dependent measure (a time,
+              a score, a count). If you cannot name it, you have not opened the
+              methods.</li>
+            <li>State one thing the paper cannot support.</li>
+            <li>Commit Part 1 before you start Part 2, so your own version is on
+              record first. This is individual work.</li>
+          </ol>
+        </article>
+
+        <article class="panel step">
+          <div class="kicker">Part 2 · with a tool · after class</div>
+          <h2>Summarize five papers with an automated tool, then check it</h2>
+          <ol class="muted">
+            <li>Collect five papers on your project topic, including your Part 1
+              paper. Each needs a DOI that resolves.</li>
+            <li>Use one automated tool (Copilot, a chatbot given the PDF, or a
+              library AI search) to write the same three-heading summary for all
+              five. Record the tool and your exact prompt.</li>
+            <li>Save them as a table in <code>week06-cite/auto-summaries.md</code>:
+              reference, question, method, one limit.</li>
+            <li>Compare the tool's summary of your Part 1 paper with yours. Mark
+              each heading as matches, partly, or wrong, checking against the
+              PDF.</li>
+            <li>Write four to six sentences: what the tool missed or invented, how
+              long each approach took, and which you would trust in a literature
+              review. Does the tool answer from the paper in front of it, or from
+              memory?</li>
+          </ol>
         </article>
       </section>
 
       <section class="grid-2" style="margin-top: 16px">
         <article class="panel">
-          <div class="kicker">Remix</div>
-          <h2>Modification</h2>
-          <p class="muted">
-            Rewrite the note until a classmate can say what the paper measured
-            after one reading, and name the dependent measure in the paper
-            (a time, a score, a count). If you cannot name it, you have not
-            opened the methods.
-          </p>
+          <div class="kicker">Tonight</div>
+          <h2>Agenda</h2>
+          <table>
+            <tr><th>Time</th><th>Block</th></tr>
+            <tr><td>18:00</td><td>What belongs in a citation. Library search, not a chatbot bibliography.</td></tr>
+            <tr><td>18:20</td><td>Guest: Devon Yanitski on building AP-RAG, then questions.</td></tr>
+            <tr><td>19:05</td><td>Break.</td></tr>
+            <tr><td>19:15</td><td>Citation audit, then Part 1: find, file, and summarize your paper.</td></tr>
+            <tr><td>20:00</td><td>Finish Part 1 on your own. Instructor checks references.</td></tr>
+            <tr><td>20:25</td><td>Revise until the dependent measure is named in numbers. Commit Part 1 and start Part 2.</td></tr>
+          </table>
         </article>
         <article class="panel">
-          <div class="kicker">Weekly report</div>
+          <div class="kicker">Weekly report · due Tuesday 20 October</div>
           <h2>What to submit</h2>
           <p class="muted">
-            A complete reference, plus the question the paper asked, the
-            method in a sentence, and one limit. Path:
-            <code>week06-cite/README.md</code> and a file or URL in
-            the same folder. Due Tuesday 20 October.
+            Push <code>week06-cite/</code> with:
+          </p>
+          <ul class="muted">
+            <li><code>README.md</code>: Part 1, your hand summary with a complete
+              reference, plus the PDF or <code>SOURCE.md</code>.</li>
+            <li><code>auto-summaries.md</code>: Part 2, the five tool summaries,
+              the tool and prompt, the comparison marks, and your four to six
+              sentences.</li>
+          </ul>
+          <p class="muted">
+            Both parts are individual work. On Canvas, paste the folder path and
+            your Part 1 reference.
           </p>
         </article>
-      </section>
-
-      <section class="panel" style="margin-top: 16px">
-        <div class="kicker">Class night</div>
-        <h2>Agenda</h2>
-        <div class="agenda">
-          <dl>
-            <dt>18:00 Introduction</dt>
-            <dd>What belongs in a citation. Library search, not a chatbot bibliography.</dd>
-            <dt>18:25 Demonstration</dt>
-            <dd>Instructor finds one paper and files the PDF or link in a repo folder.</dd>
-            <dt>18:40 Exercise</dt>
-            <dd>Students locate one assigned or approved paper and write five to eight sentences.</dd>
-          </dl>
-          <dl>
-            <dt>19:25 Results</dt>
-            <dd>Read your annotation: question, method, one limit. No exchange of drafts.</dd>
-            <dt>20:05 Modification</dt>
-            <dd>Rewrite the note until a classmate can restate the measure, and name the dependent measure in the paper.</dd>
-            <dt>Preparation</dt>
-            <dd>Library access. No extra article beyond the one you file.</dd>
-          </dl>
-        </div>
-        <p class="muted">
-          <strong>Report:</strong>
-          <code>week06-cite/README.md</code>
-          (complete reference + question / method / one limit) and a file or
-          URL in that folder.
-        </p>
       </section>
     </div>
   </body>
