@@ -151,7 +151,7 @@ There is no extra credit and no rounding announced in advance.
 | 4    | Wed 23 Sep | Python / Typst report loop                           | Week 4 report Tue 29 Sep                               |
 | —    | Wed 30 Sep | No class (National Day for Truth and Reconciliation) | —                                                      |
 | 5    | Wed 7 Oct  | Two-condition comparison                             | Week 5 report Tue 13 Oct                               |
-| 6    | Wed 14 Oct | Cite and file a paper                                | Week 6 report Tue 20 Oct                               |
+| 6    | Wed 14 Oct | Cite and summarize papers, by hand and with a tool   | Week 6 report Tue 20 Oct                               |
 | 7    | Wed 21 Oct | Methods section                                      | Week 7 report Tue 27 Oct                               |
 | 8    | Wed 28 Oct | Results page + midterm check-in                      | Week 8 report Tue 3 Nov; check-in in class             |
 | 9    | Wed 4 Nov  | Browser game that studies a question                 | Week 9 report Tue 10 Nov (last weekly)                 |
