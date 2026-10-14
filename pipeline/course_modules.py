@@ -82,9 +82,9 @@ WEEKLIES = [
         "lab": f"{BOOK}/cite.html",
         "lab_label": "Week 6 citation",
         "note_path": "week06-cite/README.md",
-        "ask": "Complete reference, path or URL to the paper in week06-cite/, and the question / method / one limit.",
+        "ask": "Both paths in week06-cite/, your Part 1 complete reference, the Part 2 tool and your three match marks.",
         "module": "Week 6 · Citation (14 Oct)",
-        "preamble": "Find, cite, and file one paper. Put the PDF or a stable URL in <code>week06-cite/</code> with the report.",
+        "preamble": "Summarize one paper by hand (Part 1), then five with an automated tool and check it (Part 2). Individual work.",
     },
     {
         "n": 7,
@@ -148,6 +148,8 @@ def weekly_description(read_template, row: dict) -> str:
         tpl = read_template("week4_report.html")
     elif row["n"] == 5:
         tpl = read_template("week5_report.html")
+    elif row["n"] == 6:
+        tpl = read_template("week6_report.html")
     else:
         tpl = read_template("weekly_report.html")
     return fill(tpl, **{k: str(row[k]) for k in row})
