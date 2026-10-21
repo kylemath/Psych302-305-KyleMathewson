@@ -95,9 +95,9 @@ WEEKLIES = [
         "lab": f"{BOOK}/methods.html",
         "lab_label": "Week 7 Methods",
         "note_path": "week07-methods/README.md",
-        "ask": "Path to week07-methods/README.md. Timing, keys, and exclusion rules in numbers.",
+        "ask": "Path to week07-methods/README.md: your Stroop Methods (timing, keys, exclusions in numbers), invented decisions, your result, and the Hedge guess, misses, and reanalysis.",
         "module": "Week 7 · Methods (21 Oct)",
-        "preamble": "Document a procedure you already ran so a stranger could repeat it.",
+        "preamble": "Part 1: write a Stroop Methods, then build and run it from the Week 2 rt.html template. Part 2: reverse-engineer the Methods of Hedge et al. (2018) and rerun their open data. Individual work.",
     },
     {
         "n": 8,
