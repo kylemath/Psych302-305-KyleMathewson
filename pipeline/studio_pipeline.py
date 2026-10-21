@@ -18,6 +18,7 @@ TEMPLATES = ROOT / "templates"
 STUDENT_TEMPLATE = ROOT / "student_template"
 OUT = ROOT / "out"
 IDS_PATH = OUT / "ids.json"
+USERNAME_OVERRIDES = OUT / "username_overrides.json"
 PSYCH275_CANDIDATES = (
     Path("/Users/fulkanjou/Psych275_Instructor/pipeline"),
     Path("/Users/kylemathewson/Teaching/Psych275_Instructor/pipeline"),
@@ -212,11 +213,25 @@ def cmd_week0_pull(_: argparse.Namespace) -> None:
                 **parsed,
             }
         )
+    _apply_username_overrides(rows)
     OUT.mkdir(exist_ok=True)
     dest = OUT / "week0_roster.json"
     dest.write_text(json.dumps(rows, indent=2) + "\n")
     submitted = [r for r in rows if r["github_username"]]
     print(f"wrote {dest}  {len(submitted)}/{len(rows)} with a username")
+
+
+def _apply_username_overrides(rows: list[dict]) -> None:
+    """Replace a mistyped Week 0 GitHub username with the fix in out/username_overrides.json."""
+    if not USERNAME_OVERRIDES.exists():
+        return
+    overrides = json.loads(USERNAME_OVERRIDES.read_text())
+    for row in rows:
+        fix = overrides.get(str(row.get("canvasUserId")))
+        if fix:
+            row["github_username_submitted"] = row.get("github_username")
+            row["github_username"] = fix["github_username"]
+            print(f"override  {row.get('canvasName')}: {row['github_username_submitted']!r} -> {fix['github_username']!r}")
 
 
 URL_RE = re.compile(r"https?://[^\s<>\"']+")
