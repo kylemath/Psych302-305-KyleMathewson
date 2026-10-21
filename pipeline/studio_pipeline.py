@@ -168,7 +168,8 @@ def parse_week0_body(body: str) -> dict:
     profile = found.get("GitHub profile", "").strip()
     if username and not profile:
         profile = f"https://github.com/{username}"
-    if not username and profile:
+    if profile and not _valid_github_username(username):
+        # Some students type their name in the username box; trust the profile link instead.
         m = re.search(r"github\.com/([A-Za-z0-9-]+)", profile)
         if m:
             username = m.group(1)
@@ -212,6 +213,13 @@ def cmd_week0_pull(_: argparse.Namespace) -> None:
                 **parsed,
             }
         )
+    overrides_path = OUT / "username_overrides.json"
+    overrides = json.loads(overrides_path.read_text()) if overrides_path.exists() else {}
+    for row in rows:
+        login = overrides.get(str(row["canvasUserId"]))
+        if login:
+            row["github_username"] = login
+            row["github_username_source"] = "override"
     OUT.mkdir(exist_ok=True)
     dest = OUT / "week0_roster.json"
     dest.write_text(json.dumps(rows, indent=2) + "\n")
