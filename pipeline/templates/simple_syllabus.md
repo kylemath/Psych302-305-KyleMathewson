@@ -152,7 +152,7 @@ There is no extra credit and no rounding announced in advance.
 | —    | Wed 30 Sep | No class (National Day for Truth and Reconciliation) | —                                                      |
 | 5    | Wed 7 Oct  | Two-condition comparison                             | Week 5 report Tue 13 Oct                               |
 | 6    | Wed 14 Oct | Cite and summarize papers, by hand and with a tool   | Week 6 report Tue 20 Oct                               |
-| 7    | Wed 21 Oct | Methods section                                      | Week 7 report Tue 27 Oct                               |
+| 7    | Wed 21 Oct | Methods: Stroop + Hedge (2018) reanalysis            | Week 7 report Tue 27 Oct                               |
 | 8    | Wed 28 Oct | Results page + midterm check-in                      | Week 8 report Tue 3 Nov; check-in in class             |
 | 9    | Wed 4 Nov  | Browser game that studies a question                 | Week 9 report Tue 10 Nov (last weekly)                 |
 | —    | 9–13 Nov   | Reading Week                                         | Work on the final; no classmate data over the break    |

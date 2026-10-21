@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Week 7 · Methods · PSYCH 302 / 305</title>
     <link rel="stylesheet" href="studio.css" />
+    <style>
+      .steps { display: grid; gap: 18px; margin-top: 18px; }
+      .steps > *, .steps li { min-width: 0; }
+      .steps ol, .steps ul { padding-left: 20px; }
+      .steps li { margin-bottom: 8px; }
+      .steps a { overflow-wrap: anywhere; }
+      pre.code {
+        background: #0e1318;
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        overflow-x: auto;
+        font-size: 12.5px;
+        line-height: 1.5;
+      }
+      details summary { cursor: pointer; font-weight: 600; margin: 12px 0 8px; }
+      table { width: 100%; border-collapse: collapse; font-family: "Segoe UI", sans-serif; font-size: 0.88rem; }
+      th, td { text-align: left; padding: 6px 8px 6px 0; border-bottom: 1px solid var(--panel-border); vertical-align: top; }
+    </style>
   </head>
   <body>
     <div class="wrap">
@@ -23,94 +42,209 @@
       </nav>
 
       <header class="panel">
-        <div class="kicker">Week 7 laboratory</div>
-        <h1>Write the procedure you already ran</h1>
+        <div class="kicker">Week 7 laboratory · 21 October</div>
+        <h1>A Methods section is a recipe. Cook from one, then reverse one.</h1>
         <p class="lede">
-          Document Week 2 or Week 3 so a stranger could repeat it. Write
-          <code>week07-methods/README.md</code>.
-          Numbers belong in the procedure (keys, delays, exclusion rules).
+          Part 1: write the Methods for a Stroop task, then build exactly that
+          task from the Week 2 reaction-time page and run it on yourself.
+          Part 2: start from a published result, guess the Methods that
+          produced it, check against the paper, and rerun the authors' own data.
         </p>
       </header>
 
-      <section class="grid-3" style="margin-top: 16px">
-        <article class="card">
-          <div class="chip gold">Participants</div>
-          <h3>Who</h3>
-          <p>Usually you. Age group is enough. Do not name classmates.</p>
-        </article>
-        <article class="card">
-          <div class="chip">Materials</div>
-          <h3>What</h3>
-          <p>Which page, which keys or items, which file you saved.</p>
-        </article>
-        <article class="card">
-          <div class="chip">Procedure and data</div>
-          <h3>How</h3>
-          <p>One trial or one completion, in order. State the exclusion rule in milliseconds or item numbers.</p>
-        </article>
-      </section>
-
-      <section class="panel" style="margin-top: 16px">
-        <div class="kicker">Weak versus clear</div>
-        <h2>The page must be runnable from the text</h2>
-        <p class="muted">
-          Weak: “I did the reaction-time task on the website.” Clear: “Each
-          trial showed a fixation, then a gold square after 800–2200 ms. I
-          pressed the space bar. Twenty scored trials. Times under 150 ms or
-          over 2500 ms were stored and excluded from the mean.”
-        </p>
-      </section>
-
       <section class="grid-2" style="margin-top: 16px">
         <article class="panel">
-          <div class="kicker">Remix</div>
-          <h2>Modification</h2>
+          <div class="kicker">The task</div>
+          <h2>Stroop: name the ink, not the word</h2>
           <p class="muted">
-            Cut hedges that hide the procedure. A stranger should not have to
-            guess which page you opened. State timing, keys, and exclusion
-            rules in numbers (milliseconds, trial counts, reverse-scored item
-            numbers).
+            <span style="color:#e6463c;font-weight:700">BLUE</span> in red ink is
+            slower to name than <span style="color:#e6463c;font-weight:700">RED</span>
+            in red ink. The slowdown (incongruent minus congruent RT) is the
+            Stroop effect, one of the most replicated results in psychology.
+            The task is a small edit of the page you built in Week 2.
           </p>
         </article>
         <article class="panel">
-          <div class="kicker">Weekly report</div>
-          <h2>What to submit</h2>
+          <div class="kicker">The paper</div>
+          <h2>Hedge, Powell &amp; Sumner (2018)</h2>
           <p class="muted">
-            Path to <code>week07-methods/README.md</code>, with timing, keys, and exclusions in
-            numbers. Headings to follow:
-            <a href="lab-notes/METHODS.md">lab-notes/METHODS.md</a>
-            on the handbook. Due Tuesday 27 October.
+            “The reliability paradox: Why robust cognitive tasks do not produce
+            reliable individual differences.” <em>Behavior Research Methods,
+            50</em>(3), 1166–1186.
+            <a href="https://doi.org/10.3758/s13428-017-0935-1">doi:10.3758/s13428-017-0935-1</a>.
+            Open data on <a href="https://osf.io/cwzds/">OSF</a>. Everyone shows
+            a Stroop effect, yet the same person's effect three weeks later is
+            only partly predictable. Do not open the PDF until Part 2.
           </p>
         </article>
       </section>
 
-      <section class="panel" style="margin-top: 16px">
-        <div class="kicker">Class night</div>
-        <h2>Agenda</h2>
-        <div class="agenda">
-          <dl>
-            <dt>18:00 Introduction</dt>
-            <dd>Participants, materials, procedure, data handling. Write so someone else could repeat it.</dd>
-            <dt>18:25 Demonstration</dt>
-            <dd>A short weak Methods and a clear one.</dd>
-            <dt>18:40 Exercise</dt>
-            <dd>Draft the section for one of your earlier laboratories.</dd>
-          </dl>
-          <dl>
-            <dt>19:25 Results</dt>
-            <dd>Instructor checklist: could a stranger run this? No draft exchange.</dd>
-            <dt>20:05 Modification</dt>
-            <dd>Cut hedges, and state timing, keys, and exclusion rules in numbers.</dd>
-            <dt>Reading</dt>
-            <dd>None. Bring your Week 2 or Week 3 CSV.</dd>
-          </dl>
-        </div>
-        <p class="muted">
-          <strong>Report:</strong> path to
-          <code>week07-methods/README.md</code>
-          with timing, keys, and
-          exclusions in numbers.
-        </p>
+      <section class="steps">
+        <article class="panel step">
+          <div class="kicker">Get the files</div>
+          <h2>Your <code>week07-methods/</code> folder</h2>
+          <p>
+            Pull your private repo in VS Code (Source Control → Sync). If
+            <code>week07-methods/</code> is there, you are set. If not, make the
+            folder and save these three files into it:
+          </p>
+          <ul>
+            <li><a href="https://raw.githubusercontent.com/kylemath/Psych302-305-KyleMathewson/main/pipeline/student_template/week07-methods/rt.html"><code>rt.html</code></a>, the Week 2 reaction-time template, unchanged. You turn it into the Stroop task.</li>
+            <li><a href="https://raw.githubusercontent.com/kylemath/Psych302-305-KyleMathewson/main/pipeline/student_template/week07-methods/README.md"><code>README.md</code></a>, your report, with the Methods headings.</li>
+            <li><a href="https://raw.githubusercontent.com/kylemath/Psych302-305-KyleMathewson/main/pipeline/student_template/week07-methods/analyze_stroop.py"><code>analyze_stroop.py</code></a>, for Part 2.</li>
+          </ul>
+          <p class="muted">Right-click → Save Link As. Keep the file names.</p>
+        </article>
+
+        <article class="panel step">
+          <div class="kicker">Part 1 · forward · about 80 minutes</div>
+          <h2>Write the Methods, then build what it says</h2>
+          <ol>
+            <li>
+              <strong>Before touching code,</strong> fill in Participants,
+              Materials, Procedure, and Data handling in the README. Numbers,
+              not adjectives: which words and ink colours, which keys, how long
+              the fixation and the gap between trials last, how many trials per
+              condition, how the order is shuffled, which trials are thrown out.
+              Commit. The commit time shows the Methods came first.
+            </li>
+            <li>
+              Open <code>week07-methods/rt.html</code> and turn it into the task
+              your Methods describes. The pieces you need:
+              <pre class="code">// (a) colours, words, and keys at the top
+const colours = [
+  { name: "RED", key: "z", rgb: [230, 70, 60] },
+  { name: "BLUE", key: "x", rgb: [80, 140, 255] },
+  // ...
+];
+
+// (b) a shuffled list of trials, half congruent, half incongruent
+trials.push({ condition: "congruent", word: ink.name, ink: ink });
+trials.push({ condition: "incongruent", word: other.name, ink: ink });
+trials = shuffle(trials);
+
+// (c) in draw(): show the word in the ink colour instead of the square
+fill(current.ink.rgb[0], current.ink.rgb[1], current.ink.rgb[2]);
+text(current.word, width / 2, height / 2);
+
+// (d) in keyPressed(): send z/x/n/m to handleResponse(k),
+//     and work out correct = (k === current.ink.key) ? 1 : 0
+
+// (e) add condition, word, ink, key, correct to results.push({...}),
+//     to the CSV header, and to the .join(",") list</pre>
+            </li>
+            <li>
+              Every time the code makes you decide something the Methods did
+              not say (does the word stay until a key press? what happens after
+              a wrong key? is a practice block counted?), write it under
+              <em>Decisions I had to invent</em>, then add it to the Methods.
+            </li>
+            <li>
+              Run a practice block, then the scored block on yourself. Export
+              <code>stroop-week07.csv</code> into <code>week07-methods/</code>.
+              It needs the columns <code>condition</code>, <code>rt</code>, and
+              <code>correct</code>. Write your congruent mean, incongruent mean,
+              and Stroop effect under <em>My result</em>.
+            </li>
+          </ol>
+          <p class="muted">
+            The test: could a stranger rebuild your page from your Methods
+            alone, without seeing the code?
+          </p>
+        </article>
+
+        <article class="panel step">
+          <div class="kicker">Part 2 · backward · about 60 minutes</div>
+          <h2>From Hedge's result back to Hedge's Methods</h2>
+          <p>
+            Here is what the paper reports for the Stroop task. Every
+            participant was tested twice. Reliability is an intraclass
+            correlation (ICC): 1 means people kept exactly the same rank order
+            from session 1 to session 2, 0 means no relation.
+          </p>
+          <table>
+            <tr><th></th><th>Study 1</th><th>Study 2</th></tr>
+            <tr><td>Participants analysed</td><td>47</td><td>56</td></tr>
+            <tr><td>Test-retest ICC, Stroop RT cost</td><td>.60</td><td>.66</td></tr>
+            <tr><td>Test-retest ICC, Stroop error cost</td><td>.48</td><td>.44</td></tr>
+          </table>
+          <ol>
+            <li>
+              <strong>Guess first.</strong> Under <em>My guess</em> in the README,
+              write the Methods you think produced this: who, how many trials,
+              which colours and keys, how long between sessions, which trials
+              and which people were excluded. Commit.
+            </li>
+            <li>
+              <strong>Reveal.</strong> Open the
+              <a href="https://orca.cardiff.ac.uk/id/eprint/102138">open-access PDF</a>
+              and read the Stroop Methods (or open the box below). Under
+              <em>What I missed</em>, list three details you got wrong or never
+              thought of, and whether each could change the result.
+            </li>
+            <li>
+              <strong>Reanalyse.</strong> In a terminal in
+              <code>week07-methods/</code>:
+              <pre class="code">python3 analyze_stroop.py --mine stroop-week07.csv</pre>
+              It downloads the tidied Hedge data (every trial, both studies, both
+              sessions), applies their exclusion rules, and prints the group
+              effect, the session 1 vs 2 correlation, and where your own effect
+              falls. Paste <code>output/numbers.md</code> into the README.
+            </li>
+            <li>
+              Run it again with <code>--rule course</code> (our 150–2500 ms rule
+              instead of theirs). What changed? One sentence on why exclusion
+              rules belong in a Methods section, written in numbers.
+            </li>
+          </ol>
+          <details>
+            <summary>Reveal: Hedge et al.'s Stroop Methods, in brief</summary>
+            <ul class="muted">
+              <li><strong>Participants.</strong> Undergraduates. Study 1: 50 (ages 18–21); Study 2: 62 (ages 18–47). Two 90-minute sessions, three weeks apart, same time of day. People who did not return were dropped, as was anyone below 60% accuracy in either session.</li>
+              <li><strong>Materials.</strong> PsychoPy. Words in Arial, size 70, centred. Ink red, blue, green, or yellow, answered with Z, X, N, M.</li>
+              <li><strong>Conditions.</strong> Congruent (word matches ink), incongruent (word names another response colour), and neutral (lot, ship, cross, advice, matched for length and frequency).</li>
+              <li><strong>Procedure.</strong> Word stays until a response; 750 ms between trials. 240 trials per condition, 720 in all, randomly intermixed, in five blocks of about 4 minutes with feedback on mean RT and errors after each block.</li>
+              <li><strong>Data handling.</strong> RT cost = incongruent − congruent. RTs under 100 ms, or more than three median absolute deviations from the person's median, were left out.</li>
+            </ul>
+            <p class="muted">Notice what is still ambiguous. Is that median taken per condition or across all trials? The script picks one reading and says so. And the script keeps 105 people where the paper analysed 103 (47 + 56): the 60% rule alone does not catch every person they dropped. What else would the Methods need to say?</p>
+          </details>
+        </article>
+
+        <article class="panel">
+          <div class="kicker">Tonight</div>
+          <h2>Agenda</h2>
+          <div class="agenda">
+            <dl>
+              <dt>18:00 The paradox</dt>
+              <dd>A famous effect everyone shows, that still fails to rank people. What would you need to know to check that claim?</dd>
+              <dt>18:15 Part 1: write</dt>
+              <dd>Stroop Methods in the README, with numbers, committed before any code.</dd>
+              <dt>18:35 Part 1: build and run</dt>
+              <dd>Turn <code>rt.html</code> into your Stroop. Log every decision the code forced on you. Run yourself, export the CSV.</dd>
+            </dl>
+            <dl>
+              <dt>19:35 Part 2: guess and reveal</dt>
+              <dd>Write Hedge's Methods from their result, then read the real ones.</dd>
+              <dt>20:00 Part 2: reanalyse</dt>
+              <dd>Run <code>analyze_stroop.py</code> on their data and yours. Swap the exclusion rule and watch the numbers move.</dd>
+              <dt>20:30 Wrap</dt>
+              <dd>Which missing details changed a number? Next week: one dataset, many analysts.</dd>
+            </dl>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="kicker">Weekly report · due Tuesday 27 October, 17:00</div>
+          <h2>What to submit</h2>
+          <p class="muted">
+            Push <code>week07-methods/</code> with your Stroop <code>rt.html</code>,
+            <code>stroop-week07.csv</code>, the filled <code>README.md</code>
+            (Part 1 Methods, invented decisions, your result; Part 2 guess, what
+            you missed, reanalysis), and <code>output/numbers.md</code>. Paste the
+            path <code>week07-methods/README.md</code> on Canvas. Individual work;
+            you are the only participant in your CSV.
+          </p>
+        </article>
       </section>
     </div>
   </body>

@@ -2,7 +2,7 @@
 
 **Name:**
 **Date of class:**
-**Study documented:** Week 2 reaction time / Week 3 inventory / other:
+**Study documented:** Week 7 Stroop (see week07-methods/README.md) / other:
 
 ## Participants
 Who took part (usually you). Age group is enough. Do not name classmates.

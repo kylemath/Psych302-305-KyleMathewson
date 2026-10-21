@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Week 7 · Stroop demo · PSYCH 302 / 305</title>
+    <script src="vendor/p5.min.js"></script>
+    <style>
+      html, body { margin: 0; background: #0b0f14; color: #f3efe6; font-family: Georgia, serif; }
+      p { max-width: 640px; margin: 16px auto; color: #b7b1a4; padding: 0 16px; }
+      a { color: #e8b86d; }
+      canvas { display: block; margin: 0 auto 24px; }
+    </style>
+  </head>
+  <body>
+    <p>
+      Instructor demo: one way to turn the Week 2 reaction-time sketch into a
+      Stroop task. Keys: <b>Z</b> red, <b>X</b> blue, <b>N</b> green,
+      <b>M</b> yellow. Back to <a href="methods.html">methods.html</a>.
+    </p>
+    <script>
+// Stroop, built from the Week 2 reaction-time sketch.
+// Name the INK colour, not the word.
+let nPerCondition = 40;
+let fixationMs = 500;
+let itiMs = 750;
+let rtMin = 150;
+let rtMax = 2500;
+
+const colours = [
+  { name: "RED", key: "z", rgb: [230, 70, 60] },
+  { name: "BLUE", key: "x", rgb: [80, 140, 255] },
+  { name: "GREEN", key: "n", rgb: [70, 200, 90] },
+  { name: "YELLOW", key: "m", rgb: [240, 215, 60] },
+];
+
+let state = "idle";
+let trials = [];
+let trial = 0;
+let current = null;
+let onset = 0;
+let waitUntil = 0;
+let itiUntil = 0;
+let practiceBlock = false;
+let results = [];
+let note = "Click Start. Press the key for the INK colour.";
+
+function fitWidth() {
+  return Math.max(320, Math.min(640, windowWidth));
+}
+
+function setup() {
+  createCanvas(fitWidth(), 420);
+  textFont("system-ui, sans-serif");
+}
+
+function windowResized() {
+  resizeCanvas(fitWidth(), 420);
+}
+
+function makeTrials(perCondition) {
+  const list = [];
+  for (let i = 0; i < perCondition; i++) {
+    const ink = colours[i % colours.length];
+    list.push({ condition: "congruent", word: ink.name, ink: ink });
+    let other = random(colours.filter((c) => c !== ink));
+    list.push({ condition: "incongruent", word: other.name, ink: ink });
+  }
+  return shuffle(list);
+}
+
+function draw() {
+  background(7, 9, 13);
+
+  if (state === "wait" && millis() >= waitUntil) {
+    state = "show";
+    onset = millis();
+  }
+  if (state === "iti" && millis() >= itiUntil) {
+    beginTrial();
+  }
+
+  textAlign(CENTER, CENTER);
+  if (state === "wait") {
+    fill(183, 177, 164);
+    textSize(48);
+    text("+", width / 2, height / 2 + 10);
+  } else if (state === "show") {
+    const c = current.ink.rgb;
+    fill(c[0], c[1], c[2]);
+    textSize(64);
+    textStyle(BOLD);
+    text(current.word, width / 2, height / 2 + 10);
+    textStyle(NORMAL);
+  }
+
+  textAlign(LEFT, TOP);
+  textSize(14);
+  fill(183, 177, 164);
+  text(note, 16, 16);
+  text(progressLabel(), 16, 36);
+  text(statsLabel(), 16, 56);
+  text("Z red   X blue   N green   M yellow", 16, 76);
+  drawButtons();
+}
+
+function progressLabel() {
+  if (state === "idle") return "Ready";
+  if (state === "done") return trials.length + " / " + trials.length;
+  return trial + " / " + trials.length;
+}
+
+function meanRt(condition) {
+  const xs = results
+    .filter((r) => !r.practice && r.condition === condition && r.correct && r.rt >= rtMin && r.rt <= rtMax)
+    .map((r) => r.rt);
+  if (!xs.length) return null;
+  return xs.reduce((a, b) => a + b, 0) / xs.length;
+}
+
+function statsLabel() {
+  const con = meanRt("congruent");
+  const inc = meanRt("incongruent");
+  if (con === null || inc === null) return "congruent = —   incongruent = —";
+  return (
+    "congruent = " + Math.round(con) + " ms   incongruent = " + Math.round(inc) +
+    " ms   Stroop effect = " + Math.round(inc - con) + " ms"
+  );
+}
+
+function btnW() {
+  return Math.min(130, (width - 48) / 3);
+}
+
+function drawButtons() {
+  const bw = btnW();
+  pill(16, height - 52, bw, 36, "Start " + nPerCondition * 2);
+  pill(16 + bw + 10, height - 52, bw, 36, "Practice 8");
+  pill(16 + 2 * (bw + 10), height - 52, bw, 36, "Export CSV");
+}
+
+function pill(x, y, w, h, label) {
+  const over = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+  fill(over ? 232 : 40, over ? 184 : 44, over ? 109 : 52);
+  rect(x, y, w, h, 8);
+  fill(over ? 28 : 243, over ? 20 : 239, over ? 8 : 230);
+  textAlign(CENTER, CENTER);
+  textSize(14);
+  text(label, x + w / 2, y + h / 2);
+  textAlign(LEFT, TOP);
+}
+
+function hitButtons() {
+  const bw = btnW();
+  if (mouseY < height - 52 || mouseY > height - 16) return null;
+  if (mouseX >= 16 && mouseX <= 16 + bw) return "start";
+  if (mouseX >= 16 + bw + 10 && mouseX <= 16 + 2 * bw + 10) return "practice";
+  if (mouseX >= 16 + 2 * (bw + 10) && mouseX <= 16 + 3 * bw + 20) return "export";
+  return null;
+}
+
+function mousePressed() {
+  const hit = hitButtons();
+  if (hit === "start") startBlock(nPerCondition, false);
+  if (hit === "practice") startBlock(4, true);
+  if (hit === "export") exportCsv();
+}
+
+function keyPressed() {
+  const k = key.toLowerCase();
+  if (colours.some((c) => c.key === k)) {
+    handleResponse(k);
+    return false;
+  }
+}
+
+function startBlock(perCondition, practice) {
+  practiceBlock = practice;
+  trials = makeTrials(perCondition);
+  if (!practice) results = [];
+  trial = 0;
+  beginTrial();
+}
+
+function beginTrial() {
+  trial += 1;
+  if (trial > trials.length) {
+    state = "done";
+    note = practiceBlock ? "Practice finished. Click Start." : "Block finished. Export the CSV.";
+    return;
+  }
+  current = trials[trial - 1];
+  state = "wait";
+  note = "Name the INK colour.";
+  waitUntil = millis() + fixationMs;
+}
+
+function handleResponse(k) {
+  if (state !== "show") return;
+  const rt = Math.round(millis() - onset);
+  const correct = k === current.ink.key ? 1 : 0;
+  results.push({
+    trial: trial,
+    condition: current.condition,
+    word: current.word,
+    ink: current.ink.name,
+    key: k,
+    correct: correct,
+    rt: rt,
+    practice: practiceBlock ? 1 : 0,
+  });
+  note = correct ? rt + " ms" : "Wrong key (" + rt + " ms)";
+  state = "iti";
+  itiUntil = millis() + itiMs;
+}
+
+function exportCsv() {
+  if (!results.length) {
+    note = "No trials to export yet.";
+    return;
+  }
+  const header = "trial,condition,word,ink,key,correct,rt,practice";
+  const lines = results.map((r) =>
+    [r.trial, r.condition, r.word, r.ink, r.key, r.correct, r.rt, r.practice].join(",")
+  );
+  const blob = new Blob([header + "\n" + lines.join("\n") + "\n"], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "stroop-week07.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  note = "CSV downloaded. Move it into week07-methods/.";
+}
+    </script>
+  </body>
+</html>

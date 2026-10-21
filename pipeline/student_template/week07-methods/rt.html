@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Week 7 Stroop starter · PSYCH 302 / 305</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+    <style>
+      html, body { margin: 0; background: #0b0f14; color: #f3efe6; font-family: Georgia, serif; }
+      p { max-width: 640px; margin: 16px auto; color: #b7b1a4; padding: 0 16px; }
+      a { color: #e8b86d; }
+      canvas { display: block; margin: 0 auto 24px; }
+    </style>
+  </head>
+  <body>
+    <p>
+      Week 7 starter: this is the Week 2 reaction-time task, unchanged.
+      Turn it into the Stroop task your Methods describes (Part 1 on
+      <a href="https://kylemath.github.io/Psych302-305-KyleMathewson/methods.html">methods.html</a>).
+      Serve this folder with <code>python3 -m http.server 8765</code> and open
+      <code>http://127.0.0.1:8765/rt.html</code>. Save the CSV as
+      <code>stroop-week07.csv</code> in this folder.
+    </p>
+    <script>
+// Week 7: start here. This is the Week 2 sketch. Make it the Stroop task
+// in your Methods, then reload the page after each edit.
+let nTrials = 20;
+let markSize = 72;
+let markColor = [232, 184, 109];
+let delayMin = 800;
+let delayMax = 2200;
+let rtMin = 150;
+let rtMax = 2500;
+
+let state = "idle";
+let trial = 0;
+let nWanted = 20;
+let onset = 0;
+let waitUntil = 0;
+let itiUntil = 0;
+let results = [];
+let note = "Click Start. Then space or click when the square appears.";
+
+function fitWidth() {
+  return Math.max(320, Math.min(640, windowWidth));
+}
+
+function setup() {
+  createCanvas(fitWidth(), 420);
+  textFont("system-ui, sans-serif");
+}
+
+function windowResized() {
+  resizeCanvas(fitWidth(), 420);
+}
+
+function draw() {
+  background(7, 9, 13);
+
+  if (state === "wait" && millis() >= waitUntil) {
+    state = "show";
+    onset = millis();
+  }
+  if (state === "iti" && millis() >= itiUntil) {
+    beginTrial();
+  }
+
+  if (state === "wait") {
+    fill(183, 177, 164);
+    textAlign(CENTER, CENTER);
+    textSize(48);
+    text("+", width / 2, height / 2 + 10);
+  } else if (state === "show") {
+    noStroke();
+    fill(markColor[0], markColor[1], markColor[2]);
+    rectMode(CENTER);
+    rect(width / 2, height / 2 + 10, markSize, markSize, 10);
+    rectMode(CORNER);
+  }
+
+  textAlign(LEFT, TOP);
+  textSize(14);
+  fill(183, 177, 164);
+  text(note, 16, 16);
+  text(progressLabel(), 16, 36);
+  text(statsLabel(), 16, 56);
+  drawButtons();
+}
+
+function progressLabel() {
+  if (state === "idle") return "Ready";
+  if (state === "done") return nWanted + " / " + nWanted;
+  return trial + " / " + nWanted;
+}
+
+function statsLabel() {
+  const good = results.filter((row) => row.usable && !row.practice);
+  if (!good.length) return "n = 0   mean = —   SD = —";
+  const xs = good.map((row) => row.rt);
+  const m = xs.reduce((a, b) => a + b, 0) / xs.length;
+  let sd = "—";
+  if (xs.length > 1) {
+    const v = xs.reduce((a, x) => a + (x - m) * (x - m), 0) / (xs.length - 1);
+    sd = String(Math.round(Math.sqrt(v)));
+  }
+  return "n = " + good.length + "   mean = " + Math.round(m) + " ms   SD = " + sd + " ms";
+}
+
+function btnW() {
+  return Math.min(130, (width - 48) / 3);
+}
+
+function drawButtons() {
+  const bw = btnW();
+  pill(16, height - 52, bw, 36, "Start " + nTrials);
+  pill(16 + bw + 10, height - 52, bw, 36, "Practice 6");
+  pill(16 + 2 * (bw + 10), height - 52, bw, 36, "Export CSV");
+}
+
+function pill(x, y, w, h, label) {
+  const over = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+  fill(over ? 232 : 40, over ? 184 : 44, over ? 109 : 52);
+  rect(x, y, w, h, 8);
+  fill(over ? 28 : 243, over ? 20 : 239, over ? 8 : 230);
+  textAlign(CENTER, CENTER);
+  textSize(14);
+  text(label, x + w / 2, y + h / 2);
+  textAlign(LEFT, TOP);
+}
+
+function hitButtons() {
+  const bw = btnW();
+  if (mouseY < height - 52 || mouseY > height - 16) return null;
+  if (mouseX >= 16 && mouseX <= 16 + bw) return "start";
+  if (mouseX >= 16 + bw + 10 && mouseX <= 16 + 2 * bw + 10) return "practice";
+  if (mouseX >= 16 + 2 * (bw + 10) && mouseX <= 16 + 3 * bw + 20) return "export";
+  return null;
+}
+
+function mousePressed() {
+  const hit = hitButtons();
+  if (hit === "start") {
+    startBlock(nTrials);
+    return;
+  }
+  if (hit === "practice") {
+    startBlock(6);
+    return;
+  }
+  if (hit === "export") {
+    exportCsv();
+    return;
+  }
+  handleResponse();
+}
+
+function keyPressed() {
+  if (key === " ") {
+    handleResponse();
+    return false;
+  }
+}
+
+function startBlock(n) {
+  nWanted = n;
+  results = [];
+  trial = 0;
+  note = "Wait for the square.";
+  beginTrial();
+}
+
+function beginTrial() {
+  trial += 1;
+  if (trial > nWanted) {
+    state = "done";
+    note = "Block finished. Export the CSV.";
+    return;
+  }
+  state = "wait";
+  note = "Wait for the square.";
+  waitUntil = millis() + random(delayMin, delayMax);
+}
+
+function handleResponse() {
+  if (state === "wait") {
+    results.push({
+      trial: trial,
+      rt: 0,
+      usable: 0,
+      anticipation: 1,
+      practice: nWanted <= 6 ? 1 : 0,
+    });
+    note = "Too early. Stored as an anticipation.";
+    state = "iti";
+    itiUntil = millis() + 550;
+    return;
+  }
+  if (state !== "show") return;
+  const rt = Math.round(millis() - onset);
+  const usable = rt >= rtMin && rt <= rtMax ? 1 : 0;
+  results.push({
+    trial: trial,
+    rt: rt,
+    usable: usable,
+    anticipation: 0,
+    practice: nWanted <= 6 ? 1 : 0,
+  });
+  if (rt < rtMin) note = rt + " ms — very fast; excluded from the mean.";
+  else if (rt > rtMax) note = rt + " ms — very slow; excluded from the mean.";
+  else note = rt + " ms";
+  state = "iti";
+  itiUntil = millis() + 550;
+}
+
+function exportCsv() {
+  if (!results.length) {
+    note = "No trials to export yet.";
+    return;
+  }
+  const header = "trial,rt,usable,anticipation,practice";
+  const lines = results.map((row) =>
+    [row.trial, row.rt, row.usable, row.anticipation, row.practice].join(",")
+  );
+  const blob = new Blob([header + "\n" + lines.join("\n") + "\n"], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "stroop-week07.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  note = "CSV downloaded. Move it into week07-methods/ in VS Code.";
+}
+    </script>
+  </body>
+</html>
