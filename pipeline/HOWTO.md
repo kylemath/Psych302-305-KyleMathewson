@@ -38,6 +38,8 @@ python studio_pipeline.py assignments-update --notify-week 3   # same, email onl
 
 `week0-pull` writes `out/week0_roster.json`: Canvas user ↔ GitHub username, Education status, repo consent.
 
+If a student typed something other than their GitHub login, add the fix to `out/username_overrides.json` (gitignored, keyed by Canvas user id): `{"<canvasUserId>": {"github_username": "<login>", "note": "why"}}`. `week0-pull` applies it on every pull and keeps what they typed in `github_username_submitted`.
+
 `roster-pull` writes `out/roster.json`: current vs former student enrollments. Use this as the class list. Former rows are the cleanup candidates.
 
 `week0-grade` PUTs Canvas `complete` / `incomplete` only. Complete = parsed GitHub username present and non-empty. Do not invent points. Assignment is `pass_fail` and omitted from the final grade.
