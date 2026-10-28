@@ -22,6 +22,9 @@ python studio_pipeline.py week2-grade --apply
 python studio_pipeline.py week3-pull           # harvest Week 3 Canvas boxes + inspect week03-inventory/
 python studio_pipeline.py week3-grade          # dry-run Week 3 exception rubric
 python studio_pipeline.py week3-grade --apply
+python studio_pipeline.py week4-pull           # harvest Week 4 Canvas boxes + inspect week04-report/
+python studio_pipeline.py week4-grade          # dry-run Week 4 exception rubric
+python studio_pipeline.py week4-grade --apply
 python studio_pipeline.py repos-mint           # dry-run plan (default)
 python studio_pipeline.py repos-mint --apply   # create private repos + add collaborators
 python studio_pipeline.py repos-sync           # dry-run: missing template files on existing repos
@@ -34,6 +37,7 @@ python studio_pipeline.py modules-create       # Canvas modules + weekly assignm
 python studio_pipeline.py assignments-update   # rewrite weekly bodies only; no student email
 python studio_pipeline.py assignments-update --from-week 3   # weeks 3+ and Canvas intro/schedule pages
 python studio_pipeline.py assignments-update --notify-week 3   # same, email only Week 3
+python studio_pipeline.py assignments-update --only-week 5   # rewrite one week's body only; no pages, no email
 ```
 
 `week0-pull` writes `out/week0_roster.json`: Canvas user ↔ GitHub username, Education status, repo consent.
@@ -42,7 +46,9 @@ python studio_pipeline.py assignments-update --notify-week 3   # same, email onl
 
 `week0-grade` PUTs Canvas `complete` / `incomplete` only. Complete = parsed GitHub username present and non-empty. Do not invent points. Assignment is `pass_fail` and omitted from the final grade.
 
-`week1-grade` / `week2-grade` PUT the published 10-point exception rubrics after the Tuesday due date. Default is dry-run. Week 1 checks that the four GitHub links open. Week 2 accepts `week02-rt/` or the older `lab-notes/` + `rt/` + `data/` paths. Do not invent a different scale. `--force` overwrites a score that is already posted.
+`week1-grade` / `week2-grade` PUT the published 10-point exception rubrics after the Tuesday due date. Default is dry-run. Week 1 checks that the four GitHub links open, and tries the next link if an earlier one is a profile URL or has a trailing `&nbsp`. Week 2 accepts `week02-rt/` or the older `lab-notes/` + `rt/` + `data/` paths, including those paths on the student's handbook fork when the private studio repo has no RT page. Do not invent a different scale. `--force` overwrites a score that is already posted.
+
+`week4-grade` scores the Week 4 exception rubric from `week04-report/`: generated `output/numbers.typ` plus `output/figure.png` (2), prediction and limitation in `main.typ` rather than the starter stubs (2), `output/main.pdf` opens with the figure (2), a real change after the first build (2), a limitation that states n (1), disclosure (1). A numbers file that still names `sample-rt.csv` is flagged `REVIEW`, not auto-deducted. Late Canvas submissions are flagged `REVIEW`, not auto-zeroed.
 
 `week3-grade` scores the Week 3 exception rubric from `week03-inventory/`: all ten `ITEMS` texts differ from the template (3; 5–9 rewritten is 2, 1–4 is 1), 5 domains × 2 items with one `reverse: 1` each plus `inventory.css` beside it (2), filled `README.md` + a CSV (2), prediction (1), tedium sentence (1), disclosure (1). Items moved into a local `<script src="inventory.js">` are followed. Late Canvas submissions, commits after the due date, and edits below `STOP EDITING HERE` are flagged `REVIEW`, not auto-deducted.
 
@@ -56,6 +62,6 @@ python studio_pipeline.py assignments-update --notify-week 3   # same, email onl
 
 Instructor demo (Kyle as student): `kylemath/psych302-305-kylemath`, local clone `/Users/kylemathewson/Teaching/psych302-305-kylemath`. Maintain it the same way students maintain theirs.
 
-To the agent: **`plant week0`** means create (or confirm) the assignment and announcement. **`pull week0`** means harvest usernames. **`grade week0`** means complete/incomplete. **`pull roster`** means current vs former enrollments. **`pull week1`** means harvest the four GitHub links from Canvas. **`pull week3`** means `week3-pull`. **`grade week1`** / **`grade week2`** / **`grade week3`** mean dry-run the published rubric, then `--apply` after the Tuesday due date (do not invent a scale). **`mint repos`** means dry-run first, then `--apply` for eligible students only. **`sync repos`** means dry-run first, then `--apply` to add missing template files only. **`cleanup repos`** means dry-run first, then `--apply` to archive dropped students’ private repos only.
+To the agent: **`plant week0`** means create (or confirm) the assignment and announcement. **`pull week0`** means harvest usernames. **`grade week0`** means complete/incomplete. **`pull roster`** means current vs former enrollments. **`pull week1`** means harvest the four GitHub links from Canvas. **`pull week3`** means `week3-pull`. **`grade week1`** / **`grade week2`** / **`grade week3`** / **`grade week4`** mean dry-run the published rubric, then `--apply` after the Tuesday due date (do not invent a scale). **`pull week4`** means `week4-pull`. **`mint repos`** means dry-run first, then `--apply` for eligible students only. **`sync repos`** means dry-run first, then `--apply` to add missing template files only. **`cleanup repos`** means dry-run first, then `--apply` to archive dropped students’ private repos only.
 
 Students work in **VS Code on their laptops** (GitHub Codespaces is not used). After a handbook push, rewrite Canvas weeklies from Week 3 onward with `assignments-update --from-week 3` (no student email unless `--notify-week`).

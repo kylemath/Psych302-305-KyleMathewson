@@ -222,9 +222,15 @@ def cmd_week0_pull(_: argparse.Namespace) -> None:
 URL_RE = re.compile(r"https?://[^\s<>\"']+")
 
 
+def _clean_url(url: str) -> str:
+    """Drop HTML leftovers Canvas sometimes glues onto the end of a link."""
+    url = (url or "").replace("\xa0", "").replace("&nbsp;", "").replace("&nbsp", "")
+    return url.rstrip(").,;\"' ")
+
+
 def _plain_text(body: str) -> str:
     text = re.sub(r"<[^>]+>", "\n", body or "")
-    text = text.replace("&nbsp;", " ").replace("&amp;", "&")
+    text = text.replace("&nbsp;", " ").replace("&nbsp", " ").replace("&amp;", "&")
     return re.sub(r"\n+", "\n", text).strip()
 
 
@@ -235,8 +241,8 @@ def parse_week1_body(body: str) -> dict:
     urls = []
     seen = set()
     for match in URL_RE.findall(raw) + URL_RE.findall(text):
-        url = match.rstrip(").,;\"'")
-        if url not in seen:
+        url = _clean_url(match)
+        if url and url not in seen:
             seen.add(url)
             urls.append(url)
     pages, prs, forks, repos, other = [], [], [], [], []
@@ -763,6 +769,7 @@ def cmd_assignments_update(args: argparse.Namespace) -> None:
         notify_weeks=notify_weeks,
         from_week=args.from_week,
         update_pages=not args.no_pages,
+        only_week=args.only_week,
     )
     if 2 in notify_weeks:
         cid = client.require_course()
@@ -795,11 +802,14 @@ def main() -> None:
         cmd_week2_pull,
         cmd_week3_grade,
         cmd_week3_pull,
+        cmd_week4_grade,
+        cmd_week4_pull,
     )
 
     sub.add_parser("roster-pull").set_defaults(func=cmd_roster_pull)
     sub.add_parser("week2-pull").set_defaults(func=cmd_week2_pull)
     sub.add_parser("week3-pull").set_defaults(func=cmd_week3_pull)
+    sub.add_parser("week4-pull").set_defaults(func=cmd_week4_pull)
     g = sub.add_parser("week0-grade")
     g.add_argument("--dry-run", action="store_true", help="Print complete/incomplete; do not PUT")
     g.set_defaults(func=cmd_week0_grade)
@@ -818,6 +828,11 @@ def main() -> None:
     w3g.add_argument("--apply", action="store_true", help="PUT rubric scores on Canvas")
     w3g.add_argument("--force", action="store_true", help="Overwrite a score that is already posted")
     w3g.set_defaults(func=cmd_week3_grade)
+    w4g = sub.add_parser("week4-grade")
+    w4g.add_argument("--dry-run", action="store_true", help="Print scores only (default if --apply is omitted)")
+    w4g.add_argument("--apply", action="store_true", help="PUT rubric scores on Canvas")
+    w4g.add_argument("--force", action="store_true", help="Overwrite a score that is already posted")
+    w4g.set_defaults(func=cmd_week4_grade)
     cl = sub.add_parser("repos-cleanup")
     cl.add_argument("--dry-run", action="store_true", help="Print the plan only (default if --apply is omitted)")
     cl.add_argument("--apply", action="store_true", help="Archive private repos whose week0 owner dropped")
@@ -844,6 +859,7 @@ def main() -> None:
         default=[],
         help="Week number whose assignment update emails students (repeatable). Default: none.",
     )
+    u.add_argument("--only-week", type=int, default=None, help="Rewrite only this week's body (no check-in, final, or pages).")
     u.add_argument(
         "--from-week",
         type=int,

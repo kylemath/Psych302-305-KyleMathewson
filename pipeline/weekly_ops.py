@@ -256,27 +256,16 @@ def _repo_raw(full: str, path: str) -> str | None:
     return result.stdout
 
 
-def _inspect_week2_repo(username: str) -> dict:
-    from studio_pipeline import _repo_exists, _repo_file_paths, _repo_full_name
+def _inspect_week2_full(full: str) -> dict:
+    from studio_pipeline import _repo_exists, _repo_file_paths
 
-    if not username:
-        return {"repo": None, "exists": False, "files": [], "note_path": "", "page_path": "", "csv_paths": [], "page_looks_default": None}
-    full = _repo_full_name(username)
-    if not _repo_exists(full):
-        return {"repo": full, "exists": False, "files": [], "note_path": "", "page_path": "", "csv_paths": [], "page_looks_default": None}
+    empty = {"repo": full, "exists": False, "files": [], "note_path": "", "page_path": "", "csv_paths": [], "page_looks_default": None}
+    if not full or not _repo_exists(full):
+        return empty
     try:
         files = sorted(_repo_file_paths(full))
     except RuntimeError as exc:
-        return {
-            "repo": full,
-            "exists": True,
-            "files": [],
-            "note_path": "",
-            "page_path": "",
-            "csv_paths": [],
-            "page_looks_default": None,
-            "error": str(exc)[:200],
-        }
+        return {**empty, "exists": True, "error": str(exc)[:200]}
     note = next((p for p in WEEK2_NOTE_PATHS if p in files), "")
     page = next((p for p in WEEK2_PAGE_PATHS if p in files), "")
     csvs = [
@@ -311,6 +300,26 @@ def _inspect_week2_repo(username: str) -> dict:
         "old_layout": any(p.startswith("lab-notes/") or p.startswith("rt/") or p.startswith("data/") for p in files),
         "new_layout": any(p.startswith("week02-rt/") for p in files),
     }
+
+
+def _inspect_week2_repo(username: str) -> dict:
+    from studio_pipeline import _repo_exists, _repo_full_name
+
+    if not username:
+        return {"repo": None, "exists": False, "files": [], "note_path": "", "page_path": "", "csv_paths": [], "page_looks_default": None}
+    full = _repo_full_name(username)
+    result = _inspect_week2_full(full)
+    # Week 2 work sometimes stayed on the handbook fork (lab-notes/, rt.html, data/).
+    if result.get("page_path"):
+        return result
+    fork_full = f"{username}/Psych302-305-KyleMathewson"
+    if fork_full.lower() == full.lower() or not _repo_exists(fork_full):
+        return result
+    fork = _inspect_week2_full(fork_full)
+    if fork.get("page_path") or fork.get("note_path") or fork.get("csv_paths"):
+        fork["graded_from_fork"] = True
+        return fork
+    return result
 
 
 def _inspect_pasted_urls(urls: list[str]) -> dict:
@@ -538,29 +547,40 @@ def score_week1(row: dict) -> dict:
             "needs_review": False,
             "reasons": ["unsubmitted"],
         }
-    own = (row.get("own_repo_urls") or row.get("urls") or [None])[0] if (row.get("own_repo_urls") or row.get("urls")) else ""
-    if row.get("own_repo_urls"):
-        own = row["own_repo_urls"][0]
-    pages = (row.get("pages_urls") or [None])[0] or ""
-    forks = (row.get("fork_urls") or [None])[0] or ""
-    prs = (row.get("pr_urls") or [None])[0] or ""
-    username = (row.get("github_username") or "").strip()
+    def _first_working(urls: list, check) -> tuple[str, bool | None, str]:
+        chosen, ok, why = "", False, "missing"
+        for url in urls or []:
+            if not url:
+                continue
+            ok, why = check(url)
+            chosen = url
+            if ok:
+                return chosen, ok, why
+        return chosen, ok, why
 
-    repo_ok, repo_why = _gh_repo_ok(own) if own else (False, "missing")
-    if not own and username:
-        repo_ok, repo_why = _gh_repo_ok(f"https://github.com/{username}")
-    pages_ok, pages_why = _http_ok(pages) if pages else (False, "missing")
+    own, repo_ok, repo_why = _first_working(row.get("own_repo_urls") or [], _gh_repo_ok)
+    if not repo_ok:
+        username_url = ""
+        username = (row.get("github_username") or "").strip()
+        if not own and username:
+            username_url = f"https://github.com/{username}"
+            repo_ok, repo_why = _gh_repo_ok(username_url)
+            if repo_ok:
+                own = username_url
+    pages, pages_ok, pages_why = _first_working(row.get("pages_urls") or [], _http_ok)
     if pages_ok is None:
         review.append(f"pages {pages_why}")
         pages_ok = bool(pages) and "github.io" in pages.lower()
-    fork_ok, fork_why = _fork_ok(forks) if forks else (False, "missing")
-    if not forks:
+    forks, fork_ok, fork_why = _first_working(row.get("fork_urls") or [], _fork_ok)
+    if not fork_ok:
         # A handbook-named repo URL sometimes landed in own_repo or other
         for url in row.get("urls") or []:
             ok, why = _fork_ok(url)
             if ok:
-                fork_ok, fork_why = ok, why
+                forks, fork_ok, fork_why = url, ok, why
                 break
+    prs = (row.get("pr_urls") or [None])[0] or ""
+    username = (row.get("github_username") or "").strip()
     pr_ok, pr_why = _pr_ok(prs, username) if prs else (False, "missing")
     if not pr_ok and username:
         found = _class_pr_for(username)
@@ -710,6 +730,8 @@ def score_week2(row: dict) -> dict:
     review = []
     if page_path and defaultish is True and named and not strong:
         review.append("page still looks like the class default")
+    if inspect.get("graded_from_fork"):
+        review.append(f"graded from handbook fork {inspect.get('repo')}")
     if inspect.get("error"):
         review.append(inspect["error"])
     return {
@@ -1194,6 +1216,318 @@ def cmd_week3_grade(args: object) -> None:
         return scored
 
     _grade_week(args, 3, "week3_roster.json", score, "week3_grades.json")
+
+
+WEEK4_DIR = "week04-report"
+WEEK4_STARTER_PREDICTION = "write this sentence before you run the script"
+WEEK4_STARTER_LIMITATION = "state n and one reason the number can lie"
+WEEK4_CHANGE_RE = re.compile(
+    r"after the first build|rebuil|i changed|i added|i switched|i replaced|i edited|exclusion|histogram|colour|color of",
+    re.I,
+)
+
+
+def _repo_bytes(full: str, path: str) -> bytes:
+    import os
+    import subprocess
+
+    env = os.environ.copy()
+    env["GH_PROMPT_DISABLED"] = "1"
+    result = subprocess.run(
+        ["gh", "api", f"repos/{full}/contents/{path}", "-H", "Accept: application/vnd.github.raw"],
+        capture_output=True,
+        env=env,
+    )
+    if result.returncode != 0:
+        return b""
+    return result.stdout or b""
+
+
+def _typst_sections(text: str) -> dict[str, str]:
+    sections: dict[str, str] = {}
+    current = ""
+    for line in (text or "").splitlines():
+        match = re.match(r"^=\s+(.+?)\s*$", line)
+        if match:
+            current = match.group(1).strip().lower()
+            sections[current] = ""
+            continue
+        if current:
+            sections[current] += line + "\n"
+    return sections
+
+
+def _section_body(body: str, stub: str) -> str:
+    """Drop a leftover starter line so a real sentence under it still counts."""
+    kept = []
+    for line in (body or "").splitlines():
+        if stub and stub in _norm_text(line):
+            continue
+        kept.append(line)
+    return "\n".join(kept).strip()
+
+
+def _named_section(sections: dict[str, str], *keys: str) -> str:
+    for name, body in sections.items():
+        if any(key in name for key in keys):
+            return body
+    return ""
+
+
+def _section_filled(body: str, stub: str) -> bool:
+    text = _section_body(body, stub)
+    letters = len(re.findall(r"[A-Za-z]", text))
+    if letters >= 12:
+        return True
+    return letters >= 4 and bool(re.search(r"\d", text))
+
+
+def _week4_change_claim(text: str) -> bool:
+    cleaned = re.sub(
+        r"one sentence:\s*what you changed after the first build.*",
+        " ",
+        text or "",
+        flags=re.I,
+    )
+    return bool(WEEK4_CHANGE_RE.search(cleaned))
+
+
+def _inspect_week4_repo(full: str, due_at: str = "") -> dict:
+    from studio_pipeline import STUDENT_TEMPLATE, _gh, _repo_exists, _repo_file_paths
+
+    empty = {
+        "repo": full,
+        "exists": False,
+        "main_typ": "",
+        "numbers_typ": "",
+        "csv_name": "",
+        "figure_bytes": 0,
+        "pdf_bytes": 0,
+        "pdf_header": False,
+        "pdf_has_image": False,
+        "script_changed": False,
+        "includes_numbers": False,
+        "late_commit": "",
+    }
+    if not full or not _repo_exists(full):
+        return empty
+    try:
+        paths = _repo_file_paths(full)
+    except RuntimeError as exc:
+        return {**empty, "exists": True, "error": str(exc)[:200]}
+    prefix = f"{WEEK4_DIR}/"
+    main = _repo_raw(full, f"{prefix}main.typ") or ""
+    numbers = _repo_raw(full, f"{prefix}output/numbers.typ") or ""
+    script = _repo_raw(full, f"{prefix}scripts/summarize.py") or ""
+    template_script = (STUDENT_TEMPLATE / WEEK4_DIR / "scripts" / "summarize.py").read_text(encoding="utf-8")
+    pdf = _repo_bytes(full, f"{prefix}output/main.pdf") if f"{prefix}output/main.pdf" in paths else b""
+    figure_path = f"{prefix}output/figure.png"
+    csv_match = re.search(r"#raw\(\"([^\"]+\.csv)\"\)", numbers)
+    late = ""
+    if due_at:
+        result = _gh(
+            "api",
+            f"repos/{full}/commits?path={WEEK4_DIR}&since={due_at}&per_page=1",
+            "--jq",
+            ".[0].commit.committer.date // empty",
+            check=False,
+        )
+        late = result.stdout.strip() if result.returncode == 0 else ""
+    return {
+        "repo": full,
+        "exists": True,
+        "main_typ": main[:8000],
+        "numbers_typ": numbers[:4000],
+        "csv_name": csv_match.group(1) if csv_match else "",
+        "figure_bytes": len(_repo_bytes(full, figure_path)) if figure_path in paths else 0,
+        "pdf_bytes": len(pdf),
+        "pdf_header": pdf.startswith(b"%PDF"),
+        "pdf_has_image": b"/Subtype /Image" in pdf or b"/Subtype/Image" in pdf,
+        "script_changed": bool(script) and re.sub(r"\s+", "", script) != re.sub(r"\s+", "", template_script),
+        "includes_numbers": 'include "output/numbers.typ"' in main or "include \"numbers.typ\"" in main,
+        "numbers_generated": "#table(" in numbers and "$n=" in numbers and "will be replaced" not in numbers,
+        "late_commit": late,
+    }
+
+
+def cmd_week4_pull(_: object) -> None:
+    """Harvest Week 4 Canvas boxes and inspect each private week04-report folder. Does not grade."""
+    from studio_pipeline import OUT, _client, _plain_text, _repo_full_name, _weekly_assignment_id
+
+    client = _client()
+    aid = _weekly_assignment_id(client, 4)
+    due_at = (client.get_assignment(aid) or {}).get("due_at") or ""
+    week0 = _load_week0_by_id()
+    rows = []
+    for sub in client.list_submissions(aid):
+        user = sub.get("user") or {}
+        raw = sub.get("body") or ""
+        row = {
+            "canvasUserId": sub.get("user_id"),
+            "canvasName": user.get("name"),
+            "sortableName": user.get("sortable_name"),
+            "sisUserId": user.get("sis_user_id"),
+            "workflow": sub.get("workflow_state"),
+            "submitted_at": sub.get("submitted_at"),
+            "late": bool(sub.get("late")),
+            "due_at": due_at,
+            "grade": sub.get("grade"),
+            "score": sub.get("score"),
+            "github_username": _username_for({"canvasUserId": sub.get("user_id")}, week0),
+            "text": _plain_text(raw)[:4000],
+            "urls": parse_week2_body(raw).get("urls") or [],
+        }
+        if _skip_row(row):
+            continue
+        full = _repo_full_name(row["github_username"]) if row["github_username"] else ""
+        row["repo_inspect"] = _inspect_week4_repo(full, due_at) if full else {"repo": None, "exists": False}
+        rows.append(row)
+    OUT.mkdir(exist_ok=True)
+    dest = OUT / "week4_roster.json"
+    dest.write_text(json.dumps(rows, indent=2) + "\n")
+    submitted = [r for r in rows if r.get("submitted_at")]
+    pdfs = [r for r in submitted if (r.get("repo_inspect") or {}).get("pdf_header")]
+    generated = [r for r in submitted if (r.get("repo_inspect") or {}).get("numbers_generated")]
+    print(
+        f"wrote {dest}  {len(submitted)} submitted / {len(rows)} rows  "
+        f"generated={len(generated)} pdfs={len(pdfs)}"
+    )
+
+
+def score_week4(row: dict) -> dict:
+    zero = {"pipeline": 0, "paper": 0, "pdf": 0, "iteration": 0, "limitation": 0, "disclosure": 0}
+    if not row.get("submitted_at"):
+        return {
+            "score": 0,
+            "parts": zero,
+            "comment": "No Canvas submission by the Tuesday due date.",
+            "needs_review": False,
+            "reasons": ["unsubmitted"],
+        }
+    inspect = row.get("repo_inspect") or {}
+    text = row.get("text") or ""
+    main = inspect.get("main_typ") or ""
+    numbers = inspect.get("numbers_typ") or ""
+    sections = _typst_sections(main)
+    review = []
+
+    generated = bool(inspect.get("numbers_generated")) or (
+        "#table(" in numbers
+        and "will be replaced" not in numbers
+        and bool(re.search(r"mean|\$n", numbers, re.I))
+    )
+    figure_ok = int(inspect.get("figure_bytes") or 0) >= 5000
+    if generated and figure_ok:
+        pipeline_pts = 2
+    elif generated or figure_ok:
+        pipeline_pts = 1
+    else:
+        pipeline_pts = 0
+
+    pred_ok = _section_filled(_named_section(sections, "predict"), WEEK4_STARTER_PREDICTION)
+    lim_raw = _named_section(sections, "limit")
+    lim_section_ok = _section_filled(lim_raw, WEEK4_STARTER_LIMITATION)
+    if pred_ok and lim_section_ok:
+        paper_pts = 2
+    elif pred_ok or lim_section_ok:
+        paper_pts = 1
+    else:
+        paper_pts = 0
+
+    pdf_ok = bool(inspect.get("pdf_header")) and int(inspect.get("pdf_bytes") or 0) >= 8000
+    pdf_image = bool(inspect.get("pdf_has_image"))
+    includes = bool(inspect.get("includes_numbers"))
+    if pdf_ok and pdf_image and (includes or generated):
+        pdf_pts = 2
+    elif pdf_ok:
+        pdf_pts = 1
+        review.append("PDF is present but the figure or the generated include is missing")
+    else:
+        pdf_pts = 0
+
+    claim = _week4_change_claim(text) or _week4_change_claim(main)
+    csv_name = inspect.get("csv_name") or ""
+    own_csv = bool(csv_name) and csv_name != "sample-rt.csv"
+    file_change = bool(inspect.get("script_changed")) or own_csv or (paper_pts > 0 and generated)
+    if pdf_pts and file_change and claim:
+        iter_pts = 2
+    elif pdf_pts and (file_change or claim):
+        iter_pts = 1
+    else:
+        iter_pts = 0
+    if csv_name == "sample-rt.csv":
+        review.append("generated numbers still cite sample-rt.csv")
+    elif not csv_name and generated:
+        review.append("generated numbers do not name a CSV")
+
+    lim_text = _section_body(lim_raw, WEEK4_STARTER_LIMITATION)
+    lim_source = lim_text if lim_section_ok else text
+    has_reason = bool(
+        re.search(
+            r"limit|practice|anticipat|fatigue|small|self-report|\blie\b|distract|bias|"
+            r"not represent|may not|misleading|cannot|lag|one person|single|attention|"
+            r"not a stable|valid set|researcher|only one",
+            lim_source,
+            re.I,
+        )
+    )
+    has_n = bool(re.search(r"\bn\b|\$n\b|\d+|trial|session|one person|participant", lim_source, re.I))
+    lim_pts = 1 if has_reason and has_n else 0
+    if lim_section_ok and lim_pts == 0:
+        review.append("limitation section does not give a reason and n")
+
+    disc_pts = 1 if DISCLOSURE_RE.search(text) or DISCLOSURE_RE.search(main) else 0
+    if disc_pts == 0 and inspect.get("exists") and inspect.get("repo"):
+        from studio_pipeline import STUDENT_TEMPLATE
+
+        readme = _repo_raw(inspect["repo"], f"{WEEK4_DIR}/README.md") or ""
+        template_md = (STUDENT_TEMPLATE / WEEK4_DIR / "README.md").read_text(encoding="utf-8")
+        note = _section(_filled_sections(readme, template_md), "copilot", "disclosure", "agent")
+        if note and (DISCLOSURE_RE.search(note) or re.search(r"\bai\b|assistant", note, re.I)):
+            disc_pts = 1
+
+    if inspect.get("error"):
+        review.append(inspect["error"])
+    if not inspect.get("exists"):
+        review.append("private studio repo was not found")
+    if row.get("late"):
+        review.append("Canvas marks the submission late")
+    if inspect.get("late_commit"):
+        review.append(f"week04-report commit after due: {inspect['late_commit']}")
+
+    parts = {
+        "pipeline": pipeline_pts,
+        "paper": paper_pts,
+        "pdf": pdf_pts,
+        "iteration": iter_pts,
+        "limitation": lim_pts,
+        "disclosure": disc_pts,
+    }
+    score = sum(parts.values())
+    reasons = [
+        f"numbers={generated} figure={inspect.get('figure_bytes') or 0}B csv={csv_name or '—'} pts={pipeline_pts}",
+        f"prediction={pred_ok} limitation_section={lim_section_ok} pts={paper_pts}",
+        f"pdf={inspect.get('pdf_bytes') or 0}B header={inspect.get('pdf_header')} image={pdf_image} include={includes} pts={pdf_pts}",
+        f"claim={claim} script_changed={bool(inspect.get('script_changed'))} own_csv={own_csv} pts={iter_pts}",
+        f"limitation={lim_pts} disclosure={disc_pts}",
+    ]
+    comment = (
+        f"Week 4: pipeline {parts['pipeline']}, paper {parts['paper']}, "
+        f"PDF {parts['pdf']}, iteration {parts['iteration']}, "
+        f"limitation {parts['limitation']}, disclosure {parts['disclosure']}. Total {score}/10."
+    )
+    return {
+        "score": score,
+        "parts": parts,
+        "comment": comment,
+        "needs_review": bool(review),
+        "reasons": reasons + ([f"review: {'; '.join(review)}"] if review else []),
+    }
+
+
+def cmd_week4_grade(args: object) -> None:
+    """Score Week 4 from Canvas text + private week04-report files. Default dry-run."""
+    _grade_week(args, 4, "week4_roster.json", score_week4, "week4_grades.json")
 
 
 def _list_studio_repos() -> list[str]:
