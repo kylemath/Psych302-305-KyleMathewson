@@ -1,40 +1,37 @@
-# Midterm check-in · due Wednesday 28 October 2026, in class
+# Midterm: your project plan
 
-**Weight:** 15% of the course. Individual. Graded by the instructor.
-Instructions and marks: https://kylemath.github.io/Psych302-305-KyleMathewson/project.html#midterm
+**Due:** Wednesday 28 October 2026, 21:00 (in class)
+**Worth:** 15% of your grade. Work on your own.
+More details: https://kylemath.github.io/Psych302-305-KyleMathewson/project.html#midterm
 
-This file is the check-in — there is no separate template to copy.
-`FINAL.md` (later, same folder) is the last piece of the project.
+For the rest of the term you will work on a project you choose. It can be
+anything that uses code and has something to do with psychology or how
+people think and act. You do not have to finish it. On 2 December you will
+tell us how far you got.
+
+Answer each part below in a few sentences. About one page in total is
+enough. It is fine if your plan changes later.
 
 **Name:**
 
-## Question
-One sentence. What will you measure or show?
+## 1. Your idea (4 points)
+What do you want to make or find out? Why does it interest you?
 
-## Tool
-Which taught tool will you use? (reaction time, inventory, comparison, a
-methods-and-results page, or a browser game that studies a question)
+## 2. How you will do it (4 points)
+What will you build or do? What will you use to do it? Will you use any
+data, and where will it come from? If you have a guess about what you will
+find, write it here now, before you start.
 
-## Prediction
-One comparison or one expected direction, written before you collect new
-data.
+## 3. Your steps (4 points)
+- **First step** (done before 18 November):
+- **By 2 December, I hope to have:**
+- **If things go really well, I could also:**
 
-## What already exists
-List the files in this repository that you will reuse (CSV, earlier report,
-draft page).
+## 4. What you have and what might go wrong (3 points)
+- **What I already have** (files, data, or skills I can use):
+- **What might go wrong:**
+- **What I will do if it does:**
 
-## What you will build by 2 December
-A page that a classmate could open and understand without you in the room,
-and a short in-class presentation of that page.
-
-## Risk
-One thing that could fail (no data, unclear claim, page that does not run).
-
-## Copilot disclosure
-- **Used tonight:** yes / no
-- **What I asked** (one sentence):
-- **What I kept:**
-- **What I changed:**
-
-If Copilot was unavailable, write "no Copilot tonight" and stop. Do not
-purchase a plan.
+## 5. Use of AI (required, no points)
+- Did you use an AI tool (like Copilot or ChatGPT) for this? yes / no
+- If yes: what did you ask, what did you keep, and what did you change?

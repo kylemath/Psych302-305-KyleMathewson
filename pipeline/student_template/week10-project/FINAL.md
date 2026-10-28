@@ -1,50 +1,39 @@
-# Final project · due Wednesday 2 December 2026
+# Final: your progress report
 
-**Weight:** 35% of the course. Individual. Self as participant by default.
-Instructions and marks: https://kylemath.github.io/Psych302-305-KyleMathewson/project.html#final
+**Due:** Wednesday 2 December 2026, 21:00 (last class)
+**Worth:** 35% of your grade. Work on your own.
+More details: https://kylemath.github.io/Psych302-305-KyleMathewson/project.html#final
 
-This file is the checklist — there is no separate template to copy. Build
-around the page and prediction you started in `CHECKIN.md` (same folder).
-This is a **project**, not a registrar-scheduled exam. The last class
-meeting is a short in-class presentation of your page; that talk is one
-component of the 35%.
+Tell us how far you got with the project from your plan (`CHECKIN.md`).
+It does **not** need to be finished. You get marks for the work you did
+and for describing it honestly, not for how much you finished.
+
+Put all your project files in this folder (`week10-project/`): code,
+web pages, data, pictures, notes. They are worth 10 points.
 
 **Name:**
 
-## Page
-Path (in this folder) or URL of your running page (HTML), or a Markdown
-methods-and-results file with a figure.
+## 1. What I planned
+Two or three sentences. Did your idea change? Say so.
 
-## Prediction
-The prediction you wrote at the midterm check-in. Say so if the question
-changed.
+## 2. What I did (7 points)
+What did you actually do? Where is the project now? Name the files in this
+folder so we can find them.
 
-## Result
-One figure or table and a sentence that states the claim.
+## 3. One thing to show (6 points)
+Show one thing you made: a picture, a graph, a screenshot, a result, or
+something that works. Add a sentence saying what it shows. If you
+collected data, say how much.
 
-## Limitation
-What your *n* can and cannot support.
+## 4. What changed and what is next (5 points)
+What changed from your plan, and why? What did not work? If you kept going,
+what would you do next?
 
-## Data
-Path to a CSV in this folder if you collected any, or the line
-`no new data`.
+## 5. Use of AI (2 points)
+- Did you use an AI tool (like Copilot or ChatGPT)? yes / no
+- If yes: what did you ask, what did you keep, and what did you change?
 
-## Copilot disclosure
-- **Used tonight:** yes / no
-- **What I asked** (one sentence):
-- **What I kept:**
-- **What I changed:**
-
-If Copilot was unavailable, write "no Copilot tonight" and stop. Do not
-purchase a plan.
-
-## Last class meeting · 2 December
-A 3-minute presentation of this page. Everyone presents; that talk is 5 of the
-35 points.
-
-## Allowed tools
-Something already taught: simple or choice RT, the inventory, a
-two-condition comparison, a short report built from your existing files, or
-a browser game that studies a question (no new libraries). Not required: a
-partner, classmate data, or a statistical test beyond descriptives you can
-explain.
+## Your talk on 2 December (5 points)
+Three minutes in front of the class. Say what you planned, show what you
+made, share one thing you learned, and say what you would do next. No
+slides needed. Everyone gives a talk.
