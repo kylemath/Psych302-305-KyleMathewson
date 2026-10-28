@@ -1,40 +1,37 @@
-# Midterm · project plan · due Wednesday 28 October 2026, in class
+# Midterm: your project plan
 
-**Weight:** 15% of the course. Individual. Graded by the instructor.
-Instructions and marks: https://kylemath.github.io/Psych302-305-KyleMathewson/project.html#midterm
+**Due:** Wednesday 28 October 2026, 21:00 (in class)
+**Worth:** 15% of your grade. Work on your own.
+More details: https://kylemath.github.io/Psych302-305-KyleMathewson/project.html#midterm
 
-Your project is open ended: pick something you want to make or find out,
-and work on it until 2 December. You do not have to finish it. At the end
-you report how far you got in `FINAL.md` (same folder). A page or so here
-is plenty. Your plan can change later.
+For the rest of the term you will work on a project you choose. It can be
+anything that uses code and has something to do with psychology or how
+people think and act. You do not have to finish it. On 2 December you will
+tell us how far you got.
+
+Answer each part below in a few sentences. About one page in total is
+enough. It is fine if your plan changes later.
 
 **Name:**
 
-## The idea (4 points)
-What do you want to make, find out, or try? Why does it interest you?
-A study on yourself, a reanalysis of data you have or of an open dataset,
-a tool, a demo, a game, a visualization: any of these is fine.
+## 1. Your idea (4 points)
+What do you want to make or find out? Why does it interest you?
 
-## The approach (4 points)
-How will you go about it? What will you build or do, with what tools
-(from class or new), and what data, if any? If you expect a particular
-result, write what you expect now, before you look.
+## 2. How you will do it (4 points)
+What will you build or do? What will you use to do it? Will you use any
+data, and where will it come from? If you have a guess about what you will
+find, write it here now, before you start.
 
-## Steps (4 points)
-- **First step** (push it before Week 10, 18 November):
-- **Some progress by 2 December** would look like:
-- **Stretch goal** if things go well:
+## 3. Your steps (4 points)
+- **First step** (done before 18 November):
+- **By 2 December, I hope to have:**
+- **If things go really well, I could also:**
 
-## Starting point and risk (3 points)
-- **What I already have** (files in this repository, data, skills):
-- **What could get in the way:**
-- **My fallback if it does:**
+## 4. What you have and what might go wrong (3 points)
+- **What I already have** (files, data, or skills I can use):
+- **What might go wrong:**
+- **What I will do if it does:**
 
-## Copilot disclosure (required, not scored)
-- **Used tonight:** yes / no
-- **What I asked** (one sentence):
-- **What I kept:**
-- **What I changed:**
-
-If Copilot was unavailable, write "no Copilot tonight" and stop. Do not
-purchase a plan.
+## 5. Use of AI (required, no points)
+- Did you use an AI tool (like Copilot or ChatGPT) for this? yes / no
+- If yes: what did you ask, what did you keep, and what did you change?
