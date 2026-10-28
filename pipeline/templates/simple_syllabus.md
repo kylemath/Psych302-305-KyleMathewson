@@ -95,9 +95,9 @@ No graded participation, no graded group work, and no graded peer review.
 
 For the rest of the term, each student works on a project they choose: anything that uses code and has something to do with psychology or how people think and act. Big or small is up to the student. Students use themselves as participants and do not include classmates' names or data.
 
-**Midterm (15%), Wednesday 28 October, 21:00:** a written plan in `week10-project/CHECKIN.md`. Marks: the idea 4, how they will do it 4, their steps 4, what they have and what might go wrong 3. Use of AI must be stated (no points).
+**Midterm (15%), Wednesday 28 October, 21:00:** a written plan in `week10-project/CHECKIN.md`, then a 5-minute one-on-one chat with the instructor in class. Marks: the idea 3, how they will do it 3, their steps 3, what they have and what might go wrong 3, the chat 3. Use of AI must be stated (no points).
 
-**Final (35%), Wednesday 2 December, 21:00:** a report on how far the project got. It does not need to be finished. Students save their project files in `week10-project/`, answer the questions in `week10-project/FINAL.md`, and give a 3-minute talk at the last class meeting. The talk is part of the 35%, not a separate exam.
+**Final (35%), Wednesday 2 December, 21:00:** a report on how far the project got. It does not need to be finished. Students save their project files in `week10-project/`, answer the questions in `week10-project/FINAL.md`, and give a 3-minute talk to the class at the last class meeting. The talk is part of the 35%, not a separate exam.
 
 Marks (35 points): the work they did 10, what they did 7, one thing to show 6, what changed and what is next 5, use of AI 2, talk 5. No marks are lost for an unfinished or small project. Full details: [https://kylemath.github.io/Psych302-305-KyleMathewson/project.html](https://kylemath.github.io/Psych302-305-KyleMathewson/project.html)
 
