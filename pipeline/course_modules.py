@@ -106,11 +106,11 @@ WEEKLIES = [
         "due_display": "3 November 2026",
         "meet": "28 October",
         "lab": f"{BOOK}/results.html",
-        "lab_label": "Week 8 results page",
-        "note_path": "week08-results/README.md",
-        "ask": "Path to the results page in week08-results/ and the claim. The 15% check-in is a separate assignment.",
-        "module": "Week 8 · Results and check-in (28 Oct)",
-        "preamble": "One claim and one figure or table on a results page. The midterm check-in is a separate Canvas box.",
+        "lab_label": "Week 8: start your project",
+        "note_path": "week10-project/",
+        "ask": "The path to your first project file in week10-project/ (for example week10-project/index.html), and one sentence on what it does or will do.",
+        "module": "Week 8 · Start your project (28 Oct)",
+        "preamble": "Tonight you start building your project: make one first file and save it to GitHub. Your project plan (midterm, 15%) is a separate Canvas box.",
     },
     {
         "n": 9,
@@ -150,6 +150,8 @@ def weekly_description(read_template, row: dict) -> str:
         tpl = read_template("week5_report.html")
     elif row["n"] == 6:
         tpl = read_template("week6_report.html")
+    elif row["n"] == 8:
+        tpl = read_template("week8_report.html")
     else:
         tpl = read_template("weekly_report.html")
     return fill(tpl, **{k: str(row[k]) for k in row})
