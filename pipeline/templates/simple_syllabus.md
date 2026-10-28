@@ -81,8 +81,8 @@ Canvas holds assignments, grades, and announcements. This Simple Syllabus is the
 | Component                             | Weight | Due                           | Notes                                                                           |
 | ------------------------------------- | ------ | ----------------------------- | ------------------------------------------------------------------------------- |
 | Weekly laboratory reports (weeks 1–9) | 50%    | Tuesdays 17:00 after each lab | Nine reports, drop the lowest. Week 4 due 29 September (no class 30 September). |
-| Midterm check-in                      | 15%    | Wednesday 28 October, 21:00   | Individual. Question, taught tool, prediction, existing files.                  |
-| Final project                         | 35%    | Wednesday 2 December, 21:00   | Running page plus a short in-class presentation. No registrar-scheduled exam.   |
+| Midterm check-in                      | 15%    | Wednesday 28 October, 21:00   | Individual. Open-ended project plan: idea, approach, steps, risk.               |
+| Final project                         | 35%    | Wednesday 2 December, 21:00   | Progress report on the project plus a short in-class talk. No registrar exam.   |
 
 
 Week 0 (GitHub username) is complete/incomplete and **omitted** from the course average.
@@ -91,21 +91,22 @@ No graded participation, no graded group work, and no graded peer review.
 
 **Assignments ≥ 10% of the course** (GFC): each weekly report is 50/8 = 6.25% after the drop, so under 10% individually. The midterm check-in (15%) and the final project (35%) are the items that must appear with dates above. There is no registrar final examination.
 
-### What the final project is
+### What the project is
 
-A small study on a page you already know how to build, using a tool taught in the course (reaction time, inventory, two-condition comparison, a methods-and-results page, or a browser game that studies a question). One question, one prediction, one result, one limit. Self as participant by default. No new libraries. No classmate names or raw classmate data.
+An open-ended individual project, chosen by the student: something to make or find out with code that connects to psychology (a study on yourself, a reanalysis of existing or open data, a tool, demo, game, or visualization). Tools from class or new ones the student can explain. Self as participant by default. No classmate names or raw classmate data.
 
-**Due Wednesday 2 December, 21:00**, in the private course repository and on the Canvas assignment:
+**Midterm (15%), 28 October:** a written plan in `week10-project/CHECKIN.md`: the idea (4), the approach (4), steps including a first step and what progress by 2 December would look like (4), and starting point and risk (3). AI note required, not scored.
 
-1. A running page (HTML) or a Markdown methods-and-results file with a figure.
-2. The prediction written at the midterm check-in (say so if the question changed).
-3. One result sentence and one figure or table that comes from a file.
-4. One limitation, including what your *n* can and cannot support.
-5. A CSV in that week’s folder if you collected any, or the line `no new data`.
-6. An AI disclosure, or `no Copilot tonight`.
-7. A 3-minute in-class **presentation** of that page on the last class meeting (2 December). The presentation is one component of the 35% project score, not a separate exam and not a sit-down test.
+**Final (35%), Wednesday 2 December, 21:00:** a progress report, not a finished product. In the private course repository and on the Canvas assignment:
 
-Marking (35 points): running page 7, prediction 6, result 7, limitation 5, presentation 5, data 3, disclosure 2. Full scheme: [https://kylemath.github.io/Psych302-305-KyleMathewson/rubrics.html](https://kylemath.github.io/Psych302-305-KyleMathewson/rubrics.html)
+1. The work itself (code, page, data, figures, notes) pushed to `week10-project/`.
+2. `week10-project/FINAL.md`: what was planned, what was done, and where it stands.
+3. One concrete thing to show (figure, result, screenshot, demo, or example output).
+4. What changed and what would come next.
+5. An AI disclosure, or `no Copilot tonight`.
+6. A 3-minute in-class **talk** at the last class meeting (2 December). The talk is one component of the 35% project score, not a separate exam and not a sit-down test.
+
+Marking (35 points): evidence of progress 10, what was done 7, something to show 6, what changed and next steps 5, disclosure 2, talk 5. Not marked: whether the project is finished, its size, or whether a prediction held. Full scheme: [https://kylemath.github.io/Psych302-305-KyleMathewson/project.html](https://kylemath.github.io/Psych302-305-KyleMathewson/project.html)
 
 Arts and Science use the same points and the same Wednesday modification hour.
 
@@ -173,7 +174,7 @@ Full agendas: [https://kylemath.github.io/Psych302-305-KyleMathewson/schedule.ht
 - **Weekly reports:** due Tuesday 17:00. The lowest of nine is dropped. That dropped week is the late/absent buffer. Further late weeklies are not accepted unless Accessibility Resources or an approved absence/deferral is already in place.
 - **Week 0:** still accepted for complete/incomplete after the first night, so a student who missed 2 September can catch up before Week 2. It does not enter the average.
 - **Midterm check-in:** due in class 28 October. If you are absent with a reason the instructor accepts, submit by Friday 30 October, 17:00.
-- **Final project:** Wednesday 2 December, 21:00 — running page on Canvas and the short in-class presentation. There is no registrar-scheduled final examination. If you miss the presentation with a reason the instructor accepts, present by Friday 4 December, 17:00. A missed project (no page and no presentation) follows the Faculty process for a missed final assessment.
+- **Final project:** Wednesday 2 December, 21:00 — progress report on Canvas and the short in-class talk. There is no registrar-scheduled final examination. If you miss the presentation with a reason the instructor accepts, present by Friday 4 December, 17:00. A missed project (no page and no presentation) follows the Faculty process for a missed final assessment.
 - Do not submit classmate names or raw classmate data. Self as participant is the default.
 
 ---

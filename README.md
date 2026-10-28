@@ -34,7 +34,7 @@ No class 30 September or 11 November.
 
 - **50%** weekly laboratory reports (weeks 1–9, drop the lowest). Tuesday 17:00.
 - **15%** individual midterm check-in, 28 October.
-- **35%** individual final project (running page plus in-class presentation), 2 December. There is no registrar exam.
+- **35%** individual final project (progress report on an open-ended project, plus in-class talk), 2 December. There is no registrar exam.
 
 Marking schemes: [rubrics.html](rubrics.html). Official late work and letter grades: Simple Syllabus on Canvas. No graded group work and no graded peer review. Week 0 is complete/incomplete and omitted from the average.
 

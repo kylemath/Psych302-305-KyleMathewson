@@ -1,50 +1,46 @@
-# Final project · due Wednesday 2 December 2026
+# Final · progress report · due Wednesday 2 December 2026
 
 **Weight:** 35% of the course. Individual. Self as participant by default.
 Instructions and marks: https://kylemath.github.io/Psych302-305-KyleMathewson/project.html#final
 
-This file is the checklist — there is no separate template to copy. Build
-around the page and prediction you started in `CHECKIN.md` (same folder).
-This is a **project**, not a registrar-scheduled exam. The last class
-meeting is a short in-class presentation of your page; that talk is one
-component of the 35%.
+This is a report on how far you got with the project you planned in
+`CHECKIN.md` (same folder). It does not have to be finished. You are marked
+on real work pushed to this folder and an honest account of it, not on a
+completed product or on whether your prediction came true. Put your code,
+page, data, figures, and notes in `week10-project/`.
 
 **Name:**
 
-## Page
-Path (in this folder) or URL of your running page (HTML), or a Markdown
-methods-and-results file with a figure.
+## What I set out to do
+Two or three sentences from your plan. Say so if the idea changed.
 
-## Prediction
-The prediction you wrote at the midterm check-in. Say so if the question
-changed.
+## What I did (7 points)
+What you actually did since the plan, and where the project stands now.
+Link the files in this folder (for example `stroop.html`, `data.csv`,
+`analysis.py`, `notes.md`).
 
-## Result
-One figure or table and a sentence that states the claim.
+## Something to show (6 points)
+One concrete thing: a figure, a result, a screenshot, a working demo, or
+an example output. Add a sentence on what it shows. If you collected data,
+say how much (*n*).
 
-## Limitation
-What your *n* can and cannot support.
+## What changed and what is next (5 points)
+How and why the plan changed, what did not work, and what you would do
+next if you kept going.
 
-## Data
-Path to a CSV in this folder if you collected any, or the line
-`no new data`.
-
-## Copilot disclosure
-- **Used tonight:** yes / no
+## Copilot disclosure (2 points)
+- **Used:** yes / no
 - **What I asked** (one sentence):
 - **What I kept:**
 - **What I changed:**
 
-If Copilot was unavailable, write "no Copilot tonight" and stop. Do not
-purchase a plan.
+If Copilot was unavailable, write "no Copilot" and stop. Do not purchase a
+plan.
 
-## Last class meeting · 2 December
-A 3-minute presentation of this page. Everyone presents; that talk is 5 of the
-35 points.
+## Talk · 2 December (5 points)
+Three minutes in class: what you set out to do, what you built, one thing
+you learned, and what comes next. Show your files, page, or this report;
+no slides needed. Everyone presents.
 
-## Allowed tools
-Something already taught: simple or choice RT, the inventory, a
-two-condition comparison, a short report built from your existing files, or
-a browser game that studies a question (no new libraries). Not required: a
-partner, classmate data, or a statistical test beyond descriptives you can
-explain.
+The other 10 points are for the evidence of progress itself: the work you
+pushed to this folder.
