@@ -119,11 +119,11 @@ WEEKLIES = [
         "due_display": "10 November 2026",
         "meet": "4 November",
         "lab": f"{BOOK}/game.html",
-        "lab_label": "Week 9 gamified research",
+        "lab_label": "Week 9: make a game",
         "note_path": "week09-game/README.md",
-        "ask": "Your question of interest, the game as the instrument, what was logged (including the extra logged variable). Last weekly report.",
+        "ask": "The name of your game, the three changes you made, your guess and what happened (numbers from your CSV).",
         "module": "Week 9 · Gamified research (4 Nov)",
-        "preamble": "A browser game that studies a question. Last weekly report.",
+        "preamble": "Tonight you make a starter game your own, then use it to test one guess about yourself. Last weekly report.",
     },
 ]
 
