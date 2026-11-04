@@ -3,84 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Week 9 · Gamified research · PSYCH 302 / 305</title>
+    <title>Week 9 · Make a game · PSYCH 302 / 305</title>
     <link rel="stylesheet" href="studio.css" />
     <style>
-      .lab-grid {
-        display: grid;
-        grid-template-columns: 0.9fr 1.3fr;
-        gap: 18px;
-      }
-      .stage {
-        min-height: 320px;
-        border-radius: 16px;
-        background: #07090d;
-        display: grid;
-        place-items: center;
-        position: relative;
-        outline: none;
-      }
-      .stage:focus {
-        box-shadow: 0 0 0 2px rgba(232, 184, 109, 0.45);
-      }
-      .fix,
-      .mark,
-      .hold-copy {
-        display: none;
-      }
-      .stage.waiting .fix {
-        display: block;
-        color: #b7b1a4;
-        font-size: 2rem;
-      }
-      .stage.go .mark {
-        display: block;
-        width: 84px;
-        height: 84px;
-        border-radius: 50%;
-        background: #e8b86d;
-        box-shadow: 0 0 0 10px rgba(232, 184, 109, 0.16);
-      }
-      .stage.nogo .mark {
-        display: block;
-        width: 84px;
-        height: 84px;
-        border-radius: 12px;
-        background: #6ee7b7;
-        box-shadow: 0 0 0 10px rgba(110, 231, 183, 0.16);
-      }
-      .stage.nogo .hold-copy {
-        display: block;
-        position: absolute;
-        bottom: 28px;
-        color: #6ee7b7;
-        font-family: "Segoe UI", sans-serif;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        font-size: 0.72rem;
-      }
-      .hud {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 12px;
-        font-family: "Segoe UI", sans-serif;
-        color: var(--muted);
-        font-size: 0.9rem;
-      }
-      table {
+      .game-frame {
         width: 100%;
-        border-collapse: collapse;
-        font-family: "Segoe UI", sans-serif;
-        font-size: 0.88rem;
+        height: 640px;
+        border: 0;
+        border-radius: 16px;
+        background: #10141c;
       }
-      th, td {
-        text-align: left;
-        padding: 6px 0;
-        border-bottom: 1px solid var(--panel-border);
-      }
-      @media (max-width: 900px) {
-        .lab-grid { grid-template-columns: 1fr; }
+      .ideas li { margin-bottom: 10px; }
+      .grid-2 > * { min-width: 0; }
+      code { overflow-wrap: anywhere; }
+      pre {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 10px 12px;
+        overflow-x: auto;
+        font-size: 0.85rem;
       }
     </style>
   </head>
@@ -89,7 +30,7 @@
       <nav class="topnav">
         <a class="brand" href="index.html">
           <small>Week 9 · PSYCH 302 / 305</small>
-          <strong>Gamified research</strong>
+          <strong>Make a game</strong>
         </a>
         <div class="nav-links">
           <a href="index.html">Overview</a>
@@ -101,410 +42,163 @@
       </nav>
 
       <header class="panel" style="margin-bottom: 18px">
-        <div class="kicker">Week 9 laboratory · last weekly report</div>
-        <h1>A game that studies a question</h1>
+        <div class="kicker">Week 9 · Wednesday 4 November · last weekly report</div>
+        <h1>Make a game</h1>
         <p class="lede">
-          Question: are people worse at withholding a frequent response than at
-          executing it? Amber circle = press space. Mint square = do nothing.
-          Write a predicted false-alarm rate before you start. Export the CSV
-          into <code>week09-game/</code>.
+          Tonight you take a small working game and make it your own. Change
+          how it looks, change how it plays, then use it to test one guess
+          about yourself. It saves a data file of every turn, just like the
+          reaction-time page from Week 2.
+        </p>
+        <p class="muted">
+          Work on your own. If you missed your 5-minute project chat last
+          week, the instructor will find you during class.
         </p>
       </header>
 
-      <div class="lab-grid">
-        <aside class="panel">
-          <div class="kicker">This block</div>
-          <h2>Usable trials only</h2>
-          <p class="muted">
-            Go times under 150 ms are anticipations. Times over 1000 ms, or a
-            missed go, are lapses. Every trial is stored. Means use correct go
-            responses in 150–1000 ms. No-go accuracy is the share of holds you
-            actually withheld.
-          </p>
-          <div class="equation">
-            go mean RT
-            <small>Milliseconds, correct go trials in 150–1000 ms.</small>
-          </div>
-          <div class="stat" id="meanEl">—</div>
-          <p class="muted" id="summaryEl">n = 0 · no-go accuracy = —</p>
-          <table>
-            <thead>
-              <tr><th>Condition</th><th>n</th><th>Result</th></tr>
-            </thead>
-            <tbody id="meansBody">
-              <tr><td colspan="3">No trials yet.</td></tr>
-            </tbody>
-          </table>
-        </aside>
-
-        <section class="panel">
-          <div class="hud">
-            <span id="status">Click the display, then start a block.</span>
-            <span id="progress">0 / 0</span>
-          </div>
-          <div id="stage" class="stage" tabindex="0" role="application" aria-label="Go / no-go display">
-            <div class="fix" aria-hidden="true">+</div>
-            <div class="mark" aria-hidden="true"></div>
-            <div class="hold-copy" aria-hidden="true">hold</div>
-          </div>
-          <div class="actions" style="margin-top: 14px">
-            <button id="practiceBtn" class="secondary">8-trial practice</button>
-            <button id="scoredBtn" class="primary">Scored block (30 trials)</button>
-            <button id="exportBtn" class="secondary">Export CSV</button>
-          </div>
-          <p class="muted" style="margin-top: 12px">
-            About one trial in five is a hold. Practice means are not findings.
-          </p>
-        </section>
-      </div>
+      <section class="panel">
+        <div class="kicker">Start here · 10 minutes</div>
+        <h2>Play the starter game</h2>
+        <p class="muted">
+          Click the game, press <b>Start</b>, then press <b>SPACE</b> (or tap)
+          for a star and do nothing for a bomb. It gets faster every 10 turns.
+          How far can you get?
+        </p>
+        <iframe class="game-frame" src="pipeline/student_template/week09-game/game.html" title="Starter game"></iframe>
+      </section>
 
       <section class="grid-2" style="margin-top: 16px">
         <article class="panel">
-          <div class="kicker">The instrument</div>
-          <h2>Question first, then the game</h2>
+          <div class="kicker">Get the file</div>
+          <h2>Your copy</h2>
+          <ol class="muted">
+            <li>In VS Code, open your course repository and press <b>Sync</b>. A new folder <code>week09-game/</code> should appear with <code>game.html</code> and <code>README.md</code>.</li>
+            <li>No folder? Make <code>week09-game/</code> yourself and save these two files into it:
+              <a href="https://raw.githubusercontent.com/kylemath/Psych302-305-KyleMathewson/main/pipeline/student_template/week09-game/game.html"><code>game.html</code></a> and
+              <a href="https://raw.githubusercontent.com/kylemath/Psych302-305-KyleMathewson/main/pipeline/student_template/week09-game/README.md"><code>README.md</code></a>.</li>
+            <li>Open <code>game.html</code> in your browser. After every change: save, then reload.</li>
+          </ol>
+        </article>
+        <article class="panel">
+          <div class="kicker">How the file works</div>
+          <h2>Settings first</h2>
           <p class="muted">
-            Tonight’s n is still small. That is not the week’s lesson. The tool
-            is a browser game that can study a question: it presents two
-            conditions, records a response and a time, and writes a CSV you can
-            reopen in Week 5 or in the final project.
+            Near the top of the script is a block called
+            <code>SETTINGS</code>. It holds the title, the pictures, the speed,
+            the lives, and the points. Change those first. Below it is the game
+            itself, written in short functions with a comment on each one.
           </p>
+          <pre>goThings: ["⭐"],     // press for these
+stopThings: ["💣"],   // do NOT press for these
+lives: 3,
+speedUp: 0.85,</pre>
+        </article>
+      </section>
+
+      <section class="panel" style="margin-top: 16px">
+        <div class="kicker">Level 1 · about 30 minutes</div>
+        <h2>Make it look like yours</h2>
+        <p class="muted">
+          Change the title, the rules, the pictures (any emoji or a short
+          word), the colours at the top of the file, and the sounds. Make it
+          a game you would actually want to play. Write down each change in
+          your README as you go.
+        </p>
+      </section>
+
+      <section class="panel" style="margin-top: 16px">
+        <div class="kicker">Level 2 · about 40 minutes</div>
+        <h2>Change how it plays</h2>
+        <p class="muted">
+          Now change the code itself, not only a setting. Pick one idea, or
+          use your own. Start with the easy ones.
+        </p>
+        <ul class="ideas muted">
+          <li><b>Easy · More pictures.</b> Put several emoji in <code>goThings</code> and <code>stopThings</code>. Which ones are hardest to tell apart?</li>
+          <li><b>Easy · Get a life back</b> at each new level. Find where <code>level += 1</code> happens and add <code>lives += 1;</code> under it.</li>
+          <li><b>Medium · A bonus thing</b> that is rare and worth 50 points. Hint: in <code>showThing()</code>, add a third kind next to <code>"go"</code> and <code>"stop"</code>.</li>
+          <li><b>Medium · Jump around.</b> Show the thing in a random spot instead of the middle. Hint: give it a random <code>style.transform = "translate(...)"</code>.</li>
+          <li><b>Medium · High score.</b> Keep the best score with <code>localStorage</code> so it is still there after a reload.</li>
+          <li><b>Harder · Two keys.</b> Press F for one kind and J for another, instead of press or do not press.</li>
+          <li><b>Harder · A word game.</b> Show colour words (RED, BLUE) in different colours, like the Stroop task from Week 7. Press only when the word and its colour match.</li>
+          <li><b>Any level · Log something new.</b> Add a new column to the row saved in <code>endTurn()</code>, for example how long the blank wait was.</li>
+        </ul>
+        <p class="muted">
+          If you ask an AI tool for help, read what it gives you, try it, and
+          say in your README what you kept and what you changed.
+        </p>
+      </section>
+
+      <section class="panel" style="margin-top: 16px">
+        <div class="kicker">Level 3 · about 30 minutes</div>
+        <h2>Test one guess about yourself</h2>
+        <p class="muted">
+          Your game already saves every turn: the level, the kind of thing,
+          whether you pressed, how fast, and whether you were right. Write one
+          guess in your README <b>before</b> your final round. For example:
+          “I will make more mistakes on bombs once the game gets faster,” or
+          “I will be slower on the bonus thing than on stars.” Then play one
+          full game, press <b>Save my data</b>, and move
+          <code>game-week09.csv</code> into <code>week09-game/</code>.
+          Open the CSV and count. Did your guess hold up?
+        </p>
+      </section>
+
+      <section class="grid-2" style="margin-top: 16px">
+        <article class="panel">
+          <div class="kicker">Last 20 minutes</div>
+          <h2>Arcade, then save</h2>
           <p class="muted">
-            A game without a logged comparison is a toy. This page withholds on
-            a mint square so you can count false alarms against go misses.
+            If you like, let the person next to you play your game for a
+            minute. Just for fun: no marks, and do not save their data. Then
+            Commit and Sync in VS Code, and paste on Canvas.
           </p>
         </article>
         <article class="panel">
-          <div class="kicker">Remix</div>
-          <h2>Modification</h2>
+          <div class="kicker">Your project</div>
+          <h2>Could this become your project?</h2>
           <p class="muted">
-            Log one extra variable. This build stores <code>soa_ms</code> —
-            the wait from fixation to stimulus. You could instead flag catch
-            trials or collect a confidence key after each trial. You may also
-            recolour the mark, rename the conditions, or rewrite the hold
-            copy. Do not add a library.
+            Yes, if you want. A game you keep building, with a question it
+            helps answer, is a fine final project. Copy it into
+            <code>week10-project/</code> and keep going over Reading Week.
           </p>
         </article>
       </section>
 
       <section class="panel" style="margin-top: 16px">
         <div class="kicker">Class night</div>
-        <h2>Agenda</h2>
+        <h2>Plan for tonight</h2>
         <div class="agenda">
           <dl>
-            <dt>18:00 Introduction</dt>
-            <dd>A game is an instrument if it records a comparison you stated first.</dd>
-            <dt>18:25 Demonstration</dt>
-            <dd>Play eight practice trials. Write a predicted false-alarm rate.</dd>
-            <dt>18:40 Exercise</dt>
-            <dd>Run the scored block. Export the CSV into <code>week09-game/</code>.</dd>
+            <dt>18:00 Play</dt>
+            <dd>Play the starter game. Who got furthest?</dd>
+            <dt>18:10 Get the file</dt>
+            <dd>Sync, find <code>week09-game/</code>, open <code>game.html</code>.</dd>
+            <dt>18:20 Level 1</dt>
+            <dd>Make it look like yours.</dd>
+            <dt>18:50 Level 2</dt>
+            <dd>Change how it plays.</dd>
           </dl>
           <dl>
-            <dt>19:25 Results</dt>
-            <dd>One sentence: go mean, no-go accuracy, n, and what you will not claim.</dd>
-            <dt>20:05 Modification</dt>
-            <dd>Log one extra column. You may also change the feel and theme of the mark.</dd>
-            <dt>Reading</dt>
-            <dd>This page. Optional extra on n: <a href="sample.html">sample.html</a>.</dd>
+            <dt>19:30 Break</dt>
+            <dd>Ten minutes.</dd>
+            <dt>19:40 Level 3</dt>
+            <dd>Write your guess, play a full game, save the CSV.</dd>
+            <dt>20:15 Write it up</dt>
+            <dd>Finish <code>week09-game/README.md</code>.</dd>
+            <dt>20:40 Arcade and save</dt>
+            <dd>Play a neighbour’s game if you like. Commit, Sync, paste on Canvas.</dd>
           </dl>
         </div>
-        <p class="muted"><strong>Report:</strong> path to the exported CSV, the question you studied, and one limit. Last weekly report. Due Tuesday 10 November.</p>
+        <p class="muted">
+          <strong>Weekly report (10 points):</strong> in Canvas, paste the
+          path <code>week09-game/README.md</code>, the name of your game and
+          your three changes, your guess and what happened, and whether you
+          used an AI tool. Due Tuesday 10 November, 17:00. This is the last
+          weekly report. Marking:
+          <a href="rubrics.html#week9">rubrics page</a>.
+        </p>
       </section>
     </div>
-
-    <script>
-      const RT_MIN = 150;
-      const RT_MAX = 1000;
-      const WINDOW = 1000;
-      const stage = document.getElementById("stage");
-      const statusEl = document.getElementById("status");
-      const progressEl = document.getElementById("progress");
-      const meanEl = document.getElementById("meanEl");
-      const summaryEl = document.getElementById("summaryEl");
-      const meansBody = document.getElementById("meansBody");
-
-      let results = [];
-      let queue = [];
-      let index = 0;
-      let onset = 0;
-      let awaiting = false;
-      let responded = false;
-      let timer = 0;
-      let windowTimer = 0;
-      let running = false;
-      let currentSoa = 0;
-
-      function rand(min, max) {
-        return min + Math.random() * (max - min);
-      }
-
-      function mean(xs) {
-        return xs.reduce((a, b) => a + b, 0) / xs.length;
-      }
-
-      function sd(xs) {
-        if (xs.length < 2) return null;
-        const m = mean(xs);
-        return Math.sqrt(xs.reduce((a, x) => a + (x - m) ** 2, 0) / (xs.length - 1));
-      }
-
-      function shuffle(items) {
-        const copy = items.slice();
-        for (let i = copy.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [copy[i], copy[j]] = [copy[j], copy[i]];
-        }
-        return copy;
-      }
-
-      function buildQueue(n, practice) {
-        const nogoN = Math.max(2, Math.round(n * 0.2));
-        const goN = n - nogoN;
-        const items = [
-          ...Array.from({ length: goN }, () => ({ condition: "go", stimulus: "amber_circle" })),
-          ...Array.from({ length: nogoN }, () => ({ condition: "nogo", stimulus: "mint_square" })),
-        ];
-        return shuffle(items).map((item, i) => ({
-          ...item,
-          trial: i + 1,
-          practice: practice ? 1 : 0,
-        }));
-      }
-
-      function clearStage() {
-        stage.classList.remove("waiting", "go", "nogo");
-      }
-
-      function showFixation() {
-        clearStage();
-        stage.classList.add("waiting");
-      }
-
-      function showStimulus(condition) {
-        clearStage();
-        stage.classList.add(condition);
-      }
-
-      function usable(row) {
-        if (row.practice) return false;
-        if (row.condition === "go") {
-          return row.correct === 1 && row.rt_ms >= RT_MIN && row.rt_ms <= RT_MAX;
-        }
-        return row.correct === 1;
-      }
-
-      function record(row) {
-        results.push(row);
-        renderStats();
-      }
-
-      function isoNow() {
-        return new Date().toISOString();
-      }
-
-      function finishBlock() {
-        running = false;
-        awaiting = false;
-        clearStage();
-        window.clearTimeout(timer);
-        window.clearTimeout(windowTimer);
-        statusEl.textContent = "Block finished. Export the CSV.";
-        progressEl.textContent = `${queue.length} / ${queue.length}`;
-      }
-
-      function nextTrial() {
-        index += 1;
-        if (index >= queue.length) {
-          finishBlock();
-          return;
-        }
-        startTrial();
-      }
-
-      function closeTrial(response, note) {
-        if (!running || responded) return;
-        responded = true;
-        awaiting = false;
-        window.clearTimeout(timer);
-        window.clearTimeout(windowTimer);
-        const trial = queue[index];
-        const rt = response === "none" ? "" : Math.round(performance.now() - onset);
-        let correct = 0;
-        if (trial.condition === "go") {
-          correct = response === "space" ? 1 : 0;
-        } else {
-          correct = response === "none" ? 1 : 0;
-        }
-        const rtNum = rt === "" ? "" : rt;
-        const usableFlag = trial.practice
-          ? 0
-          : (trial.condition === "go"
-            ? (correct && rt !== "" && rt >= RT_MIN && rt <= RT_MAX ? 1 : 0)
-            : (correct ? 1 : 0));
-        record({
-          trial: trial.trial,
-          condition: trial.condition,
-          stimulus: trial.stimulus,
-          response,
-          rt_ms: rtNum,
-          correct,
-          usable: usableFlag,
-          timestamp: isoNow(),
-          soa_ms: Math.round(currentSoa),
-          practice: trial.practice,
-        });
-        clearStage();
-        statusEl.textContent = note;
-        window.setTimeout(nextTrial, 550);
-      }
-
-      function startTrial() {
-        const trial = queue[index];
-        responded = false;
-        awaiting = false;
-        progressEl.textContent = `${index + 1} / ${queue.length}`;
-        statusEl.textContent = trial.condition === "go"
-          ? "Amber circle: press space."
-          : "Mint square: withhold.";
-        showFixation();
-        currentSoa = rand(400, 900);
-        timer = window.setTimeout(() => {
-          showStimulus(trial.condition);
-          onset = performance.now();
-          awaiting = true;
-          windowTimer = window.setTimeout(() => {
-            if (!awaiting || responded) return;
-            if (trial.condition === "go") {
-              closeTrial("none", "Missed go. Stored as a lapse.");
-            } else {
-              closeTrial("none", "Hold. Correct withhold.");
-            }
-          }, WINDOW);
-        }, currentSoa);
-      }
-
-      function startBlock(n, practice) {
-        window.clearTimeout(timer);
-        window.clearTimeout(windowTimer);
-        if (!practice) {
-          results = results.filter((row) => row.practice === 1);
-        }
-        queue = buildQueue(n, practice);
-        index = 0;
-        running = true;
-        stage.focus();
-        startTrial();
-      }
-
-      function handleSpace() {
-        if (!running) return;
-        const trial = queue[index];
-        if (!trial || responded) return;
-        if (!awaiting) {
-          window.clearTimeout(timer);
-          window.clearTimeout(windowTimer);
-          responded = true;
-          record({
-            trial: trial.trial,
-            condition: trial.condition,
-            stimulus: trial.stimulus,
-            response: "space",
-            rt_ms: 0,
-            correct: 0,
-            usable: 0,
-            timestamp: isoNow(),
-            soa_ms: Math.round(currentSoa),
-            practice: trial.practice,
-          });
-          clearStage();
-          statusEl.textContent = "Too early. That trial is an anticipation.";
-          window.setTimeout(nextTrial, 550);
-          return;
-        }
-        if (trial.condition === "go") {
-          const rt = Math.round(performance.now() - onset);
-          let note = rt + " ms";
-          if (rt < RT_MIN) note = "Very fast. Stored, excluded from the mean.";
-          if (rt > RT_MAX) note = "Very slow. Stored, excluded from the mean.";
-          closeTrial("space", note);
-        } else {
-          closeTrial("space", "False alarm. You pressed on a hold.");
-        }
-      }
-
-      function renderStats() {
-        const scored = results.filter((row) => !row.practice);
-        const goGood = scored.filter((row) => row.condition === "go" && usable(row));
-        const nogo = scored.filter((row) => row.condition === "nogo");
-        const nogoCorrect = nogo.filter((row) => row.correct === 1);
-        if (!goGood.length) {
-          meanEl.textContent = "—";
-        } else {
-          meanEl.textContent = Math.round(mean(goGood.map((row) => Number(row.rt_ms)))) + " ms";
-        }
-        const s = goGood.length ? sd(goGood.map((row) => Number(row.rt_ms))) : null;
-        const acc = nogo.length ? Math.round((nogoCorrect.length / nogo.length) * 100) + "%" : "—";
-        summaryEl.textContent = `n = ${goGood.length} · SD = ${s === null ? "—" : Math.round(s) + " ms"} · no-go accuracy = ${acc}`;
-        const goAll = scored.filter((row) => row.condition === "go");
-        const goHits = goAll.filter((row) => row.correct === 1).length;
-        const rows = [];
-        if (goAll.length) {
-          rows.push({
-            condition: "go",
-            n: goGood.length,
-            result: goGood.length ? Math.round(mean(goGood.map((row) => Number(row.rt_ms)))) + " ms" : "—",
-          });
-          rows.push({
-            condition: "go hits",
-            n: goAll.length,
-            result: Math.round((goHits / goAll.length) * 100) + "%",
-          });
-        }
-        if (nogo.length) {
-          rows.push({
-            condition: "no-go",
-            n: nogo.length,
-            result: Math.round((nogoCorrect.length / nogo.length) * 100) + "% withheld",
-          });
-        }
-        meansBody.innerHTML = rows.length
-          ? rows.map((row) => `<tr><td>${row.condition}</td><td>${row.n}</td><td>${row.result}</td></tr>`).join("")
-          : "<tr><td colspan='3'>No scored trials yet. Practice is excluded from the table.</td></tr>";
-      }
-
-      function exportCsv() {
-        if (!results.length) {
-          statusEl.textContent = "No trials to export.";
-          return;
-        }
-        const header = "trial,condition,stimulus,response,rt_ms,correct,usable,timestamp,soa_ms,practice";
-        const lines = results.map((row) =>
-          [row.trial, row.condition, row.stimulus, row.response, row.rt_ms, row.correct, row.usable, row.timestamp, row.soa_ms, row.practice].join(",")
-        );
-        const blob = new Blob([header + "\n" + lines.join("\n") + "\n"], { type: "text/csv" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "game-week09.csv";
-        a.click();
-        URL.revokeObjectURL(a.href);
-      }
-
-      document.getElementById("practiceBtn").addEventListener("click", () => startBlock(8, true));
-      document.getElementById("scoredBtn").addEventListener("click", () => startBlock(30, false));
-      document.getElementById("exportBtn").addEventListener("click", exportCsv);
-
-      stage.addEventListener("click", () => {
-        stage.focus();
-      });
-
-      window.addEventListener("keydown", (event) => {
-        if (!running) return;
-        if (event.code === "Space") {
-          event.preventDefault();
-          handleSpace();
-        }
-      });
-
-      renderStats();
-    </script>
   </body>
 </html>

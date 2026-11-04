@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My game · Week 9</title>
+<style>
+  /* ---------- LOOK ----------
+     Change colours and fonts here. */
+  :root {
+    --background: #10141c;
+    --text: #f3efe6;
+    --accent: #e8b86d;
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--background);
+    color: var(--text);
+    font-family: system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 { margin: 20px 0 4px; }
+  #hud {
+    display: flex;
+    gap: 24px;
+    font-size: 1.2rem;
+    margin: 8px 0 12px;
+  }
+  #stage {
+    width: min(90vw, 520px);
+    height: 340px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    display: grid;
+    place-items: center;
+    font-size: 120px;
+    user-select: none;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #stage.good-flash { background: rgba(110, 231, 183, 0.25); }
+  #stage.bad-flash  { background: rgba(251, 113, 133, 0.30); }
+  #message { min-height: 1.6em; margin: 12px 0; font-size: 1.1rem; }
+  button {
+    font: inherit;
+    padding: 10px 18px;
+    margin: 4px;
+    border-radius: 999px;
+    border: 0;
+    background: var(--accent);
+    color: #1c1915;
+    cursor: pointer;
+  }
+  button.quiet { background: rgba(255, 255, 255, 0.15); color: var(--text); }
+</style>
+</head>
+<body>
+
+<h1 id="title"></h1>
+<p id="rules"></p>
+
+<div id="hud">
+  <span>Score: <b id="score">0</b></span>
+  <span>Lives: <b id="lives"></b></span>
+  <span>Level: <b id="level">1</b></span>
+</div>
+
+<div id="stage"></div>
+<div id="message">Press Start. Then press SPACE (or tap the box).</div>
+
+<div>
+  <button id="startBtn">Start</button>
+  <button id="saveBtn" class="quiet">Save my data (CSV)</button>
+</div>
+
+<script>
+// =====================================================================
+//  SETTINGS: start by changing things here.
+//  Save the file, then reload the page to see your change.
+// =====================================================================
+const SETTINGS = {
+  title: "Catch the Stars",
+  rules: "Press SPACE for a star. Do NOT press for a bomb.",
+
+  // What appears on the screen. Any emoji or short word works.
+  goThings: ["⭐"],          // press for these
+  stopThings: ["💣"],        // do NOT press for these
+
+  stopChance: 0.25,          // share of turns that are "stop" (0.25 = 1 in 4)
+  lives: 3,                  // mistakes before game over
+  turnsPerLevel: 10,         // turns before the next level starts
+
+  startTime: 1000,           // ms a thing stays on screen at level 1
+  speedUp: 0.85,             // each level, time on screen is multiplied by this
+  fastestTime: 300,          // never faster than this (ms)
+
+  waitMin: 500,              // shortest blank gap before a thing (ms)
+  waitMax: 1200,             // longest blank gap before a thing (ms)
+
+  pointsForCatch: 10,        // points for pressing on a go thing
+  pointsForStop: 5,          // points for NOT pressing on a stop thing
+  sound: true,               // beeps on or off
+};
+
+// =====================================================================
+//  The game itself. You can change this too, once the settings feel easy.
+// =====================================================================
+const stage = document.getElementById("stage");
+const message = document.getElementById("message");
+document.getElementById("title").textContent = SETTINGS.title;
+document.getElementById("rules").textContent = SETTINGS.rules;
+document.getElementById("lives").textContent = SETTINGS.lives;
+
+let data = [];          // one row per turn. This is what gets saved.
+let playing = false;
+let turn = 0;
+let score = 0;
+let lives = SETTINGS.lives;
+let level = 1;
+let current = null;     // the thing on screen right now
+let shownAt = 0;        // when it appeared (ms)
+let timer = null;
+
+function pick(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function timeOnScreen() {
+  const t = SETTINGS.startTime * Math.pow(SETTINGS.speedUp, level - 1);
+  return Math.max(SETTINGS.fastestTime, Math.round(t));
+}
+
+// A short beep. Higher = good, lower = bad.
+let audio = null;
+function beep(good) {
+  if (!SETTINGS.sound) return;
+  audio = audio || new AudioContext();
+  const osc = audio.createOscillator();
+  const gain = audio.createGain();
+  osc.frequency.value = good ? 880 : 180;
+  gain.gain.value = 0.08;
+  osc.connect(gain).connect(audio.destination);
+  osc.start();
+  osc.stop(audio.currentTime + 0.12);
+}
+
+function flash(good) {
+  stage.classList.add(good ? "good-flash" : "bad-flash");
+  setTimeout(() => stage.classList.remove("good-flash", "bad-flash"), 200);
+}
+
+function updateHud() {
+  document.getElementById("score").textContent = score;
+  document.getElementById("lives").textContent = lives;
+  document.getElementById("level").textContent = level;
+}
+
+function startGame() {
+  data = [];
+  turn = 0;
+  score = 0;
+  lives = SETTINGS.lives;
+  level = 1;
+  playing = true;
+  updateHud();
+  message.textContent = "Get ready...";
+  nextTurn();
+}
+
+function nextTurn() {
+  if (!playing) return;
+  stage.textContent = "";
+  current = null;
+  const wait = SETTINGS.waitMin + Math.random() * (SETTINGS.waitMax - SETTINGS.waitMin);
+  timer = setTimeout(showThing, wait);
+}
+
+function showThing() {
+  turn += 1;
+  const isStop = Math.random() < SETTINGS.stopChance;
+  current = {
+    kind: isStop ? "stop" : "go",
+    thing: isStop ? pick(SETTINGS.stopThings) : pick(SETTINGS.goThings),
+    onScreen: timeOnScreen(),
+  };
+  stage.textContent = current.thing;
+  shownAt = performance.now();
+  timer = setTimeout(() => endTurn(false), current.onScreen);
+}
+
+// pressed = true if the player pressed, false if time ran out.
+function endTurn(pressed) {
+  if (!playing || !current) return;
+  clearTimeout(timer);
+  const rt = pressed ? Math.round(performance.now() - shownAt) : "";
+  const correct = (current.kind === "go") === pressed;
+
+  if (correct) {
+    score += current.kind === "go" ? SETTINGS.pointsForCatch : SETTINGS.pointsForStop;
+    message.textContent = current.kind === "go" ? `Caught it! ${rt} ms` : "Nice, you held back.";
+  } else {
+    lives -= 1;
+    message.textContent = current.kind === "go" ? "Too slow!" : "Oops, that was a stop!";
+  }
+  beep(correct);
+  flash(correct);
+
+  // Save one row about this turn.
+  data.push({
+    turn: turn,
+    level: level,
+    kind: current.kind,
+    thing: current.thing,
+    on_screen_ms: current.onScreen,
+    pressed: pressed ? 1 : 0,
+    rt_ms: rt,
+    correct: correct ? 1 : 0,
+    score: score,
+  });
+
+  if (turn % SETTINGS.turnsPerLevel === 0) {
+    level += 1;
+    message.textContent += `  Level ${level}!`;
+  }
+  updateHud();
+
+  if (lives <= 0) {
+    playing = false;
+    stage.textContent = "🏁";
+    message.textContent = `Game over. Score ${score}, level ${level}, ${turn} turns. Save your data!`;
+    return;
+  }
+  nextTurn();
+}
+
+function press() {
+  if (!playing) return;
+  if (!current) {
+    message.textContent = "Too early! Wait for it.";
+    return;
+  }
+  endTurn(true);
+}
+
+function saveCsv() {
+  if (!data.length) {
+    message.textContent = "Nothing to save yet. Play first.";
+    return;
+  }
+  const columns = Object.keys(data[0]);
+  const lines = [columns.join(",")].concat(data.map((row) => columns.map((c) => row[c]).join(",")));
+  const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "game-week09.csv";
+  a.click();
+}
+
+document.getElementById("startBtn").addEventListener("click", (e) => { e.target.blur(); startGame(); });
+document.getElementById("saveBtn").addEventListener("click", saveCsv);
+stage.addEventListener("pointerdown", press);
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    press();
+  }
+});
+</script>
+</body>
+</html>
