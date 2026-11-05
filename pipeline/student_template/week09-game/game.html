@@ -3,49 +3,105 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>My game · Week 9</title>
+<title>In the Canopy · Week 9</title>
 <style>
   /* ---------- LOOK ----------
-     Change colours and fonts here. */
+     Change colours here. The jungle itself is drawn in the script. */
   :root {
-    --background: #10141c;
-    --text: #f3efe6;
-    --accent: #e8b86d;
+    --background: #070c09;
+    --text: #e7f0e4;
+    --muted: #b7c4b4;
+    --accent: #e0c27a;
   }
+  * { box-sizing: border-box; }
   body {
     margin: 0;
     min-height: 100vh;
-    background: var(--background);
+    background:
+      radial-gradient(900px 420px at 50% -10%, rgba(80, 120, 70, 0.16), transparent 55%),
+      var(--background);
     color: var(--text);
-    font-family: system-ui, sans-serif;
+    font-family: "Iowan Old Style", Palatino, Georgia, serif;
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 16px 12px 32px;
+    color-scheme: dark;
   }
-  h1 { margin: 20px 0 4px; }
+  h1 { margin: 8px 0 4px; font-weight: 600; letter-spacing: 0.01em; }
+  #rules {
+    margin: 0 0 12px;
+    max-width: 960px;
+    text-align: center;
+    color: var(--muted);
+    line-height: 1.45;
+  }
   #hud {
+    width: min(96vw, 960px);
     display: flex;
-    gap: 24px;
-    font-size: 1.2rem;
-    margin: 8px 0 12px;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    align-items: center;
+    justify-content: center;
+    font-family: system-ui, sans-serif;
+    font-size: 0.98rem;
+    margin: 0 0 10px;
+  }
+  #micState {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 0.85rem;
+  }
+  #micState.live { color: #10210f; background: var(--accent); }
+  .meter-label { display: inline-flex; align-items: center; gap: 8px; }
+  #meter {
+    position: relative;
+    width: 128px;
+    height: 12px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  }
+  #meterFill {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: #6e8f72;
+  }
+  #meterFill.hot { background: var(--accent); }
+  #meterMark {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    background: #fff;
   }
   #stage {
-    width: min(90vw, 520px);
-    height: 340px;
+    width: min(96vw, 960px);
+    height: 500px;
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.05);
-    display: grid;
-    place-items: center;
-    font-size: 120px;
+    overflow: hidden;
+    position: relative;
+    background: #07110d;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
     user-select: none;
-    cursor: pointer;
-    transition: background 0.15s;
   }
-  #stage.good-flash { background: rgba(110, 231, 183, 0.25); }
-  #stage.bad-flash  { background: rgba(251, 113, 133, 0.30); }
-  #message { min-height: 1.6em; margin: 12px 0; font-size: 1.1rem; }
+  #view { width: 100%; height: 100%; display: block; }
+  #stage.good-flash { box-shadow: inset 0 0 0 4px rgba(140, 200, 150, 0.85), 0 20px 50px rgba(0, 0, 0, 0.35); }
+  #stage.bad-flash { box-shadow: inset 0 0 0 4px rgba(196, 96, 96, 0.85), 0 20px 50px rgba(0, 0, 0, 0.35); }
+  #message {
+    min-height: 2.6em;
+    margin: 12px 0 8px;
+    max-width: 960px;
+    text-align: center;
+    font-size: 1.05rem;
+  }
   button {
     font: inherit;
+    font-family: system-ui, sans-serif;
     padding: 10px 18px;
     margin: 4px;
     border-radius: 999px;
@@ -54,7 +110,45 @@
     color: #1c1915;
     cursor: pointer;
   }
-  button.quiet { background: rgba(255, 255, 255, 0.15); color: var(--text); }
+  button.quiet { background: rgba(255, 255, 255, 0.14); color: var(--text); }
+  #controls {
+    width: min(96vw, 960px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 22px;
+    margin-top: 12px;
+    font-family: system-ui, sans-serif;
+    font-size: 0.92rem;
+  }
+  #controls label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #controls input[type="range"] { flex: 1; accent-color: var(--accent); }
+  #controls b { width: 2.6em; text-align: right; font-variant-numeric: tabular-nums; }
+  #controls .full { grid-column: 1 / -1; }
+  .depths { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .depths button {
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text);
+  }
+  .depths button.on { background: var(--accent); color: #1c1915; }
+  #controls input:disabled,
+  #controls button:disabled { opacity: 0.4; }
+  #controlNote {
+    margin: 8px 0 0;
+    max-width: 960px;
+    text-align: center;
+    color: var(--muted);
+    font-family: system-ui, sans-serif;
+    font-size: 0.82rem;
+  }
+  @media (max-width: 720px) {
+    #stage { height: 380px; }
+    #controls { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -64,185 +158,1854 @@
 
 <div id="hud">
   <span>Score: <b id="score">0</b></span>
+  <span>Best: <b id="highScore">0</b></span>
   <span>Lives: <b id="lives"></b></span>
   <span>Level: <b id="level">1</b></span>
+  <span id="micState">Mic off</span>
+  <span class="meter-label">Voice
+    <span id="meter" title="Say banana loud enough to pass the white line">
+      <span id="meterFill"></span>
+      <span id="meterMark"></span>
+    </span>
+  </span>
 </div>
 
-<div id="stage"></div>
-<div id="message">Press Start. Then press SPACE (or tap the box).</div>
+<div id="stage">
+  <canvas id="view" aria-label="A moving jungle. A banana or a coconut may be hidden in the leaves."></canvas>
+</div>
+<div id="message" role="status">Press Start, allow the microphone, then watch the trees.</div>
 
 <div>
   <button id="startBtn">Start</button>
   <button id="saveBtn" class="quiet">Save my data (CSV)</button>
 </div>
 
+<div id="controls">
+  <label>Cover <b id="occlusionVal">0.42</b>
+    <input id="occlusion" type="range" min="0" max="1" step="0.01" />
+  </label>
+  <label>Light <b id="illuminationVal">0.48</b>
+    <input id="illumination" type="range" min="0" max="1" step="0.01" />
+  </label>
+  <label>Size <b id="sizeVal">1.00</b>
+    <input id="size" type="range" min="0.45" max="1.8" step="0.01" />
+  </label>
+  <label>Loudness <b id="minVolumeVal">0.34</b>
+    <input id="minVolume" type="range" min="0.08" max="0.85" step="0.01" />
+  </label>
+  <div class="depths">
+    Depth
+    <button type="button" data-depth="1">Near</button>
+    <button type="button" data-depth="2">Mid</button>
+    <button type="button" data-depth="3">Deep</button>
+  </div>
+  <label class="full"><input id="shuffle" type="checkbox" /> Shuffle cover, light, size, and depth every turn</label>
+</div>
+<p id="controlNote"></p>
+
 <script>
 // =====================================================================
 //  SETTINGS: start by changing things here.
 //  Save the file, then reload the page to see your change.
+//
+//  This is still a go / no-go game. A banana is "go": say the word.
+//  A coconut is "stop": stay silent. Every turn is saved, as before.
+//
+//  Cover, light, size, and depth are the scene controls.
+//  Each one is a list. While "Shuffle" is on, every turn picks one
+//  value from each list. Put a single number in a list to hold that
+//  factor still, or uncheck Shuffle and use the sliders.
+//  Depth is 1 (near), 2 (mid canopy), or 3 (deep in the trees).
+//  Deeper fruit is smaller and sits behind more mist. Cover, light,
+//  and size still apply on top of that.
 // =====================================================================
 const SETTINGS = {
-  title: "Catch the Stars",
-  rules: "Press SPACE for a star. Do NOT press for a bomb.",
+  title: "In the Canopy",
+  rules: "Say “banana”, loud enough to cross the line, when you see one. Stay silent for a coconut. Stay silent in the gaps, and once it has gone.",
 
-  // What appears on the screen. Any emoji or short word works.
-  goThings: ["⭐"],          // press for these
-  stopThings: ["💣"],        // do NOT press for these
+  say: "banana",             // the only word that counts. Chrome or Edge, online.
 
-  stopChance: 0.25,          // share of turns that are "stop" (0.25 = 1 in 4)
-  lives: 3,                  // mistakes before game over
-  turnsPerLevel: 10,         // turns before the next level starts
+  depth: [1, 2, 3],
+  occlusion: [0.12, 0.42, 0.78],       // 0 = clear, 1 = buried in leaves
+  illumination: [0.22, 0.48, 0.82],    // 0 = lost in the dark, 1 = caught in a dim beam
+  size: [0.65, 1, 1.45],
 
-  startTime: 1000,           // ms a thing stays on screen at level 1
-  speedUp: 0.85,             // each level, time on screen is multiplied by this
-  fastestTime: 300,          // never faster than this (ms)
+  shuffle: true,
+  minVolume: 0.34,           // how loud the word must be (the white line)
 
-  waitMin: 500,              // shortest blank gap before a thing (ms)
-  waitMax: 1200,             // longest blank gap before a thing (ms)
+  stopChance: 0.3,           // share of turns that are coconuts
+  lives: 4,
+  turnsPerLevel: 10,
 
-  pointsForCatch: 10,        // points for pressing on a go thing
-  pointsForStop: 5,          // points for NOT pressing on a stop thing
-  sound: true,               // beeps on or off
+  startTime: 1800,           // ms the fruit stays up at level 1
+  speedUp: 0.9,              // each level, that time is multiplied by this
+  fastestTime: 700,          // never faster than this (ms)
+
+  waitMin: 750,              // shortest quiet gap before a fruit (ms)
+  waitMax: 1500,             // longest quiet gap
+  speechGrace: 1100,        // how long to keep listening after the fruit vanishes
+  lateWindow: 600,           // a "banana" this long after the fruit is too late
+                             // keep lateWindow shorter than waitMin
+
+  pointsForCatch: 10,
+  pointsForStop: 5,
+  sound: true,
 };
 
+// Near fruit is drawn a little larger. Deep fruit is farther away.
+// The size control multiplies this, so the two are separate.
+const DEPTH_SCALE = { 1: 1.16, 2: 0.9, 3: 0.64 };
+const FRUIT_BOOST = 1.55;
+const MIST_AFTER = { 3: 0.09, 2: 0.07, 1: 0.1 };
+
 // =====================================================================
-//  The game itself. You can change this too, once the settings feel easy.
+//  The game itself.
 // =====================================================================
 const stage = document.getElementById("stage");
+const canvas = document.getElementById("view");
+const ctx = canvas.getContext("2d");
 const message = document.getElementById("message");
 document.getElementById("title").textContent = SETTINGS.title;
 document.getElementById("rules").textContent = SETTINGS.rules;
-document.getElementById("lives").textContent = SETTINGS.lives;
+document.getElementById("controlNote").textContent =
+  "Shuffle uses the lists in SETTINGS. Uncheck it to hold the sliders and the depth buttons still. Loudness always uses the slider.";
 
-let data = [];          // one row per turn. This is what gets saved.
+let data = [];
 let playing = false;
+let starting = false;
 let turn = 0;
 let score = 0;
 let lives = SETTINGS.lives;
 let level = 1;
-let current = null;     // the thing on screen right now
-let shownAt = 0;        // when it appeared (ms)
+let phase = "idle";       // idle, ready, wait, show, grace, over
+let current = null;
 let timer = null;
+let practiceUntil = 0;
+let lastCommit = -99999;
+let lastQuietMsg = 0;
+let world = null;
+let noise = null;
+let bursts = [];
+let shakeUntil = 0;
+let toldKeys = false;
 
+let audio = null;
+let stream = null;
+let analyser = null;
+let wave = null;
+let rec = null;
+let recOn = false;
+let listening = false;
+let wantLocal = false;
+let restarts = 0;
+let history = [];
+let smoothLevel = 0;
+
+let highScore = Number(localStorage.getItem("bananaHunt_highScore") || 0);
+let monkeyActionUntil = 0;
+let monkeyActionType = "idle";
+let floaties = [];
+let windIntensity = 1.0;
+let jungleWindSource = null;
+let jungleWindGain = null;
+let levelUpAnnouncedUntil = 0;
+
+// =====================================================================
+//  POLISHED FUN FEATURES: THEMES, SOUND SYNTH, PROCEDURAL MONKEY, FLOATIES
+// =====================================================================
+
+const THEMES = {
+  1: { // Morning Mist (Dawn)
+    sky: ["#050b14", "#1b3535", "#3d5248", "#122019"],
+    mist: [186, 198, 184],
+    motes: "rgba(230, 240, 210, 0.14)",
+    canopy: "hsla(145, 28%, 8%, 0.72)"
+  },
+  2: { // High Noon Jungle (Bright Green)
+    sky: ["#07110d", "#163528", "#10241b", "#070c09"],
+    mist: [150, 168, 154],
+    motes: "rgba(226, 214, 170, 0.16)",
+    canopy: "hsla(145, 28%, 8%, 0.72)"
+  },
+  3: { // Sunset Shadows (Amber/Crimson)
+    sky: ["#14050a", "#381216", "#2c1c13", "#120907"],
+    mist: [205, 150, 120],
+    motes: "rgba(255, 210, 150, 0.2)",
+    canopy: "hsla(345, 28%, 6%, 0.78)"
+  },
+  4: { // Bioluminescent Midnight (Indigo/Neon)
+    sky: ["#02040b", "#091225", "#120a22", "#04020a"],
+    mist: [120, 130, 205],
+    motes: "rgba(100, 240, 255, 0.35)",
+    canopy: "hsla(260, 35%, 5%, 0.85)"
+  }
+};
+
+function getTheme() {
+  const tId = ((level - 1) % 4) + 1;
+  return THEMES[tId];
+}
+
+// ---- SYNTH SOUNDS ----
+function playCatchSound() {
+  if (!SETTINGS.sound || !audio) return;
+  const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
+  const now = audio.currentTime;
+  notes.forEach((freq, idx) => {
+    const t = now + idx * 0.08;
+    const osc = audio.createOscillator();
+    const gain = audio.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.045, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+    osc.connect(gain).connect(audio.destination);
+    osc.start(t);
+    osc.stop(t + 0.25);
+  });
+}
+
+function playWithholdSound() {
+  if (!SETTINGS.sound || !audio) return;
+  const now = audio.currentTime;
+  const osc1 = audio.createOscillator();
+  const osc2 = audio.createOscillator();
+  const gain1 = audio.createGain();
+  const gain2 = audio.createGain();
+  
+  osc1.type = "triangle";
+  osc1.frequency.setValueAtTime(880, now); // A5
+  gain1.gain.setValueAtTime(0.0001, now);
+  gain1.gain.exponentialRampToValueAtTime(0.025, now + 0.05);
+  gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+  osc1.connect(gain1).connect(audio.destination);
+  osc1.start(now);
+  osc1.stop(now + 0.55);
+  
+  osc2.type = "sine";
+  osc2.frequency.setValueAtTime(1320, now + 0.05); // E6
+  gain2.gain.setValueAtTime(0.0001, now + 0.05);
+  gain2.gain.exponentialRampToValueAtTime(0.015, now + 0.08);
+  gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+  osc2.connect(gain2).connect(audio.destination);
+  osc2.start(now + 0.05);
+  osc2.stop(now + 0.5);
+}
+
+function playMistakeSound() {
+  if (!SETTINGS.sound || !audio) return;
+  const now = audio.currentTime;
+  const osc = audio.createOscillator();
+  const gain = audio.createGain();
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(180, now);
+  osc.frequency.exponentialRampToValueAtTime(85, now + 0.3);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.linearRampToValueAtTime(0.045, now + 0.05);
+  gain.gain.linearRampToValueAtTime(0.0001, now + 0.35);
+  osc.connect(gain).connect(audio.destination);
+  osc.start(now);
+  osc.stop(now + 0.36);
+}
+
+function playLevelUpSound() {
+  if (!SETTINGS.sound || !audio) return;
+  const now = audio.currentTime;
+  const chords = [329.63, 392.00, 523.25, 659.25]; // E4, G4, C5, E5
+  chords.forEach((freq, idx) => {
+    const osc = audio.createOscillator();
+    const gain = audio.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.setValueAtTime(freq * 1.5, now + 0.18); // fifths
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.03, now + 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.75);
+    osc.connect(gain).connect(audio.destination);
+    osc.start(now);
+    osc.stop(now + 0.8);
+  });
+}
+
+function playGameOverSound() {
+  if (!SETTINGS.sound || !audio) return;
+  const notes = [196.00, 185.00, 174.61, 146.83]; // G3, F#3, F3, D3
+  const now = audio.currentTime;
+  notes.forEach((freq, idx) => {
+    const t = now + idx * 0.18;
+    const osc = audio.createOscillator();
+    const gain = audio.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.035, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+    osc.connect(gain).connect(audio.destination);
+    osc.start(t);
+    osc.stop(t + 0.28);
+  });
+}
+
+function scheduleBirdChirp() {
+  if (!playing) return;
+  const delay = 4000 + Math.random() * 8000; // chirp every 4-12s
+  setTimeout(() => {
+    if (!playing) return;
+    playBirdChirp();
+    scheduleBirdChirp();
+  }, delay);
+}
+
+function playBirdChirp() {
+  if (!SETTINGS.sound || !audio) return;
+  const now = audio.currentTime;
+  const count = 2 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < count; i++) {
+    const t = now + i * 0.15;
+    const osc = audio.createOscillator();
+    const gain = audio.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1500 + Math.random() * 600, t);
+    osc.frequency.exponentialRampToValueAtTime(2800 + Math.random() * 400, t + 0.08);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.012, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+    osc.connect(gain).connect(audio.destination);
+    osc.start(t);
+    osc.stop(t + 0.11);
+  }
+}
+
+function startJungleAmbience() {
+  if (!SETTINGS.sound || !audio) return;
+  try {
+    const bufferSize = audio.sampleRate * 2; // 2 seconds of noise
+    const noiseBuffer = audio.createBuffer(1, bufferSize, audio.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+
+    const whiteNoise = audio.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+    whiteNoise.loop = true;
+
+    const filter = audio.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(450, audio.currentTime);
+    filter.Q.setValueAtTime(1.5, audio.currentTime);
+
+    jungleWindGain = audio.createGain();
+    jungleWindGain.gain.setValueAtTime(0.008, audio.currentTime);
+
+    whiteNoise.connect(filter);
+    filter.connect(jungleWindGain);
+    jungleWindGain.connect(audio.destination);
+
+    whiteNoise.start();
+    jungleWindSource = whiteNoise;
+  } catch (err) {
+    console.error("Ambience start failed:", err);
+  }
+}
+
+function stopJungleAmbience() {
+  if (jungleWindSource) {
+    try { jungleWindSource.stop(); } catch(e) {}
+    jungleWindSource = null;
+  }
+  jungleWindGain = null;
+}
+
+// ---- FLOATIES ----
+function spawnFloaty(x, y, text, color) {
+  floaties.push({
+    x, y,
+    text,
+    color,
+    vx: (Math.random() - 0.5) * 12,
+    vy: -35 - Math.random() * 20,
+    born: performance.now(),
+    life: 1200
+  });
+}
+
+function drawFloaties(g, t) {
+  floaties = floaties.filter(f => t - f.born < f.life);
+  for (const f of floaties) {
+    const age = (t - f.born) / f.life;
+    const fx = f.x + f.vx * age;
+    const fy = f.y + f.vy * age;
+    g.save();
+    g.font = "bold " + Math.round(18 + 6 * (1 - age)) + "px system-ui, sans-serif";
+    g.fillStyle = f.color;
+    g.strokeStyle = "rgba(0, 0, 0, 0.65)";
+    g.lineWidth = 3;
+    g.textAlign = "center";
+    g.globalAlpha = 1 - age;
+    g.strokeText(f.text, fx, fy);
+    g.fillText(f.text, fx, fy);
+    g.restore();
+  }
+}
+
+// ---- LEVEL UP EXPLOSION ----
+function spawnLevelUpExplosion(cx, cy) {
+  const t = performance.now();
+  for (let i = 0; i < 40; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const speed = 50 + Math.random() * 150;
+    bursts.push({
+      x: cx, y: cy,
+      vx: Math.cos(a) * speed,
+      vy: Math.sin(a) * speed - 15,
+      born: t,
+      life: 1500,
+      len: 12 + Math.random() * 14,
+      rot: a,
+      hue: Math.random() * 360, // fully colorful!
+    });
+  }
+}
+
+// ---- MONKEY DRAWING ----
+function drawMonkeyBranch(g, w, h) {
+  g.save();
+  g.fillStyle = "#1e130c";
+  g.beginPath();
+  g.moveTo(w, h - 55);
+  g.quadraticCurveTo(w - 70, h - 55, w - 120, h - 50);
+  g.lineTo(w - 120, h - 38);
+  g.quadraticCurveTo(w - 70, h - 45, w, h - 45);
+  g.fill();
+
+  drawLeaf(g, w - 100, h - 50, 15, -0.6, "rgba(30, 72, 38, 0.95)");
+  drawLeaf(g, w - 85, h - 52, 12, -0.2, "rgba(22, 60, 30, 0.9)");
+  g.restore();
+}
+
+function drawMonkey(g, x, y, t) {
+  let state = "idle";
+  const now = performance.now();
+  if (!playing && lives <= 0) {
+    state = "sleeping";
+  } else if (now < monkeyActionUntil) {
+    state = monkeyActionType;
+  } else if (phase === "show" && current) {
+    state = current.kind === "go" ? "excited" : "scared";
+  }
+
+  g.save();
+  g.translate(x, y);
+
+  const bob = Math.sin(t * 0.003) * (state === "excited" ? 6 : state === "dizzy" ? 2 : 3);
+  const tailWag = Math.sin(t * 0.004) * (state === "excited" ? 0.6 : 0.2);
+
+  // Tail
+  g.strokeStyle = "#8d583c";
+  g.lineWidth = 5;
+  g.beginPath();
+  g.moveTo(-15, 10);
+  g.quadraticCurveTo(-35, 10 + Math.sin(t * 0.002) * 10, -30 + tailWag * 15, -15 + Math.cos(t * 0.002) * 15);
+  g.stroke();
+
+  // Body
+  g.fillStyle = "#8d583c";
+  g.beginPath();
+  g.ellipse(0, 15 + bob * 0.5, 18, 24, 0, 0, Math.PI * 2);
+  g.fill();
+
+  // Tan tummy patch
+  g.fillStyle = "#d7a17c";
+  g.beginPath();
+  g.ellipse(0, 15 + bob * 0.5, 11, 15, 0, 0, Math.PI * 2);
+  g.fill();
+
+  // Head
+  g.fillStyle = "#8d583c";
+  g.beginPath();
+  g.arc(0, -14 + bob, 18, 0, Math.PI * 2);
+  g.fill();
+
+  // Ears (Outer)
+  g.fillStyle = "#8d583c";
+  g.beginPath();
+  g.arc(-18, -16 + bob, 7, 0, Math.PI * 2);
+  g.arc(18, -16 + bob, 7, 0, Math.PI * 2);
+  g.fill();
+
+  // Ears (Inner)
+  g.fillStyle = "#fbc4b4";
+  g.beginPath();
+  g.arc(-18, -16 + bob, 4, 0, Math.PI * 2);
+  g.arc(18, -16 + bob, 4, 0, Math.PI * 2);
+  g.fill();
+
+  // Face
+  g.fillStyle = "#d7a17c";
+  g.beginPath();
+  g.ellipse(-6, -14 + bob, 8, 9, 0, 0, Math.PI * 2);
+  g.ellipse(6, -14 + bob, 8, 9, 0, 0, Math.PI * 2);
+  g.ellipse(0, -9 + bob, 9, 7, 0, 0, Math.PI * 2);
+  g.fill();
+
+  g.fillStyle = "#110b07";
+  const eyeY = -14 + bob;
+  const eyeR = 2.2;
+  const eyeX = 6;
+
+  if (state === "sleeping") {
+    g.strokeStyle = "#3e271a";
+    g.lineWidth = 2;
+    g.lineCap = "round";
+    g.beginPath();
+    g.arc(-eyeX, eyeY, 3, 0, Math.PI, true);
+    g.stroke();
+    g.beginPath();
+    g.arc(eyeX, eyeY, 3, 0, Math.PI, true);
+    g.stroke();
+
+    g.fillStyle = "#110b07";
+    g.beginPath();
+    g.arc(0, -6 + bob, 2, 0, Math.PI * 2);
+    g.fill();
+
+    const zt = (t * 0.001) % 2;
+    g.font = "bold 9px sans-serif";
+    g.fillStyle = `rgba(231, 240, 228, ${1 - zt / 2})`;
+    g.fillText("Z", 15 + zt * 5, -28 - zt * 15 + bob);
+    g.fillText("z", 22 + zt * 5, -34 - zt * 12 + bob);
+  } else if (state === "dizzy") {
+    g.strokeStyle = "#110b07";
+    g.lineWidth = 2.5;
+    g.lineCap = "round";
+    g.beginPath();
+    g.moveTo(-eyeX - 2.5, eyeY - 2.5); g.lineTo(-eyeX + 2.5, eyeY + 2.5);
+    g.moveTo(-eyeX + 2.5, eyeY - 2.5); g.lineTo(-eyeX - 2.5, eyeY + 2.5);
+    g.stroke();
+    g.beginPath();
+    g.moveTo(eyeX - 2.5, eyeY - 2.5); g.lineTo(eyeX + 2.5, eyeY + 2.5);
+    g.moveTo(eyeX + 2.5, eyeY - 2.5); g.lineTo(eyeX - 2.5, eyeY + 2.5);
+    g.stroke();
+
+    g.beginPath();
+    g.arc(0, -6 + bob, 3, 0, Math.PI, true);
+    g.stroke();
+  } else if (state === "scared") {
+    g.beginPath();
+    g.arc(-eyeX, eyeY, 3, 0, Math.PI * 2);
+    g.arc(eyeX, eyeY, 3, 0, Math.PI * 2);
+    g.fill();
+
+    g.fillStyle = "#3a1205";
+    g.beginPath();
+    g.arc(0, -6 + bob, 4.5, 0, Math.PI * 2);
+    g.fill();
+  } else if (state === "excited") {
+    g.beginPath();
+    g.arc(-eyeX, eyeY, 3.2, 0, Math.PI * 2);
+    g.arc(eyeX, eyeY, 3.2, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = "#ffffff";
+    g.beginPath();
+    g.arc(-eyeX - 1, eyeY - 1, 1, 0, Math.PI * 2);
+    g.arc(eyeX - 1, eyeY - 1, 1, 0, Math.PI * 2);
+    g.fill();
+
+    g.fillStyle = "#3a1205";
+    g.beginPath();
+    g.arc(0, -7 + bob, 5, 0, Math.PI);
+    g.fill();
+    g.fillStyle = "#fbc4b4";
+    g.beginPath();
+    g.ellipse(0, -4 + bob, 3, 2, 0, 0, Math.PI);
+    g.fill();
+  } else if (state === "eating") {
+    g.strokeStyle = "#110b07";
+    g.lineWidth = 2.2;
+    g.lineCap = "round";
+    g.beginPath();
+    g.moveTo(-eyeX - 3, eyeY + 1.5); g.lineTo(-eyeX, eyeY - 2); g.lineTo(-eyeX + 3, eyeY + 1.5);
+    g.stroke();
+    g.beginPath();
+    g.moveTo(eyeX - 3, eyeY + 1.5); g.lineTo(eyeX, eyeY - 2); g.lineTo(eyeX + 3, eyeY + 1.5);
+    g.stroke();
+
+    g.fillStyle = "#3a1205";
+    g.beginPath();
+    g.arc(0, -8 + bob, 6, 0, Math.PI);
+    g.fill();
+    g.fillStyle = "#fbc4b4";
+    g.beginPath();
+    g.ellipse(0, -5 + bob, 4, 3, 0, 0, Math.PI);
+    g.fill();
+  } else {
+    g.beginPath();
+    g.arc(-eyeX, eyeY, eyeR, 0, Math.PI * 2);
+    g.arc(eyeX, eyeY, eyeR, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = "#ffffff";
+    g.beginPath();
+    g.arc(-eyeX - 0.7, eyeY - 0.7, 0.7, 0, Math.PI * 2);
+    g.arc(eyeX - 0.7, eyeY - 0.7, 0.7, 0, Math.PI * 2);
+    g.fill();
+
+    g.strokeStyle = "#110b07";
+    g.lineWidth = 1.5;
+    g.beginPath();
+    g.arc(0, -8 + bob, 3.5, 0.1, Math.PI - 0.1);
+    g.stroke();
+  }
+
+  g.fillStyle = "#110b07";
+  g.beginPath();
+  g.ellipse(0, -10.5 + bob, 2, 1.2, 0, 0, Math.PI * 2);
+  g.fill();
+
+  g.fillStyle = "rgba(251, 196, 180, 0.5)";
+  g.beginPath();
+  g.arc(-11, -11 + bob, 2.5, 0, Math.PI * 2);
+  g.arc(11, -11 + bob, 2.5, 0, Math.PI * 2);
+  g.fill();
+
+  g.strokeStyle = "#8d583c";
+  g.lineWidth = 4.5;
+  g.lineCap = "round";
+  if (state === "excited") {
+    g.beginPath();
+    g.moveTo(-15, 12 + bob * 0.5);
+    g.quadraticCurveTo(-26, 0, -22, -12 + Math.sin(t * 0.01) * 4);
+    g.moveTo(15, 12 + bob * 0.5);
+    g.quadraticCurveTo(26, 0, 22, -12 + Math.cos(t * 0.01) * 4);
+    g.stroke();
+  } else if (state === "scared") {
+    g.beginPath();
+    g.moveTo(-15, 12 + bob * 0.5);
+    g.quadraticCurveTo(-24, -4, -14, -14 + bob);
+    g.moveTo(15, 12 + bob * 0.5);
+    g.quadraticCurveTo(24, -4, 14, -14 + bob);
+    g.stroke();
+  } else if (state === "eating") {
+    g.beginPath();
+    g.moveTo(-15, 12 + bob * 0.5);
+    g.quadraticCurveTo(-14, 25, 0, -3 + bob);
+    g.moveTo(15, 12 + bob * 0.5);
+    g.quadraticCurveTo(18, 18, 12, 12);
+    g.stroke();
+
+    g.save();
+    g.translate(-1, -4 + bob);
+    g.rotate(-0.8);
+    g.strokeStyle = "#ffeb3b";
+    g.lineWidth = 4;
+    g.beginPath();
+    g.arc(0, 0, 5, 0.3, Math.PI - 0.3);
+    g.stroke();
+    g.restore();
+  } else {
+    g.beginPath();
+    g.moveTo(-15, 12 + bob * 0.5);
+    g.quadraticCurveTo(-24, 18, -18, 25);
+    g.moveTo(15, 12 + bob * 0.5);
+    g.quadraticCurveTo(24, 18, 18, 25);
+    g.stroke();
+  }
+
+  g.strokeStyle = "#8d583c";
+  g.lineWidth = 5.5;
+  g.beginPath();
+  g.moveTo(-10, 26 + bob * 0.5);
+  g.quadraticCurveTo(-18, 38, -14, 40);
+  g.moveTo(10, 26 + bob * 0.5);
+  g.quadraticCurveTo(18, 38, 14, 40);
+  g.stroke();
+
+  g.restore();
+}
+
+const locked = {
+  depth: middle(SETTINGS.depth),
+  occlusion: middle(SETTINGS.occlusion),
+  illumination: middle(SETTINGS.illumination),
+  size: middle(SETTINGS.size),
+};
+
+function middle(list) {
+  return list[Math.floor((list.length - 1) / 2)];
+}
 function pick(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
-
+function clamp(n, a, b) {
+  return Math.max(a, Math.min(b, n));
+}
+function num(n) {
+  return Math.round(Number(n) * 100) / 100;
+}
+function mix(a, b, t) {
+  return a.map((v, i) => Math.round(v + (b[i] - v) * t));
+}
+function rgb(c) {
+  return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+}
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function stageScale() {
+  return Math.min(world.w, world.h) / 520;
+}
+function minVolume() {
+  return Number(document.getElementById("minVolume").value);
+}
+function speechFloor() {
+  return Math.min(0.08, minVolume() * 0.45);
+}
 function timeOnScreen() {
   const t = SETTINGS.startTime * Math.pow(SETTINGS.speedUp, level - 1);
   return Math.max(SETTINGS.fastestTime, Math.round(t));
 }
-
-// A short beep. Higher = good, lower = bad.
-let audio = null;
-function beep(good) {
-  if (!SETTINGS.sound) return;
-  audio = audio || new AudioContext();
-  const osc = audio.createOscillator();
-  const gain = audio.createGain();
-  osc.frequency.value = good ? 880 : 180;
-  gain.gain.value = 0.08;
-  osc.connect(gain).connect(audio.destination);
-  osc.start();
-  osc.stop(audio.currentTime + 0.12);
+function hearsWord(text) {
+  const word = String(SETTINGS.say || "banana").toLowerCase().trim();
+  const heard = text.toLowerCase();
+  if (heard.includes(word)) return true;
+  if (word === "banana" && /b[ae]n[ae]n[ae]/.test(heard)) return true;
+  return false;
+}
+function describeWhere(fruit) {
+  const depthWord = { 1: "near", 2: "mid", 3: "deep" }[fruit.depth] || "mid";
+  const coverWord = fruit.occlusion < 0.28 ? "in the open" : fruit.occlusion < 0.6 ? "half in the leaves" : "buried";
+  const lightWord = fruit.illumination < 0.32 ? "dim" : fruit.illumination < 0.62 ? "dusky" : "lit";
+  const sizeWord = fruit.size < 0.78 ? "small" : fruit.size < 1.2 ? "middling" : "large";
+  return `${depthWord}, ${coverWord}, ${lightWord}, ${sizeWord}`;
 }
 
-function flash(good) {
-  stage.classList.add(good ? "good-flash" : "bad-flash");
-  setTimeout(() => stage.classList.remove("good-flash", "bad-flash"), 200);
+// ---------- jungle ---------------------------------------------------
+// Drawn again every frame. Leaves sway, vines creep, and old leaves
+// fade so the canopy never sits still. You do not need to edit this
+// to change cover, light, size, or depth.
+
+function makeNoise() {
+  const c = document.createElement("canvas");
+  c.width = 160;
+  c.height = 160;
+  const g = c.getContext("2d");
+  const img = g.createImageData(160, 160);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = 170 + Math.random() * 70;
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+    img.data[i + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  return c;
 }
+
+function buildWorld(w, h) {
+  const rng = mulberry32((Math.random() * 1e9) | 0);
+  const u = Math.min(w, h) / 500;
+  const trees = [];
+  const counts = { 3: 9, 2: 7, 1: 6 };
+  for (const layer of [3, 2, 1]) {
+    const n = counts[layer];
+    for (let i = 0; i < n; i++) {
+      const ground = h * (layer === 3 ? 0.74 : layer === 2 ? 0.9 : 1.04);
+      const height = h * (layer === 3 ? 0.5 : layer === 2 ? 0.66 : 0.84) * (0.82 + rng() * 0.28);
+      const crownW = (layer === 3 ? 46 : layer === 2 ? 68 : 86) * u * (0.9 + rng() * 0.5);
+      const crownH = crownW * (0.72 + rng() * 0.25);
+      const leaves = [];
+      const leafN = layer === 3 ? 0 : layer === 2 ? 5 : 8;
+      for (let k = 0; k < leafN; k++) {
+        leaves.push({
+          ox: (rng() - 0.5) * crownW * 1.7,
+          oy: (rng() - 0.45) * crownH * 1.5,
+          len: (12 + rng() * 18) * u * (layer === 1 ? 1.25 : 1),
+          rot: rng() * Math.PI * 2,
+          hue: 118 + rng() * 42,
+          phase: rng() * 6,
+        });
+      }
+      trees.push({
+        layer,
+        x: ((i + 0.2 + rng() * 0.6) / n) * w,
+        ground,
+        height,
+        trunk: (4 + (4 - layer) * 3 + rng() * 4) * u,
+        crownW,
+        crownH,
+        hue: 122 + rng() * 36,
+        phase: rng() * Math.PI * 2,
+        leaves,
+      });
+    }
+  }
+  const vines = [];
+  for (let i = 0; i < 28; i++) {
+    const layer = 1 + Math.floor(rng() * 3);
+    vines.push({
+      layer,
+      x: rng() * w,
+      amp: (8 + rng() * 24) * u,
+      freq: 0.012 + rng() * 0.02,
+      phase: rng() * 10,
+      len: h * (0.35 + rng() * 0.6),
+      thick: (1.1 + rng() * 2.2) * (layer === 1 ? 1.35 : 1),
+      hue: 120 + rng() * 30,
+    });
+  }
+  const drifters = [];
+  const now = performance.now();
+  for (let i = 0; i < 96; i++) {
+    const layer = 1 + Math.floor(rng() * 3);
+    const life = 14000 + rng() * 16000;
+    drifters.push({
+      layer,
+      x: rng() * w,
+      y: rng() * h * 0.92,
+      len: (16 + rng() * 28) * u * (layer === 1 ? 1.45 : 1),
+      rot: rng() * Math.PI * 2,
+      hue: 116 + rng() * 46,
+      phase: rng() * 8,
+      speed: 0.0004 + rng() * 0.0011,
+      life,
+      born: now - rng() * life,
+    });
+  }
+  const ferns = [];
+  for (let i = 0; i < 22; i++) {
+    ferns.push({
+      x: (i / 15) * w + (rng() - 0.5) * 24,
+      y: 8 + rng() * 36 * u,
+      len: (36 + rng() * 48) * u,
+      rot: (rng() - 0.5) * 0.8,
+      hue: 120 + rng() * 30,
+      phase: rng() * 6,
+    });
+  }
+  const motes = [];
+  for (let i = 0; i < 26; i++) {
+    motes.push({
+      x: rng(),
+      y: rng(),
+      r: (0.7 + rng() * 1.5) * u,
+      speed: 0.00004 + rng() * 0.00012,
+      phase: rng() * 6,
+      drift: 0.01 + rng() * 0.04,
+    });
+  }
+  return { w, h, trees, vines, drifters, ferns, motes };
+}
+
+function drawLeaf(g, x, y, len, rot, color) {
+  g.save();
+  g.translate(x, y);
+  g.rotate(rot);
+  g.fillStyle = color;
+  g.beginPath();
+  g.moveTo(0, 0);
+  g.bezierCurveTo(len * 0.22, len * 0.2, len * 0.72, len * 0.16, len, 0);
+  g.bezierCurveTo(len * 0.72, -len * 0.16, len * 0.22, -len * 0.2, 0, 0);
+  g.fill();
+  g.strokeStyle = "rgba(6, 14, 9, 0.28)";
+  g.lineWidth = 1;
+  g.beginPath();
+  g.moveTo(len * 0.08, 0);
+  g.lineTo(len * 0.84, 0);
+  g.stroke();
+  g.restore();
+}
+
+function drawBlob(g, x, y, rx, ry) {
+  g.beginPath();
+  g.ellipse(x, y, Math.max(2, rx), Math.max(2, ry), 0, 0, Math.PI * 2);
+  g.fill();
+}
+
+function drawTree(g, tree, t) {
+  const sway = Math.sin(t * 0.0007 + tree.phase) * (tree.layer === 1 ? 7 : 3) * windIntensity;
+  const lean = Math.sin(tree.phase * 2) * tree.trunk * 2.2;
+  const x = tree.x + sway;
+  const top = tree.ground - tree.height;
+  const tx = x + lean;
+  g.fillStyle = tree.layer === 3 ? "#0d1612" : tree.layer === 2 ? "#101c16" : "#13241b";
+  g.beginPath();
+  g.moveTo(x - tree.trunk * 0.4, tree.ground);
+  g.lineTo(tx - tree.trunk * 0.55, top + tree.crownH * 0.45);
+  g.lineTo(tx + tree.trunk * 0.55, top + tree.crownH * 0.45);
+  g.lineTo(x + tree.trunk * 0.5, tree.ground);
+  g.fill();
+  const light = tree.layer === 3 ? 11 : tree.layer === 2 ? 15 : 19;
+  const alpha = tree.layer === 3 ? 0.8 : 0.92;
+  g.fillStyle = `hsla(${tree.hue}, 30%, ${Math.max(6, light - 4)}%, ${alpha})`;
+  drawBlob(g, tx, top + tree.crownH * 0.1, tree.crownW * 0.62, tree.crownH * 0.5);
+  const clumps = tree.layer === 1 ? 16 : tree.layer === 2 ? 12 : 8;
+  for (let i = 0; i < clumps; i++) {
+    const a = (i / clumps) * Math.PI * 2 + tree.phase;
+    const ring = 0.25 + (i % 3) * 0.28;
+    const lx = tx + Math.cos(a) * tree.crownW * ring + Math.sin(t * 0.0008 + i) * 2 * windIntensity;
+    const ly = top + Math.sin(a) * tree.crownH * ring * 0.85;
+    const len = tree.crownW * (0.42 + (i % 4) * 0.1);
+    const hue = tree.hue + (i % 5) * 6;
+    const lit = light + (i % 3) * 3;
+    drawLeaf(g, lx, ly, len, a + Math.sin(t * 0.001 + i) * 0.12 * windIntensity, `hsla(${hue}, 34%, ${lit}%, ${alpha})`);
+  }
+  for (const leaf of tree.leaves) {
+    const lx = tx + leaf.ox + Math.sin(t * 0.001 + leaf.phase) * 3 * windIntensity;
+    const ly = top + leaf.oy + Math.cos(t * 0.0011 + leaf.phase) * 2 * windIntensity;
+    const rot = leaf.rot + Math.sin(t * 0.001 + leaf.phase) * 0.1 * windIntensity;
+    drawLeaf(g, lx, ly, leaf.len, rot, `hsla(${leaf.hue}, 36%, ${light + 7}%, 0.94)`);
+  }
+}
+
+function drawVine(g, v, t, h) {
+  const cycle = (t * 0.00032 + v.phase) % (Math.PI * 2);
+  const grow = cycle < Math.PI
+    ? 0.4 + 0.6 * (cycle / Math.PI)
+    : 1 - 0.6 * ((cycle - Math.PI) / Math.PI);
+  const len = Math.min(h * 0.98, v.len * grow);
+  g.beginPath();
+  g.moveTo(v.x, -16);
+  for (let y = 0; y <= len; y += 12) {
+    const x = v.x + Math.sin(y * v.freq + t * 0.00105 + v.phase) * v.amp * windIntensity;
+    g.lineTo(x, y);
+  }
+  const light = v.layer === 1 ? 22 : v.layer === 2 ? 16 : 12;
+  g.strokeStyle = `hsla(${v.hue}, 24%, ${light}%, 0.8)`;
+  g.lineWidth = v.thick;
+  g.stroke();
+  for (let y = 36; y < len; y += 64) {
+    const x = v.x + Math.sin(y * v.freq + t * 0.00105 + v.phase) * v.amp * windIntensity;
+    const side = (Math.floor(y / 64) % 2 === 0 ? 1 : -1);
+    drawLeaf(
+      g, x, y,
+      11 + (v.layer === 1 ? 8 : 3),
+      side * 0.9 + Math.sin(t * 0.001 + y) * 0.12 * windIntensity,
+      `hsla(${v.hue}, 30%, ${light + 3}%, 0.9)`
+    );
+  }
+}
+
+function drawDrifter(g, leaf, t) {
+  let age = t - leaf.born;
+  if (age > leaf.life) {
+    leaf.born = t;
+    leaf.x = Math.random() * world.w;
+    leaf.y = Math.random() * world.h * 0.9;
+    leaf.rot = Math.random() * Math.PI * 2;
+    leaf.hue = 116 + Math.random() * 46;
+    age = 0;
+  }
+  const fade = Math.sin(Math.PI * (age / leaf.life));
+  const x = leaf.x + Math.sin(t * leaf.speed + leaf.phase) * 18 * windIntensity;
+  const y = leaf.y + Math.cos(t * leaf.speed * 0.72 + leaf.phase) * 12 * windIntensity;
+  const light = leaf.layer === 1 ? 26 : leaf.layer === 2 ? 18 : 13;
+  drawLeaf(
+    g, x, y, leaf.len,
+    leaf.rot + Math.sin(t * 0.0009 + leaf.phase) * 0.18 * windIntensity,
+    `hsla(${leaf.hue}, 32%, ${light}%, ${0.25 + 0.7 * fade})`
+  );
+}
+
+function drawFerns(g, t, h) {
+  for (const f of world.ferns) {
+    const sway = Math.sin(t * 0.001 + f.phase) * 0.15 * windIntensity;
+    drawLeaf(g, f.x, h - f.y, f.len, -1.15 + f.rot + sway, `hsla(${f.hue}, 28%, 11%, 0.92)`);
+    drawLeaf(g, f.x + 10, h - f.y + 6, f.len * 0.75, -0.35 + sway, `hsla(${f.hue + 12}, 24%, 9%, 0.9)`);
+  }
+}
+
+function drawLayer(g, layer, t, h) {
+  for (const tree of world.trees) if (tree.layer === layer) drawTree(g, tree, t);
+  for (const vine of world.vines) if (vine.layer === layer) drawVine(g, vine, t, h);
+  for (const leaf of world.drifters) if (leaf.layer === layer) drawDrifter(g, leaf, t);
+  if (layer === 1) drawFerns(g, t, h);
+}
+
+function mistSheet(g, w, h, alpha) {
+  const theme = getTheme();
+  const [r, g_val, b] = theme.mist;
+  const fog = g.createLinearGradient(0, 0, 0, h);
+  fog.addColorStop(0, `rgba(${r}, ${g_val}, ${b}, ${alpha})`);
+  fog.addColorStop(0.45, `rgba(${r - 20}, ${g_val - 20}, ${b - 20}, ${alpha * 0.55})`);
+  fog.addColorStop(1, `rgba(${Math.max(0, r - 80)}, ${Math.max(0, g_val - 80)}, ${Math.max(0, b - 80)}, ${alpha * 0.2})`);
+  g.fillStyle = fog;
+  g.fillRect(0, 0, w, h);
+}
+
+function drawCanopyCeiling(g, w, h, t) {
+  g.beginPath();
+  g.moveTo(0, 0);
+  g.lineTo(w, 0);
+  for (let x = w; x >= -20; x -= 26) {
+    const y = h * (0.14 + 0.045 * Math.sin(x * 0.03 + t * 0.00035));
+    g.lineTo(x, y);
+  }
+  g.closePath();
+  g.fillStyle = "hsla(145, 28%, 8%, 0.72)";
+  g.fill();
+}
+
+function drawFrameLeaves(g, w, h, t) {
+  const u = Math.min(w, h) / 500;
+  const frames = [
+    [ -8, h * 0.22, 78 * u, 0.35 ],
+    [ -12, h * 0.62, 96 * u, 0.15 ],
+    [ w + 6, h * 0.18, 88 * u, 2.7 ],
+    [ w + 4, h * 0.58, 110 * u, 3.3 ],
+    [ w * 0.2, h + 6, 70 * u, -1.3 ],
+    [ w * 0.78, h + 8, 84 * u, -1.8 ],
+  ];
+  frames.forEach(([x, y, len, rot], i) => {
+    const sway = Math.sin(t * 0.001 + i) * 0.08;
+    drawLeaf(g, x, y, len, rot + sway, `hsla(${128 + i * 8}, 34%, 16%, 0.92)`);
+    drawLeaf(g, x + 12, y + 8, len * 0.72, rot + 0.4 + sway, `hsla(${140 + i * 6}, 30%, 13%, 0.9)`);
+  });
+}
+
+function drawSky(g, w, h, t) {
+  const theme = getTheme();
+  const sky = g.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, theme.sky[0]);
+  sky.addColorStop(0.32, theme.sky[1]);
+  sky.addColorStop(0.58, theme.sky[2]);
+  sky.addColorStop(1, theme.sky[3]);
+  g.fillStyle = sky;
+  g.fillRect(0, 0, w, h);
+  const drift = Math.sin(t * 0.00018) * w * 0.04;
+  g.save();
+  g.globalAlpha = ((level - 1) % 4) === 3 ? 0.09 : 0.055;
+  g.fillStyle = ((level - 1) % 4) === 2 ? "#ffca28" : ((level - 1) % 4) === 3 ? "#00e5ff" : "#e7f0d2";
+  g.beginPath();
+  g.moveTo(w * 0.06 + drift, 0);
+  g.lineTo(w * 0.36 + drift, 0);
+  g.lineTo(w * 0.58 + drift, h);
+  g.lineTo(w * 0.1 + drift, h);
+  g.fill();
+  g.restore();
+}
+
+function drawMotes(g, w, h, t) {
+  const theme = getTheme();
+  const isNight = ((level - 1) % 4) === 3;
+  for (const m of world.motes) {
+    const x = ((m.x + t * m.drift * 0.00004) % 1) * w;
+    const y = ((m.y + Math.sin(t * m.speed + m.phase) * 0.02) % 1) * h;
+    const twinkle = (isNight ? 0.2 : 0.04) + (isNight ? 0.3 : 0.1) * (0.5 + 0.5 * Math.sin(t * m.speed * 8 + m.phase));
+    g.fillStyle = theme.motes.replace(/[\d\.]+\)$/, `${twinkle})`);
+    g.beginPath();
+    g.arc(x, y, m.r * (isNight ? 1.5 : 1.0), 0, Math.PI * 2);
+    g.fill();
+    if (isNight) {
+      g.fillStyle = theme.motes.replace(/[\d\.]+\)$/, `${twinkle * 0.25})`);
+      g.beginPath();
+      g.arc(x, y, m.r * 5, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+}
+
+function drawBursts(g, t) {
+  bursts = bursts.filter((b) => t - b.born < b.life);
+  for (const b of bursts) {
+    const age = (t - b.born) / b.life;
+    const x = b.x + b.vx * age;
+    const y = b.y + b.vy * age + age * age * 40;
+    drawLeaf(g, x, y, b.len, b.rot + age * 2, `hsla(${b.hue}, 40%, 42%, ${1 - age})`);
+  }
+}
+
+// ---------- fruit ----------------------------------------------------
+
+function drawBanana(g, light) {
+  const skin = mix([62, 54, 22], [214, 176, 62], light);
+  const edge = mix([42, 36, 16], [158, 116, 40], light);
+  const hi = mix([62, 54, 22], [255, 236, 180], light);
+  g.save();
+  g.lineCap = "round";
+  g.lineJoin = "round";
+  g.fillStyle = "rgba(0, 0, 0, 0.28)";
+  g.beginPath();
+  g.ellipse(2, 18, 26, 7, 0.15, 0, Math.PI * 2);
+  g.fill();
+  const grad = g.createLinearGradient(-32, -10, 34, 10);
+  grad.addColorStop(0, rgb(edge));
+  grad.addColorStop(0.45, rgb(skin));
+  grad.addColorStop(1, rgb(edge));
+  g.strokeStyle = grad;
+  g.lineWidth = 20;
+  g.beginPath();
+  g.moveTo(-30, 12);
+  g.quadraticCurveTo(-2, -36, 34, -8);
+  g.stroke();
+  g.strokeStyle = `rgba(${hi[0]}, ${hi[1]}, ${hi[2]}, ${0.08 + light * 0.72})`;
+  g.lineWidth = 4;
+  g.beginPath();
+  g.moveTo(-18, 2);
+  g.quadraticCurveTo(-2, -22, 22, -10);
+  g.stroke();
+  g.fillStyle = rgb(mix([48, 34, 16], [102, 68, 32], light));
+  g.beginPath();
+  g.ellipse(-31, 13, 6, 4.2, 0.5, 0, Math.PI * 2);
+  g.fill();
+  g.beginPath();
+  g.ellipse(35, -8, 5, 3.4, 1, 0, Math.PI * 2);
+  g.fill();
+  g.strokeStyle = rgb(mix([54, 38, 18], [118, 78, 36], light));
+  g.lineWidth = 3.2;
+  g.beginPath();
+  g.moveTo(34, -9);
+  g.quadraticCurveTo(42, -16, 36, -22);
+  g.stroke();
+  g.restore();
+}
+
+function drawCoconut(g, light) {
+  const husk = mix([46, 34, 24], [156, 114, 72], light);
+  const dark = mix([28, 20, 14], [92, 64, 40], light);
+  const shine = mix([46, 34, 24], [214, 180, 130], light);
+  g.fillStyle = "rgba(0, 0, 0, 0.3)";
+  g.beginPath();
+  g.ellipse(2, 16, 20, 7, 0, 0, Math.PI * 2);
+  g.fill();
+  g.strokeStyle = rgb(dark);
+  g.lineWidth = 1.1;
+  for (let i = 0; i < 8; i++) {
+    g.beginPath();
+    g.ellipse(0, 2, 24, 19, i * 0.35, 0.15, 1.35);
+    g.stroke();
+  }
+  const grad = g.createRadialGradient(-7, -6, 3, 0, 2, 24);
+  grad.addColorStop(0, rgb(shine));
+  grad.addColorStop(0.45, rgb(husk));
+  grad.addColorStop(1, rgb(dark));
+  g.fillStyle = grad;
+  g.beginPath();
+  g.ellipse(0, 2, 26, 22, 0.08, 0, Math.PI * 2);
+  g.fill();
+  g.fillStyle = `rgba(16, 10, 6, ${0.55 + 0.3 * (1 - light)})`;
+  for (const [ex, ey] of [[-6, -2], [6, -1], [0, 7]]) {
+    g.beginPath();
+    g.ellipse(ex, ey, 2.1, 2.5, 0, 0, Math.PI * 2);
+    g.fill();
+  }
+}
+
+function makeOccluders(fruit) {
+  const rng = mulberry32(fruit.seed);
+  const n = Math.round(fruit.occlusion * 6);
+  const list = [];
+  for (let i = 0; i < n; i++) {
+    const ang = rng() * Math.PI * 2;
+    const dist = fruit.scale * (2 + rng() * 16);
+    const len = fruit.scale * (22 + rng() * 28) * (0.55 + fruit.occlusion);
+    list.push({
+      x: fruit.x + Math.cos(ang) * dist,
+      y: fruit.y + Math.sin(ang) * dist * 0.7,
+      len,
+      rot: ang + rng() * 0.6,
+      phase: rng() * 6,
+      color: `hsla(${124 + rng() * 36}, 32%, ${14 + rng() * 10}%, ${0.78 + rng() * 0.2})`,
+    });
+  }
+  return list;
+}
+
+function makeCrossVine(fruit) {
+  const rng = mulberry32((fruit.seed ^ 0x9e3779b9) >>> 0);
+  return {
+    ang: -0.9 + rng() * 1.8,
+    span: (34 + rng() * 28) * fruit.scale * (0.5 + fruit.occlusion),
+    bow: (rng() - 0.5) * 18 * fruit.scale,
+    thick: 1.1 + fruit.occlusion * 2.4,
+    phase: rng() * 6,
+    hue: 128 + rng() * 28,
+  };
+}
+
+function drawCrossVine(g, fruit, t) {
+  const v = fruit.crossVine;
+  const sway = Math.sin(t * 0.0014 + v.phase) * 4 * windIntensity;
+  const x0 = fruit.x + Math.cos(v.ang) * -v.span;
+  const y0 = fruit.y + Math.sin(v.ang) * -v.span * 0.62;
+  const x1 = fruit.x + Math.cos(v.ang) * v.span;
+  const y1 = fruit.y + Math.sin(v.ang) * v.span * 0.62;
+  const cx = fruit.x + sway + v.bow;
+  const cy = fruit.y + v.bow * 0.25;
+  g.strokeStyle = `hsla(${v.hue}, 26%, 16%, 0.92)`;
+  g.lineWidth = v.thick;
+  g.beginPath();
+  g.moveTo(x0, y0);
+  g.quadraticCurveTo(cx, cy, x1, y1);
+  g.stroke();
+  drawLeaf(g, (x0 + cx) / 2, (y0 + cy) / 2, 14 * Math.max(0.8, fruit.scale), v.ang, `hsla(${v.hue}, 30%, 20%, 0.94)`);
+  drawLeaf(g, (x1 + cx) / 2, (y1 + cy) / 2, 12 * Math.max(0.8, fruit.scale), v.ang + 0.8, `hsla(${v.hue + 8}, 28%, 18%, 0.94)`);
+}
+
+function drawFruit(g, fruit, t) {
+  const flicker = 0.94 + 0.06 * Math.sin(t * 0.004 + (fruit.seed || 0));
+  const light = clamp(fruit.illumination * flicker, 0, 1);
+  const pool = 78 * fruit.scale * (0.65 + light);
+  const glow = g.createRadialGradient(fruit.x, fruit.y, 4, fruit.x, fruit.y, pool);
+  const alpha = 0.03 + light * 0.16;
+  const col = fruit.kind === "go" ? "232, 196, 110" : "186, 150, 110";
+  glow.addColorStop(0, `rgba(${col}, ${alpha})`);
+  glow.addColorStop(1, `rgba(${col}, 0)`);
+  g.fillStyle = glow;
+  g.beginPath();
+  g.arc(fruit.x, fruit.y, pool, 0, Math.PI * 2);
+  g.fill();
+
+  g.save();
+  g.translate(fruit.x, fruit.y);
+  g.rotate(fruit.rot + Math.sin(t * 0.0016 + (fruit.seed || 0)) * 0.035 * windIntensity);
+  g.scale(fruit.scale, fruit.scale);
+  if (fruit.kind === "go") drawBanana(g, light);
+  else drawCoconut(g, light);
+  g.restore();
+
+  for (const leaf of fruit.occluders) {
+    const sway = Math.sin(t * 0.0013 + leaf.phase) * 3.5 * windIntensity;
+    drawLeaf(g, leaf.x + sway, leaf.y + sway * 0.3, leaf.len, leaf.rot + sway * 0.012 * windIntensity, leaf.color);
+  }
+  if (fruit.crossVine) drawCrossVine(g, fruit, t);
+}
+
+function placeFruit(depth, scale) {
+  const bands = { 1: [0.56, 0.78], 2: [0.38, 0.6], 3: [0.2, 0.44] };
+  const [y0, y1] = bands[depth];
+  const target = depth === 1 ? 0.15 : depth === 2 ? 0.55 : 0.95;
+  const found = [];
+  for (let i = 0; i < 28; i++) {
+    const x = world.w * (0.14 + Math.random() * 0.72);
+    const y = world.h * (y0 + Math.random() * (y1 - y0));
+    let score = 0;
+    for (const tree of world.trees) {
+      if (tree.layer >= depth) continue;
+      const top = tree.ground - tree.height;
+      const dx = (x - tree.x) / (tree.crownW * 1.05);
+      const dy = (y - top) / (tree.crownH * 1.05);
+      const d = dx * dx + dy * dy;
+      if (d < 1) score += (1 - d) * 3;
+    }
+    for (const leaf of world.drifters) {
+      if (leaf.layer >= depth) continue;
+      const dx = x - leaf.x;
+      const dy = y - leaf.y;
+      const rad = 16 * scale + leaf.len * 0.45;
+      if (dx * dx + dy * dy < rad * rad) score += 0.3;
+    }
+    found.push({ x, y, score });
+  }
+  found.sort((a, b) => Math.abs(a.score - target) - Math.abs(b.score - target));
+  const shortlist = found.slice(0, 4);
+  return shortlist[Math.floor(Math.random() * shortlist.length)];
+}
+
+function factorsForTurn() {
+  const shuffle = document.getElementById("shuffle").checked;
+  if (shuffle) {
+    return {
+      depth: pick(SETTINGS.depth),
+      occlusion: pick(SETTINGS.occlusion),
+      illumination: pick(SETTINGS.illumination),
+      size: pick(SETTINGS.size),
+    };
+  }
+  return {
+    depth: locked.depth,
+    occlusion: locked.occlusion,
+    illumination: locked.illumination,
+    size: locked.size,
+  };
+}
+
+// ---------- voice ----------------------------------------------------
+// The microphone stays on. Volume comes from the analyser. The word
+// comes from speech recognition. A banana only counts if the word is
+// heard AND the voice crosses the loudness line while the fruit is up.
+
+function setMic(text, live) {
+  const el = document.getElementById("micState");
+  el.textContent = text;
+  el.classList.toggle("live", !!live);
+}
+
+function micError(err) {
+  if (err && err.message === "speech") {
+    return "This browser cannot hear words. Open the game in Chrome or Edge.";
+  }
+  if (!window.isSecureContext) {
+    return "The microphone needs localhost or https. Use Live Server, or play from the course page — not a file opened from the desktop.";
+  }
+  if (err && (err.name === "NotAllowedError" || err.name === "PermissionDeniedError")) {
+    return "The microphone is blocked. Allow it in the browser, then press Start again.";
+  }
+  return "The microphone did not start. Allow it, then press Start again.";
+}
+
+async function prepareLocal(SR) {
+  if (typeof SR.available !== "function") return;
+  try {
+    const status = await SR.available({ langs: ["en-US"], processLocally: true });
+    if (status === "available") wantLocal = true;
+  } catch (err) {
+    wantLocal = false;
+  }
+}
+
+function armRecognizer(SR) {
+  rec = new SR();
+  rec.lang = "en-US";
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.maxAlternatives = 3;
+  if (wantLocal) {
+    try { rec.processLocally = true; } catch (err) { wantLocal = false; }
+  }
+  let toldNetwork = false;
+  rec.onresult = (event) => {
+    restarts = 0;
+    let text = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const alts = event.results[i];
+      for (let j = 0; j < alts.length; j++) text += " " + alts[j].transcript;
+    }
+    if (hearsWord(text)) onWord();
+  };
+  rec.onerror = (event) => {
+    if (event.error === "not-allowed") setMic("Mic blocked", false);
+    // Keep retrying, but don't let a repeating error cover the trial messages.
+    if (event.error === "network" && !toldNetwork) {
+      toldNetwork = true;
+      message.textContent = "The mic is on, but word recognition needs a network (or Chrome’s on-device speech). It will keep trying.";
+    }
+  };
+  rec.onend = () => {
+    recOn = false;
+    if (!listening) return;
+    restarts += 1;
+    const delay = Math.min(1200, 180 * restarts);
+    setTimeout(() => {
+      if (!listening || recOn) return;
+      try {
+        rec.start();
+        recOn = true;
+      } catch (err) {
+        recOn = false;
+      }
+    }, delay);
+  };
+  const startIt = () => {
+    rec.start();
+    recOn = true;
+    listening = true;
+    setMic("Mic live", true);
+  };
+  try {
+    startIt();
+  } catch (err) {
+    if (wantLocal) {
+      wantLocal = false;
+      try { rec.processLocally = false; startIt(); } catch (err2) { recOn = false; }
+    }
+  }
+}
+
+async function ensureMic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) throw new Error("speech");
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    throw new Error("secure");
+  }
+  if (!stream) {
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: false },
+      video: false,
+    });
+    audio = new AudioContext();
+    const src = audio.createMediaStreamSource(stream);
+    analyser = audio.createAnalyser();
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.35;
+    wave = new Float32Array(analyser.fftSize);
+    src.connect(analyser);
+  }
+  if (audio.state === "suspended") await audio.resume();
+  await prepareLocal(SR);
+  if (!recOn) armRecognizer(SR);
+}
+
+function sampleVoice() {
+  const now = performance.now();
+  let level = 0;
+  if (analyser && wave) {
+    analyser.getFloatTimeDomainData(wave);
+    let sum = 0;
+    for (let i = 0; i < wave.length; i++) sum += wave[i] * wave[i];
+    const rms = Math.sqrt(sum / wave.length);
+    level = clamp(rms / 0.15, 0, 1);
+  }
+  history.push({ t: now, level });
+  while (history.length && now - history[0].t > 2600) history.shift();
+  if (current && phase === "show") {
+    current.volumePeak = Math.max(current.volumePeak || 0, level);
+  }
+  smoothLevel = smoothLevel * 0.62 + level * 0.38;
+  windIntensity = 1.0 + smoothLevel * 4.5;
+  if (jungleWindGain && audio) {
+    const targetGain = 0.008 + smoothLevel * 0.12;
+    jungleWindGain.gain.setTargetAtTime(targetGain, audio.currentTime, 0.15);
+  }
+  const fill = document.getElementById("meterFill");
+  fill.style.width = (smoothLevel * 100) + "%";
+  fill.classList.toggle("hot", smoothLevel >= minVolume());
+  document.getElementById("meterMark").style.left = (minVolume() * 100) + "%";
+}
+
+function lastRun(now) {
+  const hang = Math.max(speechFloor(), minVolume() * 0.5);
+  const samples = [];
+  for (const s of history) {
+    if (s.t >= now - 1700 && s.t <= now) samples.push(s);
+  }
+  let best = null;
+  let start = null;
+  let peak = 0;
+  let lastLoud = null;
+  function closeRun() {
+    if (start !== null) best = { onset: start, peak: peak };
+    start = null;
+    peak = 0;
+    lastLoud = null;
+  }
+  for (const s of samples) {
+    if (s.level >= hang) {
+      if (start === null || (lastLoud !== null && s.t - lastLoud > 220)) {
+        closeRun();
+        start = s.t;
+        peak = s.level;
+      } else {
+        peak = Math.max(peak, s.level);
+      }
+      lastLoud = s.t;
+    } else if (start !== null && lastLoud !== null && s.t - lastLoud > 220) {
+      closeRun();
+    }
+  }
+  if (start !== null) best = { onset: start, peak: peak };
+  if (!best) return { onset: now, peak: 0, loud: false };
+  return { onset: best.onset, peak: best.peak, loud: best.peak >= minVolume() };
+}
+
+function heardVoice(t0, t1) {
+  for (const s of history) {
+    if (s.t >= t0 && s.t <= t1 && s.level >= speechFloor()) return true;
+  }
+  return false;
+}
+
+function commitLock() {
+  const now = performance.now();
+  if (now - lastCommit < 900) return false;
+  lastCommit = now;
+  return true;
+}
+
+function onWord() {
+  if (!playing || phase === "over") return;
+  const utt = lastRun(performance.now());
+  if (utt.peak < speechFloor()) return;
+  if (utt.onset < practiceUntil) {
+    practiceHint(utt);
+    return;
+  }
+  if (current && utt.onset >= current.shownAt && utt.onset <= current.visibleUntil && !current.resolved) {
+    duringWord(utt);
+    return;
+  }
+  if (current && utt.onset > current.visibleUntil && (!current.resolved || utt.onset <= current.visibleUntil + SETTINGS.lateWindow)) {
+    lateWord(utt);
+    return;
+  }
+  if (phase === "wait" || phase === "grace" || phase === "show") {
+    if (!commitLock()) return;
+    betweenWord(utt);
+  }
+}
+
+function practiceHint(utt) {
+  const now = performance.now();
+  if (now - lastQuietMsg < 700) return;
+  lastQuietMsg = now;
+  message.textContent = utt.loud
+    ? "The mic heard you. Wait until a banana is actually there."
+    : "Louder — take the voice bar past the white line.";
+}
+
+function duringWord(utt) {
+  if (current.kind === "stop") {
+    if (!commitLock()) return;
+    current.said = true;
+    current.loudEnough = utt.loud;
+    current.responseOnset = utt.onset;
+    current.uttPeak = utt.peak;
+    finishTrial("false-alarm");
+    return;
+  }
+  if (!utt.loud) {
+    current.tooQuiet = true;
+    current.said = true;
+    current.uttPeak = Math.max(current.uttPeak || 0, utt.peak);
+    const now = performance.now();
+    if (now - lastQuietMsg > 600) {
+      lastQuietMsg = now;
+      message.textContent = "Louder — take the voice bar past the white line.";
+    }
+    return;
+  }
+  if (!commitLock()) return;
+  current.said = true;
+  current.loudEnough = true;
+  current.responseOnset = utt.onset;
+  current.uttPeak = utt.peak;
+  finishTrial("hit");
+}
+
+function lateWord(utt) {
+  if (current && !current.resolved) {
+    if (!commitLock()) return;
+    current.tooLate = true;
+    current.said = true;
+    current.loudEnough = utt.loud;
+    current.responseOnset = utt.onset;
+    current.uttPeak = utt.peak;
+    finishTrial(current.kind === "stop" ? "false-alarm" : "miss");
+    return;
+  }
+  if (!current || !current.row || !commitLock()) return;
+  if (current.kind === "stop" && current.row.correct === 1) {
+    score = Math.max(0, score - SETTINGS.pointsForStop);
+    lives -= 1;
+    current.row.correct = 0;
+    current.row.pressed = 1;
+    current.row.said_banana = 1;
+    current.row.loud_enough = utt.loud ? 1 : 0;
+    current.row.too_late = 1;
+    current.row.rt_ms = Math.max(0, Math.round(utt.onset - current.shownAt));
+    current.row.score = score;
+    current.row.volume_peak = num(Math.max(current.volumePeak || 0, utt.peak));
+    message.textContent = "Too late. That coconut had already passed.";
+    beep(false);
+    flash(false);
+    updateHud();
+    if (lives <= 0) gameOver();
+    return;
+  }
+  if (current.kind === "go" && current.row.correct === 0) {
+    current.row.too_late = 1;
+    current.row.said_banana = 1;
+    message.textContent = "Too late.";
+  }
+}
+
+function betweenWord(utt) {
+  lives -= 1;
+  data.push({
+    turn: "",
+    level: level,
+    kind: "between",
+    thing: "",
+    depth: "",
+    occlusion: "",
+    illumination: "",
+    size: "",
+    fruit_x: "",
+    fruit_y: "",
+    on_screen_ms: "",
+    said_banana: 1,
+    loud_enough: utt.loud ? 1 : 0,
+    volume_peak: num(utt.peak),
+    min_volume: num(minVolume()),
+    pressed: 1,
+    rt_ms: "",
+    too_quiet: 0,
+    too_early: 1,
+    too_late: 0,
+    correct: 0,
+    score: score,
+  });
+  message.textContent = "Not in the gap. Say it only while a banana is showing.";
+  monkeyActionType = "dizzy";
+  monkeyActionUntil = performance.now() + 1500;
+  if (world) {
+    spawnFloaty(world.w - 75, world.h - 130, "GAP TALK!", "#e53935");
+    spawnFloaty(world.w - 75, world.h - 100, "-1 LIFE", "#e53935");
+  }
+  beep(false);
+  flash(false);
+  updateHud();
+  if (lives <= 0) gameOver();
+}
+
+// ---------- turns, score, saving ------------------------------------
 
 function updateHud() {
   document.getElementById("score").textContent = score;
   document.getElementById("lives").textContent = lives;
   document.getElementById("level").textContent = level;
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem("bananaHunt_highScore", String(highScore));
+  }
+  const hsEl = document.getElementById("highScore");
+  if (hsEl) hsEl.textContent = highScore;
+}
+
+function beep(good) {
+  if (good) {
+    if (current && current.kind === "go") playCatchSound();
+    else playWithholdSound();
+  } else {
+    playMistakeSound();
+  }
+}
+
+function flash(good) {
+  stage.classList.add(good ? "good-flash" : "bad-flash");
+  setTimeout(() => stage.classList.remove("good-flash", "bad-flash"), 180);
+  if (!good) shakeUntil = performance.now() + 140;
+}
+
+function spawnBurst(x, y) {
+  const t = performance.now();
+  for (let i = 0; i < 9; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const speed = 26 + Math.random() * 70;
+    bursts.push({
+      x, y,
+      vx: Math.cos(a) * speed,
+      vy: Math.sin(a) * speed - 16,
+      born: t,
+      life: 620,
+      len: 9 + Math.random() * 12,
+      rot: a,
+      hue: 78 + Math.random() * 50,
+    });
+  }
 }
 
 function startGame() {
+  clearTimeout(timer);
   data = [];
   turn = 0;
   score = 0;
   lives = SETTINGS.lives;
   level = 1;
   playing = true;
+  current = null;
+  phase = "ready";
+  practiceUntil = performance.now() + 1300;
+  lastCommit = -99999;
+  bursts = [];
+  floaties = [];
+  toldKeys = false;
   updateHud();
-  message.textContent = "Get ready...";
-  nextTurn();
+  message.textContent = "Mic is live. Say the word only when you see a banana, and only loud enough to cross the line.";
+  
+  if (audio) {
+    startJungleAmbience();
+    scheduleBirdChirp();
+  }
+
+  timer = setTimeout(() => {
+    if (!playing) return;
+    message.textContent = "Watch the leaves.";
+    nextTurn();
+  }, 900);
 }
 
 function nextTurn() {
   if (!playing) return;
-  stage.textContent = "";
-  current = null;
+  phase = "wait";
   const wait = SETTINGS.waitMin + Math.random() * (SETTINGS.waitMax - SETTINGS.waitMin);
+  clearTimeout(timer);
   timer = setTimeout(showThing, wait);
 }
 
 function showThing() {
+  if (!playing) return;
+  if (!world) {
+    timer = setTimeout(showThing, 40);
+    return;
+  }
   turn += 1;
-  const isStop = Math.random() < SETTINGS.stopChance;
+  const factors = factorsForTurn();
+  const kind = Math.random() < SETTINGS.stopChance ? "stop" : "go";
+  const scale = factors.size * DEPTH_SCALE[factors.depth] * stageScale() * FRUIT_BOOST;
+  const spot = placeFruit(factors.depth, scale);
   current = {
-    kind: isStop ? "stop" : "go",
-    thing: isStop ? pick(SETTINGS.stopThings) : pick(SETTINGS.goThings),
+    kind,
+    thing: kind === "go" ? "banana" : "coconut",
+    depth: factors.depth,
+    occlusion: factors.occlusion,
+    illumination: factors.illumination,
+    size: factors.size,
+    scale,
+    x: spot.x,
+    y: spot.y,
+    rot: (Math.random() - 0.5) * 0.9 - 0.35,
+    seed: Math.floor(Math.random() * 1e9),
     onScreen: timeOnScreen(),
+    shownAt: performance.now(),
+    resolved: false,
+    tooQuiet: false,
+    tooLate: false,
+    said: false,
+    loudEnough: false,
+    responseOnset: null,
+    uttPeak: 0,
+    volumePeak: 0,
+    row: null,
   };
-  stage.textContent = current.thing;
-  shownAt = performance.now();
-  timer = setTimeout(() => endTurn(false), current.onScreen);
+  current.visibleUntil = current.shownAt + current.onScreen;
+  current.occluders = makeOccluders(current);
+  current.crossVine = current.occlusion > 0.22 ? makeCrossVine(current) : null;
+  phase = "show";
+  clearTimeout(timer);
+  timer = setTimeout(hideFruit, current.onScreen);
 }
 
-// pressed = true if the player pressed, false if time ran out.
-function endTurn(pressed) {
-  if (!playing || !current) return;
-  clearTimeout(timer);
-  const rt = pressed ? Math.round(performance.now() - shownAt) : "";
-  const correct = (current.kind === "go") === pressed;
+function hideFruit() {
+  if (!playing || !current || current.resolved) return;
+  phase = "grace";
+  if (heardVoice(current.shownAt, current.visibleUntil)) {
+    timer = setTimeout(() => {
+      if (!current || current.resolved) return;
+      finishTrial(current.kind === "go" ? "miss" : "withhold");
+    }, SETTINGS.speechGrace);
+  } else {
+    finishTrial(current.kind === "go" ? "miss" : "withhold");
+  }
+}
 
+function outcomeMessage(outcome, rt) {
+  const where = describeWhere(current);
+  if (current.tooLate) {
+    return current.kind === "stop"
+      ? `Too late. That was a coconut — ${where}.`
+      : `Too late — ${where}.`;
+  }
+  if (outcome === "hit") return `Caught it in ${rt} ms — ${where}.`;
+  if (outcome === "withhold") return `Quiet. The coconut passed — ${where}.`;
+  if (outcome === "miss") {
+    if (current.tooQuiet) return `Too quiet. It slipped away — ${where}.`;
+    if (current.volumePeak >= minVolume()) return `I heard a sound, but not the word — ${where}.`;
+    return `Too slow. It slipped away — ${where}.`;
+  }
+  return `You said it at a coconut — ${where}.`;
+}
+
+function finishTrial(outcome) {
+  if (!playing || !current || current.resolved) return;
+  current.resolved = true;
+  clearTimeout(timer);
+  const pressed = outcome === "hit" || outcome === "false-alarm" || current.tooLate;
+  const correct = outcome === "hit" || outcome === "withhold";
+  let rt = "";
+  if ((pressed || current.said) && current.responseOnset) {
+    rt = Math.max(0, Math.round(current.responseOnset - current.shownAt));
+  }
   if (correct) {
-    score += current.kind === "go" ? SETTINGS.pointsForCatch : SETTINGS.pointsForStop;
-    message.textContent = current.kind === "go" ? `Caught it! ${rt} ms` : "Nice, you held back.";
+    score += outcome === "hit" ? SETTINGS.pointsForCatch : SETTINGS.pointsForStop;
+    if (outcome === "hit") {
+      monkeyActionType = "eating";
+      monkeyActionUntil = performance.now() + 1500;
+      spawnFloaty(current.x, current.y, "+10", "#ffeb3b");
+    } else {
+      spawnFloaty(current.x, current.y, "+5 SAFE", "#81c784");
+    }
   } else {
     lives -= 1;
-    message.textContent = current.kind === "go" ? "Too slow!" : "Oops, that was a stop!";
+    monkeyActionType = "dizzy";
+    monkeyActionUntil = performance.now() + 1500;
+    if (world) {
+      spawnFloaty(world.w - 75, world.h - 130, "-1 LIFE", "#e53935");
+    }
+    if (outcome === "false-alarm") {
+      spawnFloaty(current.x, current.y, "COCONUT!", "#e53935");
+    } else if (outcome === "miss") {
+      spawnFloaty(current.x, current.y, "MISS!", "#ff9800");
+    }
   }
+  if (outcome === "hit") spawnBurst(current.x, current.y);
+  message.textContent = outcomeMessage(outcome, rt);
   beep(correct);
   flash(correct);
 
-  // Save one row about this turn.
-  data.push({
+  const row = {
     turn: turn,
     level: level,
     kind: current.kind,
     thing: current.thing,
+    depth: current.depth,
+    occlusion: num(current.occlusion),
+    illumination: num(current.illumination),
+    size: num(current.size),
+    fruit_x: Math.round((100 * current.x) / world.w),
+    fruit_y: Math.round((100 * current.y) / world.h),
     on_screen_ms: current.onScreen,
+    said_banana: current.said ? 1 : 0,
+    loud_enough: current.loudEnough ? 1 : 0,
+    volume_peak: num(Math.max(current.volumePeak || 0, current.uttPeak || 0)),
+    min_volume: num(minVolume()),
     pressed: pressed ? 1 : 0,
     rt_ms: rt,
+    too_quiet: current.tooQuiet ? 1 : 0,
+    too_early: 0,
+    too_late: current.tooLate ? 1 : 0,
     correct: correct ? 1 : 0,
     score: score,
-  });
+  };
+  current.row = row;
+  data.push(row);
 
   if (turn % SETTINGS.turnsPerLevel === 0) {
     level += 1;
-    message.textContent += `  Level ${level}!`;
+    levelUpAnnouncedUntil = performance.now() + 2500;
+    lives = Math.min(SETTINGS.lives, lives + 1);
+    playLevelUpSound();
+    if (world) {
+      spawnLevelUpExplosion(world.w / 2, world.h / 2);
+    }
+    message.textContent += ` Level ${level}.`;
   }
   updateHud();
-
   if (lives <= 0) {
-    playing = false;
-    stage.textContent = "🏁";
-    message.textContent = `Game over. Score ${score}, level ${level}, ${turn} turns. Save your data!`;
+    gameOver();
     return;
   }
   nextTurn();
 }
 
-function press() {
-  if (!playing) return;
-  if (!current) {
-    message.textContent = "Too early! Wait for it.";
-    return;
-  }
-  endTurn(true);
+function gameOver() {
+  playing = false;
+  phase = "over";
+  clearTimeout(timer);
+  message.textContent = `The canopy closes. Score ${score}, level ${level}, ${turn} turns. Save your data.`;
+  stopJungleAmbience();
+  playGameOverSound();
+}
+
+function csvCell(value) {
+  const s = String(value);
+  if (/[",\n]/.test(s)) return `"${s.replaceAll('"', '""')}"`;
+  return s;
 }
 
 function saveCsv() {
@@ -251,7 +2014,9 @@ function saveCsv() {
     return;
   }
   const columns = Object.keys(data[0]);
-  const lines = [columns.join(",")].concat(data.map((row) => columns.map((c) => row[c]).join(",")));
+  const lines = [columns.join(",")].concat(
+    data.map((row) => columns.map((c) => csvCell(row[c])).join(","))
+  );
   const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -259,15 +2024,198 @@ function saveCsv() {
   a.click();
 }
 
-document.getElementById("startBtn").addEventListener("click", (e) => { e.target.blur(); startGame(); });
-document.getElementById("saveBtn").addEventListener("click", saveCsv);
-stage.addEventListener("pointerdown", press);
-window.addEventListener("keydown", (e) => {
-  if (e.code === "Space") {
-    e.preventDefault();
-    press();
+// ---------- picture loop ---------------------------------------------
+
+function fitCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(1, rect.width);
+  const h = Math.max(1, rect.height);
+  const pw = Math.round(w * dpr);
+  const ph = Math.round(h * dpr);
+  if (canvas.width !== pw || canvas.height !== ph) {
+    canvas.width = pw;
+    canvas.height = ph;
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (!world || Math.abs(world.w - w) > 2 || Math.abs(world.h - h) > 2) {
+    const prev = world;
+    world = buildWorld(w, h);
+    if (current && prev && prev.w) {
+      current.x *= w / prev.w;
+      current.y *= h / prev.h;
+    }
+  }
+  return { w, h };
+}
+
+function drawFrame(t) {
+  const { w, h } = fitCanvas();
+  ctx.clearRect(0, 0, w, h);
+  ctx.save();
+  if (performance.now() < shakeUntil) {
+    ctx.translate((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 5);
+  }
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  drawSky(ctx, w, h, t);
+  drawCanopyCeiling(ctx, w, h, t);
+  drawLayer(ctx, 3, t, h);
+  if (shownFruit() && shownFruit().depth === 3) drawFruit(ctx, shownFruit(), t);
+  mistSheet(ctx, w, h, MIST_AFTER[3]);
+  drawLayer(ctx, 2, t, h);
+  if (shownFruit() && shownFruit().depth === 2) drawFruit(ctx, shownFruit(), t);
+  mistSheet(ctx, w, h, MIST_AFTER[2]);
+  drawLayer(ctx, 1, t, h);
+  if (shownFruit() && shownFruit().depth === 1) drawFruit(ctx, shownFruit(), t);
+  mistSheet(ctx, w, h, MIST_AFTER[1]);
+  drawFrameLeaves(ctx, w, h, t);
+
+  const vignette = ctx.createRadialGradient(w / 2, h / 2, w * 0.28, w / 2, h * 0.45, w * 0.72);
+  vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+  vignette.addColorStop(1, "rgba(0, 0, 0, 0.42)");
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, w, h);
+
+  // Draw monkey and branch in the lower right corner (above vignette so it's bright and clear)
+  drawMonkeyBranch(ctx, w, h);
+  drawMonkey(ctx, w - 75, h - 90, t);
+
+  drawMotes(ctx, w, h, t);
+  drawBursts(ctx, t);
+
+  // Draw and update floaties
+  drawFloaties(ctx, t);
+
+  // Level Up announcement text
+  if (performance.now() < levelUpAnnouncedUntil) {
+    const age = (levelUpAnnouncedUntil - performance.now()) / 2500;
+    const alpha = Math.sin(age * Math.PI);
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = `rgba(255, 235, 59, ${alpha})`;
+    ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
+    ctx.lineWidth = 6;
+    ctx.font = "bold 44px sans-serif";
+    ctx.strokeText(`LEVEL ${level}!`, w / 2, h / 2 - 20);
+    ctx.fillText(`LEVEL ${level}!`, w / 2, h / 2 - 20);
+
+    ctx.font = "18px sans-serif";
+    ctx.fillStyle = `rgba(231, 240, 228, ${alpha})`;
+    ctx.strokeText("The canopy thickens... +1 LIFE", w / 2, h / 2 + 20);
+    ctx.fillText("The canopy thickens... +1 LIFE", w / 2, h / 2 + 20);
+    ctx.restore();
+  }
+
+  if (noise) {
+    ctx.save();
+    ctx.globalAlpha = 0.05;
+    const ox = (t * 0.012) % 160;
+    ctx.drawImage(noise, -ox, -ox * 0.4, w + 160, h + 160);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function shownFruit() {
+  if (phase === "show" && current) return current;
+  return null;
+}
+
+function frame() {
+  try {
+    sampleVoice();
+    drawFrame(performance.now());
+  } catch (err) {
+    console.error(err);
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------- controls -------------------------------------------------
+
+function paintDepth() {
+  document.querySelectorAll(".depths button").forEach((btn) => {
+    const on = Number(btn.dataset.depth) === locked.depth;
+    btn.classList.toggle("on", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+}
+
+function syncLockUI() {
+  const shuffleOn = document.getElementById("shuffle").checked;
+  for (const id of ["occlusion", "illumination", "size"]) {
+    document.getElementById(id).disabled = shuffleOn;
+  }
+  document.querySelectorAll(".depths button").forEach((btn) => {
+    btn.disabled = shuffleOn;
+  });
+}
+
+function bindSlider(id, key) {
+  const input = document.getElementById(id);
+  const label = document.getElementById(id + "Val");
+  const start = key ? locked[key] : SETTINGS.minVolume;
+  input.value = String(start);
+  label.textContent = Number(start).toFixed(2);
+  input.addEventListener("input", () => {
+    const value = Number(input.value);
+    label.textContent = value.toFixed(2);
+    if (key) locked[key] = value;
+  });
+}
+
+function bindControls() {
+  bindSlider("occlusion", "occlusion");
+  bindSlider("illumination", "illumination");
+  bindSlider("size", "size");
+  bindSlider("minVolume", null);
+  document.getElementById("shuffle").checked = !!SETTINGS.shuffle;
+  paintDepth();
+  syncLockUI();
+  document.getElementById("shuffle").addEventListener("change", syncLockUI);
+  document.querySelectorAll(".depths button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      locked.depth = Number(btn.dataset.depth);
+      paintDepth();
+    });
+  });
+}
+
+document.getElementById("startBtn").addEventListener("click", async (e) => {
+  e.target.blur();
+  if (starting) return;
+  starting = true;
+  message.textContent = "Asking for the microphone…";
+  try {
+    await ensureMic();
+    startGame();
+  } catch (err) {
+    message.textContent = micError(err);
+    setMic("Mic off", false);
+  } finally {
+    starting = false;
   }
 });
+document.getElementById("saveBtn").addEventListener("click", saveCsv);
+stage.addEventListener("pointerdown", () => {
+  if (!playing || toldKeys) return;
+  toldKeys = true;
+  message.textContent = "Say it out loud. Tapping the jungle does nothing.";
+});
+window.addEventListener("keydown", (e) => {
+  if (e.code !== "Space") return;
+  e.preventDefault();
+  if (!playing || toldKeys) return;
+  toldKeys = true;
+  message.textContent = "Say it out loud. The keyboard does not answer.";
+});
+
+bindControls();
+updateHud();
+noise = makeNoise();
+requestAnimationFrame(frame);
 </script>
 </body>
 </html>

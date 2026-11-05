@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Banana Hunt · Week 9</title>
+<style>
+  /* ---------- LOOK ----------
+     Change colours and fonts here. */
+  :root {
+    --background: #0b120e;
+    --text: #eef2e6;
+    --accent: #f2cf4a;
+    --panel: rgba(255, 255, 255, 0.05);
+    --muted: rgba(238, 242, 230, 0.6);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--background);
+    color: var(--text);
+    font-family: system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px 40px;
+  }
+  h1 { margin: 20px 0 4px; }
+  #rules { margin: 4px 0; max-width: 720px; text-align: center; color: var(--muted); }
+  #hud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 24px;
+    font-size: 1.15rem;
+    margin: 8px 0 12px;
+  }
+  #micChip { font-size: 0.9rem; color: var(--muted); align-self: center; }
+  #stageWrap { position: relative; width: min(100%, 900px); }
+  #jungle {
+    display: block;
+    width: 100%;
+    aspect-ratio: 900 / 560;
+    border-radius: 18px;
+    background: #0e1a14;
+  }
+  #flash {
+    position: absolute; inset: 0; border-radius: 18px;
+    pointer-events: none; opacity: 0; transition: opacity 0.3s;
+  }
+  #flash.good { background: rgba(242, 207, 74, 0.22); opacity: 1; transition: none; }
+  #flash.bad  { background: rgba(251, 113, 133, 0.30); opacity: 1; transition: none; }
+  #heard {
+    position: absolute; left: 14px; bottom: 12px;
+    font-size: 0.9rem; padding: 4px 10px; border-radius: 999px;
+    background: rgba(0, 0, 0, 0.45); color: var(--text);
+    opacity: 0; transition: opacity 0.4s; pointer-events: none;
+  }
+  #heard.show { opacity: 1; transition: none; }
+  #message { min-height: 1.6em; margin: 12px 0; font-size: 1.1rem; text-align: center; }
+  button {
+    font: inherit;
+    padding: 10px 18px;
+    margin: 4px;
+    border-radius: 999px;
+    border: 0;
+    background: var(--accent);
+    color: #1c1915;
+    cursor: pointer;
+  }
+  button.quiet { background: rgba(255, 255, 255, 0.15); color: var(--text); }
+  #panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    width: min(100%, 900px);
+    margin-top: 16px;
+  }
+  .panel { background: var(--panel); border-radius: 14px; padding: 14px 16px; }
+  .panel h2 { font-size: 1rem; margin: 0 0 10px; }
+  .row { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; margin-bottom: 10px; font-size: 0.92rem; }
+  .row input[type="range"] { width: 100%; grid-column: 1 / -1; accent-color: var(--accent); }
+  .row .val { color: var(--accent); font-variant-numeric: tabular-nums; }
+  .row .mix { grid-column: 1 / -1; color: var(--muted); font-size: 0.85rem; }
+  #meter {
+    position: relative; height: 18px; border-radius: 9px;
+    background: rgba(255, 255, 255, 0.08); overflow: hidden; margin: 6px 0 12px;
+  }
+  #meterFill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #7d8a80; }
+  .mark { position: absolute; top: 0; bottom: 0; width: 2px; }
+  #markStart { background: #9fe3b8; }
+  #markLoud { background: var(--accent); }
+  #micStatus { font-size: 0.85rem; color: var(--muted); margin: 6px 0 0; }
+</style>
+</head>
+<body>
+
+<h1 id="title"></h1>
+<p id="rules"></p>
+
+<div id="hud">
+  <span>Score: <b id="score">0</b></span>
+  <span>Lives: <b id="lives"></b></span>
+  <span>Level: <b id="level">1</b></span>
+  <span id="micChip">🎤 off</span>
+</div>
+
+<div id="stageWrap">
+  <canvas id="jungle"></canvas>
+  <div id="flash"></div>
+  <div id="heard"></div>
+</div>
+<div id="message">Turn on the mic, check the meter, then press Start.</div>
+
+<div>
+  <button id="startBtn">Start</button>
+  <button id="stopBtn" class="quiet">Stop</button>
+  <button id="previewBtn" class="quiet">Preview a fruit</button>
+  <button id="saveBtn" class="quiet">Save my data (CSV)</button>
+</div>
+
+<div id="panels">
+  <div class="panel">
+    <h2>How hard is it to see?</h2>
+    <div id="sceneControls"></div>
+  </div>
+  <div class="panel">
+    <h2>Microphone</h2>
+    <button id="micBtn" class="quiet" style="margin: 0 0 8px">Turn on mic</button>
+    <div id="meter">
+      <div id="meterFill"></div>
+      <div class="mark" id="markStart"></div>
+      <div class="mark" id="markLoud"></div>
+    </div>
+    <div id="micControls"></div>
+    <p id="micStatus">Green line: when your voice starts counting. Yellow line: loud enough for a banana.</p>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+//  SETTINGS: start by changing things here.
+//  Save the file, then reload the page to see your change.
+// =====================================================================
+const SETTINGS = {
+  title: "Banana Hunt",
+  rules: "Shout BANANA when you spot a banana in the jungle. Say nothing for a coconut, nothing in between, and don't be late.",
+
+  stopChance: 0.3,           // share of turns that are coconuts (0.3 = about 1 in 3)
+  lives: 5,                  // mistakes before game over
+  turnsPerLevel: 10,         // turns before the next level starts
+
+  startTime: 1500,           // ms a fruit stays on screen at level 1
+  speedUp: 0.9,              // each level, time on screen is multiplied by this
+  fastestTime: 600,          // never faster than this (ms)
+
+  waitMin: 1200,             // shortest gap before a fruit (ms)
+  waitMax: 2600,             // longest gap before a fruit (ms)
+  listenAfter: 1500,         // ms we keep listening after the fruit goes (speech is slow to arrive)
+
+  pointsForCatch: 10,        // points for a loud banana on a banana
+  pointsForStop: 5,          // points for staying quiet on a coconut
+
+  // HOW HARD IS IT TO SEE? Each is a list. With "mix" ticked, every turn
+  // picks one value from the list at random. Untick "mix" to use the slider.
+  occlusion: [0.2, 0.45, 0.7],   // share of the fruit hidden by leaves (0 to 0.9)
+  light: [0.3, 0.6, 1.0],        // light on the fruit: 1 = full, 0.05 = nearly black
+  size: [60, 90, 130],           // banana length in pixels (a coconut is 0.6 of this across)
+  depth: [1, 2, 3],              // 1 = just behind the front leaves, 3 = deep in the mist
+
+  // Each new level adds this much (0 = no change).
+  harder: { occlusion: 0.03, light: -0.03, size: -3 },
+
+  density: 1.6,              // how thick the jungle is (1 = sparse, 2.5 = dense)
+  decoys: 2,                 // empty gaps in the leaves, so the gap doesn't give the fruit away
+  mist: 1,                   // how thick the mist is (0 = none, 2 = very thick)
+  jungleSpeed: 1,            // how fast the jungle drifts (0 = still)
+
+  // MICROPHONE
+  voiceStartDb: -50,         // sound louder than this counts as you starting to speak
+  loudEnoughDb: -28,         // your banana must get at least this loud
+  useSpeech: true,           // check the word really is "banana" (Chrome, Edge, Safari)
+  speechLang: "en-US",
+  wordMatch: /banan|nana/i,  // what counts as "banana" in what the browser heard
+  keyboardTest: true,        // press B to fake a loud "banana" (for testing without a mic)
+  sound: true,               // beeps on or off
+};
+
+// =====================================================================
+//  The game itself. You can change this too, once the settings feel easy.
+// =====================================================================
+const W = 900, H = 560;
+const DPR = Math.min(2, window.devicePixelRatio || 1);
+const canvas = document.getElementById("jungle");
+const ctx = canvas.getContext("2d");
+canvas.width = W * DPR;
+canvas.height = H * DPR;
+
+const $ = (id) => document.getElementById(id);
+const message = $("message");
+$("title").textContent = SETTINGS.title;
+$("rules").textContent = SETTINGS.rules;
+$("lives").textContent = SETTINGS.lives;
+
+const rand = (a, b) => a + Math.random() * (b - a);
+const randInt = (a, b) => Math.floor(rand(a, b + 1));
+const pick = (list) => list[Math.floor(Math.random() * list.length)];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const css = (rgb, k = 1, a = 1) =>
+  `rgba(${rgb.map((v) => Math.round(clamp(v * k, 0, 255))).join(",")},${a})`;
+const jitter = (rgb, amt) => rgb.map((v) => v * (1 + rand(-amt, amt)));
+
+function makeCanvas(w, h, dpr) {
+  const c = document.createElement("canvas");
+  c.width = Math.ceil(w * dpr);
+  c.height = Math.ceil(h * dpr);
+  const g = c.getContext("2d");
+  g.scale(dpr, dpr);
+  return [c, g];
+}
+
+// ---------------------------------------------------------------------
+//  Drawing leaves, trees, vines
+// ---------------------------------------------------------------------
+// Layer 0 is closest to you, layer 3 is deepest. Closer = darker and bigger.
+const LAYERS = [
+  { speed: 16,  leaf: [20, 40, 26],   trunk: [18, 22, 16], scale: 1.5,  dpr: 1,
+    mix: ["bigleaf", "bigleaf", "bigleaf", "bigleaf", "vine", "fern"] },
+  { speed: 9,   leaf: [34, 70, 44],   trunk: [38, 40, 30], scale: 1.1,  dpr: DPR,
+    mix: ["spray", "spray", "spray", "spray", "vine", "vine", "vine", "fern", "fern", "tree"] },
+  { speed: 5,   leaf: [52, 92, 66],   trunk: [58, 66, 56], scale: 0.8,  dpr: 1,
+    mix: ["tree", "tree", "tree", "tree", "tree", "spray", "spray", "spray", "vine", "vine", "fern", "fern"] },
+  { speed: 2.5, leaf: [80, 112, 102], trunk: [82, 98, 94], scale: 0.55, dpr: 1,
+    mix: ["tree", "tree", "tree", "tree", "tree", "tree", "tree", "spray", "spray", "spray", "spray", "vine", "spray", "tree"] },
+];
+const FOG_ALPHA = [0, 0.12, 0.18, 0.24];   // mist drawn in front of layers 1, 2, 3
+const MIST = [150, 176, 166];
+
+// A leaf pointing along +x from (0,0). wid is its full width.
+function leafPath(g, len, wid) {
+  g.beginPath();
+  g.moveTo(0, 0);
+  g.quadraticCurveTo(len * 0.45, -wid, len, 0);
+  g.quadraticCurveTo(len * 0.45, wid, 0, 0);
+  g.closePath();
+}
+
+function drawLeaf(g, x, y, len, wid, ang, rgb, shade = 1) {
+  g.save();
+  g.translate(x, y);
+  g.rotate(ang);
+  const grad = g.createLinearGradient(0, 0, len, 0);
+  grad.addColorStop(0, css(rgb, 0.8 * shade));
+  grad.addColorStop(1, css(rgb, 1.25 * shade));
+  leafPath(g, len, wid);
+  g.fillStyle = grad;
+  g.fill();
+  g.strokeStyle = css(rgb, 0.55 * shade);
+  g.lineWidth = Math.max(0.6, wid * 0.06);
+  g.beginPath();
+  g.moveTo(0, 0);
+  g.lineTo(len * 0.9, 0);
+  g.stroke();
+  g.restore();
+}
+
+// A bunch of leaves around (cx, cy), lit from above.
+function sprayAt(g, cx, cy, r, L, n) {
+  const leaves = [];
+  for (let i = 0; i < n; i++) {
+    const a = rand(0, Math.PI * 2);
+    const d = r * 0.6 * Math.sqrt(Math.random());
+    leaves.push({
+      x: cx + Math.cos(a) * d,
+      y: cy + Math.sin(a) * d * 0.75,
+      len: r * rand(0.25, 0.45),
+      ang: a + rand(-0.7, 0.7),
+      shade: rand(0.75, 1.05) - Math.sin(a) * 0.15,
+    });
+  }
+  leaves.sort((p, q) => p.shade - q.shade);
+  for (const l of leaves) drawLeaf(g, l.x, l.y, l.len, l.len * 0.32, l.ang, jitter(L.leaf, 0.12), l.shade);
+}
+
+function makeTree(L) {
+  const sc = L.scale;
+  const trunkH = H * rand(0.6, 1.1);
+  const tw = sc * rand(12, 26);
+  const cr = sc * rand(70, 130);
+  const w = cr * 2.6, h = trunkH + cr * 1.2;
+  const [c, g] = makeCanvas(w, h, L.dpr);
+  const bx = w / 2, by = h;
+  const bend = rand(-0.25, 0.25) * cr;
+  const tx = bx + bend, ty = cr * 1.1;
+  const trunk = jitter(L.trunk, 0.15);
+  const grad = g.createLinearGradient(bx - tw, 0, bx + tw, 0);
+  grad.addColorStop(0, css(trunk, 0.6));
+  grad.addColorStop(0.45, css(trunk, 1.15));
+  grad.addColorStop(1, css(trunk, 0.55));
+  g.fillStyle = grad;
+  g.beginPath();
+  g.moveTo(bx - tw, by);
+  g.quadraticCurveTo(bx - tw * 0.5 + bend * 0.3, (by + ty) / 2, tx - tw * 0.3, ty);
+  g.lineTo(tx + tw * 0.3, ty);
+  g.quadraticCurveTo(bx + tw * 0.5 + bend * 0.3, (by + ty) / 2, bx + tw, by);
+  g.closePath();
+  g.fill();
+  g.strokeStyle = css(trunk, 0.9);
+  g.lineCap = "round";
+  for (let i = 0, n = randInt(1, 3); i < n; i++) {
+    const f = rand(0.2, 0.55);
+    const x = tx + (bx - tx) * f, y = ty + (by - ty) * f;
+    const side = Math.random() < 0.5 ? -1 : 1;
+    const ex = x + side * rand(0.4, 0.8) * cr, ey = y - rand(0.2, 0.6) * cr;
+    g.lineWidth = tw * 0.3;
+    g.beginPath();
+    g.moveTo(x, y);
+    g.quadraticCurveTo((x + ex) / 2, y, ex, ey);
+    g.stroke();
+    sprayAt(g, ex, ey, cr * 0.45, L, 12);
+  }
+  sprayAt(g, tx, ty, cr, L, 40);
+  return { canvas: c, w, h, ax: bx, ay: by, place: "ground" };
+}
+
+function cubicPt(p, t) {
+  const u = 1 - t;
+  return {
+    x: u * u * u * p[0].x + 3 * u * u * t * p[1].x + 3 * u * t * t * p[2].x + t * t * t * p[3].x,
+    y: u * u * u * p[0].y + 3 * u * u * t * p[1].y + 3 * u * t * t * p[2].y + t * t * t * p[3].y,
+  };
+}
+
+function makeVine(L) {
+  const sc = L.scale;
+  const len = H * rand(0.25, 0.85);
+  const w = 90 * sc, h = len + 20 * sc;
+  const [c, g] = makeCanvas(w, h, L.dpr);
+  const p = [
+    { x: w / 2, y: 0 },
+    { x: w / 2 + rand(-30, 30) * sc, y: len * 0.33 },
+    { x: w / 2 + rand(-30, 30) * sc, y: len * 0.66 },
+    { x: w / 2 + rand(-15, 15) * sc, y: len },
+  ];
+  const col = jitter(L.trunk, 0.1).map((v, i) => v * (i === 1 ? 1.4 : 1.05));
+  g.strokeStyle = css(col);
+  g.lineWidth = 2.5 * sc;
+  g.beginPath();
+  g.moveTo(p[0].x, p[0].y);
+  g.bezierCurveTo(p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
+  g.stroke();
+  let side = 1;
+  for (let t = 0.05; t <= 1; t += (16 * sc) / len) {
+    const q = cubicPt(p, t);
+    const ll = sc * rand(10, 18);
+    drawLeaf(g, q.x, q.y, ll, ll * 0.7, Math.PI / 2 + side * rand(0.5, 1.2), jitter(L.leaf, 0.12), rand(0.8, 1.1));
+    side = -side;
+  }
+  return { canvas: c, w, h, ax: w / 2, ay: 0, place: "top" };
+}
+
+function makeFern(L) {
+  const R = L.scale * rand(60, 120);
+  const w = R * 2.4, h = R * 1.3;
+  const [c, g] = makeCanvas(w, h, L.dpr);
+  const bx = w / 2, by = h;
+  const n = randInt(5, 9);
+  const col = jitter(L.leaf, 0.1);
+  g.strokeStyle = css(col, 0.7);
+  g.lineWidth = R * 0.02;
+  for (let i = 0; i < n; i++) {
+    const a = -Math.PI + 0.35 + ((Math.PI - 0.7) * (i + rand(-0.3, 0.3))) / (n - 1);
+    const len = R * rand(0.75, 1.05);
+    const p1 = { x: bx + Math.cos(a) * len * 0.6, y: by + Math.sin(a) * len * 0.9 - len * 0.1 };
+    const p2 = { x: bx + Math.cos(a) * len, y: by + Math.sin(a) * len * 0.9 + len * 0.25 };
+    g.beginPath();
+    g.moveTo(bx, by);
+    g.quadraticCurveTo(p1.x, p1.y, p2.x, p2.y);
+    g.stroke();
+    for (let t = 0.12; t < 0.97; t += 0.06) {
+      const u = 1 - t;
+      const x = u * u * bx + 2 * u * t * p1.x + t * t * p2.x;
+      const y = u * u * by + 2 * u * t * p1.y + t * t * p2.y;
+      const dx = 2 * u * (p1.x - bx) + 2 * t * (p2.x - p1.x);
+      const dy = 2 * u * (p1.y - by) + 2 * t * (p2.y - p1.y);
+      const ang = Math.atan2(dy, dx);
+      const ll = R * 0.2 * (1 - t * 0.65);
+      for (const s of [-1, 1]) drawLeaf(g, x, y, ll, ll * 0.45, ang + s * 1.0, col, rand(0.85, 1.1));
+    }
+  }
+  return { canvas: c, w, h, ax: bx, ay: by, place: "ground" };
+}
+
+function makeSpray(L) {
+  const R = L.scale * rand(45, 95);
+  const w = R * 2.3, h = R * 2.3;
+  const [c, g] = makeCanvas(w, h, L.dpr);
+  g.strokeStyle = css(L.trunk, 1.1);
+  g.lineWidth = R * 0.05;
+  g.beginPath();
+  g.moveTo(w / 2, h / 2);
+  g.quadraticCurveTo(w / 2 + rand(-R, R) * 0.5, h * 0.25, w / 2 + rand(-R, R) * 0.5, 0);
+  g.stroke();
+  sprayAt(g, w / 2, h / 2, R, L, randInt(10, 18));
+  return { canvas: c, w, h, ax: w / 2, ay: h / 2, place: "air" };
+}
+
+function makeBigLeaf(L) {
+  const len = rand(220, 340);
+  const side = 2 * len + 20;
+  const [c, g] = makeCanvas(side, side, L.dpr);
+  const top = Math.random() < 0.5;
+  const base = top ? Math.PI / 2 : -Math.PI / 2;
+  for (let i = 0, n = randInt(1, 3); i < n; i++) {
+    const ang = base + rand(-0.9, 0.9);
+    const l = len * rand(0.75, 1);
+    const col = jitter(L.leaf, 0.15);
+    g.save();
+    g.translate(side / 2, side / 2);
+    g.rotate(ang);
+    g.strokeStyle = css(col, 0.8);
+    g.lineWidth = 6;
+    g.beginPath();
+    g.moveTo(0, 0);
+    g.lineTo(l * 0.22, 0);
+    g.stroke();
+    g.translate(l * 0.2, 0);
+    const ll = l * 0.8, wid = ll * 0.7;
+    const grad = g.createLinearGradient(0, -wid / 2, 0, wid / 2);
+    grad.addColorStop(0, css(col, 1.2));
+    grad.addColorStop(1, css(col, 0.7));
+    leafPath(g, ll, wid);
+    g.fillStyle = grad;
+    g.fill();
+    g.strokeStyle = "rgba(170, 210, 160, 0.08)";
+    g.lineWidth = 2;
+    g.stroke();
+    g.strokeStyle = css(col, 0.6);
+    g.lineWidth = 1.5;
+    g.beginPath();
+    g.moveTo(0, 0);
+    g.lineTo(ll * 0.95, 0);
+    for (let v = 1; v < 10; v++) {
+      const x = (v / 10) * ll;
+      const env = Math.sin((v / 10) * Math.PI) * wid * 0.42;
+      g.moveTo(x, 0); g.lineTo(x + ll * 0.1, -env);
+      g.moveTo(x, 0); g.lineTo(x + ll * 0.1, env);
+    }
+    g.stroke();
+    g.restore();
+  }
+  return { canvas: c, w: side, h: side, ax: side / 2, ay: side / 2, place: top ? "top" : "bottom" };
+}
+
+const MAKERS = { tree: makeTree, vine: makeVine, fern: makeFern, spray: makeSpray, bigleaf: makeBigLeaf };
+
+function newElement(li, x) {
+  const L = LAYERS[li];
+  const sp = MAKERS[pick(L.mix)](L);
+  let y;
+  if (sp.place === "ground") y = H + rand(0, 30);
+  else if (sp.place === "top") y = -5;
+  else if (sp.place === "bottom") y = H + 20;
+  else y = rand(0.08, 0.85) * H;
+  if (sp.place === "top" && sp.ay > 0) y = -20;
+  return {
+    sp, x: x === undefined ? W + 30 + sp.ax + rand(0, 60) : x, y,
+    sway: sp.place === "top" && sp.ay === 0 ? rand(0.02, 0.045) : rand(0.006, 0.02),
+    freq: rand(0.4, 0.9), phase: rand(0, 6.28),
+  };
+}
+
+const layers = LAYERS.map((L, li) => {
+  const n = Math.round(L.mix.length * SETTINGS.density);
+  const els = [];
+  for (let k = 0; k < n; k++) els.push(newElement(li, -100 + ((W + 200) * (k + Math.random())) / n));
+  return els;
+});
+
+// Layers 0-2 are drawn into their own canvas, so we can open gaps in them.
+const buffers = [0, 1, 2].map(() => makeCanvas(W, H, DPR));
+
+const fogBlobs = [1, 2, 3].map(() =>
+  Array.from({ length: 3 }, () => ({ x: rand(0, W), y: rand(0.15, 1) * H, r: rand(120, 240), vx: rand(-8, 8) }))
+);
+const shafts = Array.from({ length: 3 }, () => ({ x: rand(0.1, 0.8) * W, w: rand(40, 110), tilt: rand(80, 200), ph: rand(0, 6) }));
+
+// ---------------------------------------------------------------------
+//  Banana and coconut
+// ---------------------------------------------------------------------
+function drawBanana(g, s) {
+  const grad = g.createLinearGradient(0, -0.12 * s, 0, 0.2 * s);
+  grad.addColorStop(0, "#fff07a");
+  grad.addColorStop(0.45, "#eec02c");
+  grad.addColorStop(1, "#b8861b");
+  g.beginPath();
+  g.moveTo(-0.5 * s, -0.12 * s);
+  g.quadraticCurveTo(0, 0.46 * s, 0.5 * s, -0.12 * s);
+  g.quadraticCurveTo(0, 0.12 * s, -0.5 * s, -0.12 * s);
+  g.closePath();
+  g.fillStyle = grad;
+  g.fill();
+  g.strokeStyle = "rgba(100, 66, 10, 0.6)";
+  g.lineWidth = s * 0.015;
+  g.stroke();
+  g.strokeStyle = "rgba(255, 255, 210, 0.3)";
+  g.beginPath();
+  g.moveTo(-0.42 * s, -0.08 * s);
+  g.quadraticCurveTo(0, 0.3 * s, 0.42 * s, -0.08 * s);
+  g.stroke();
+  g.fillStyle = "#4a3410";
+  g.beginPath();
+  g.arc(-0.5 * s, -0.12 * s, 0.022 * s, 0, Math.PI * 2);
+  g.fill();
+  g.strokeStyle = "#6b5a22";
+  g.lineCap = "round";
+  g.lineWidth = s * 0.04;
+  g.beginPath();
+  g.moveTo(0.48 * s, -0.11 * s);
+  g.lineTo(0.55 * s, -0.16 * s);
+  g.stroke();
+}
+
+function drawCoconut(g, s) {
+  const r = 0.3 * s;
+  const grad = g.createRadialGradient(-0.3 * r, -0.35 * r, r * 0.1, 0, 0, r);
+  grad.addColorStop(0, "#9a6a3c");
+  grad.addColorStop(0.6, "#5a3519");
+  grad.addColorStop(1, "#2e1a0b");
+  g.fillStyle = grad;
+  g.beginPath();
+  g.arc(0, 0, r, 0, Math.PI * 2);
+  g.fill();
+  g.save();
+  g.clip();
+  g.lineWidth = Math.max(0.7, s * 0.008);
+  for (let i = 0; i < 70; i++) {
+    const a = rand(0, Math.PI * 2), d = r * Math.sqrt(Math.random());
+    const x = Math.cos(a) * d, y = Math.sin(a) * d, b = a + rand(-0.6, 0.6);
+    g.strokeStyle = Math.random() < 0.5 ? "rgba(210, 170, 120, 0.25)" : "rgba(30, 15, 5, 0.35)";
+    g.beginPath();
+    g.moveTo(x, y);
+    g.lineTo(x + Math.cos(b) * r * 0.2, y + Math.sin(b) * r * 0.2);
+    g.stroke();
+  }
+  g.restore();
+  g.fillStyle = "#1c0f06";
+  for (const [ex, ey] of [[-0.2, -0.38], [0.2, -0.38], [0, -0.14]]) {
+    g.beginPath();
+    g.ellipse(ex * r, ey * r, 0.09 * r, 0.075 * r, 0, 0, Math.PI * 2);
+    g.fill();
+  }
+}
+
+function makeFruit(kind, size, rot, light) {
+  const side = Math.ceil(size * 1.3);
+  const [c, g] = makeCanvas(side, side, DPR);
+  g.translate(side / 2, side / 2);
+  g.rotate(rot);
+  if (kind === "go") drawBanana(g, size);
+  else drawCoconut(g, size);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.globalCompositeOperation = "source-atop";
+  g.fillStyle = `rgba(4, 8, 6, ${(1 - light).toFixed(3)})`;
+  g.fillRect(0, 0, c.width, c.height);
+  return { canvas: c, w: side, h: side };
+}
+
+// Leaves in front of a fruit. Positions are relative to the fruit's centre.
+function drawCover(g, cover, mask) {
+  const s = cover.s;
+  g.lineCap = "round";
+  g.strokeStyle = mask ? "#000" : css(cover.stemRgb);
+  g.lineWidth = s * 0.035;
+  g.beginPath();
+  g.moveTo(cover.sx, cover.sy);
+  g.quadraticCurveTo(cover.cx, cover.cy, cover.ex, cover.ey);
+  g.stroke();
+  for (const l of cover.leaves) {
+    if (mask) {
+      g.save();
+      g.translate(l.x, l.y);
+      g.rotate(l.ang);
+      leafPath(g, l.len, l.wid);
+      g.fillStyle = "#000";
+      g.fill();
+      g.restore();
+    } else {
+      drawLeaf(g, l.x, l.y, l.len, l.wid, l.ang, l.rgb, l.shade);
+    }
+  }
+}
+
+function newCover(s, li) {
+  const L = LAYERS[li];
+  const a = rand(0, Math.PI * 2);
+  return {
+    s, leaves: [],
+    sx: Math.cos(a) * s * 1.3, sy: Math.sin(a) * s * 1.3,
+    cx: Math.cos(a + 0.4) * s * 1.0, cy: Math.sin(a + 0.4) * s * 1.0,
+    ex: Math.cos(a) * s * 0.75, ey: Math.sin(a) * s * 0.75,
+    stemRgb: L.trunk, leafRgb: L.leaf, measured: 0,
+  };
+}
+
+function addCoverLeaf(cover, px, py, lenK) {
+  const s = cover.s;
+  const len = s * rand(0.3, 0.6) * lenK;
+  const ang = rand(0, Math.PI * 2);
+  const leaf = {
+    x: px - Math.cos(ang) * len / 2, y: py - Math.sin(ang) * len / 2,
+    len, wid: len * 0.6, ang, rgb: jitter(cover.leafRgb, 0.12), shade: rand(0.8, 1.1),
+  };
+  cover.leaves.push(leaf);
+  return leaf;
+}
+
+// Add leaves until the share of fruit pixels hidden reaches the goal.
+function coverFruit(fruit, size, li, goal) {
+  const cover = newCover(size, li);
+  const m = Math.min(160, Math.ceil(fruit.w));
+  const k = m / fruit.w;
+  const [ac, ag] = makeCanvas(m, m, 1);
+  ag.drawImage(fruit.canvas, 0, 0, m, m);
+  const a = ag.getImageData(0, 0, m, m).data;
+  const fruitPx = [];
+  for (let i = 3; i < a.length; i += 4) if (a[i] > 100) fruitPx.push(i);
+  if (!fruitPx.length) return cover;
+  const [oc, og] = makeCanvas(m, m, 1);
+  const measure = () => {
+    og.setTransform(1, 0, 0, 1, 0, 0);
+    og.clearRect(0, 0, m, m);
+    og.setTransform(k, 0, 0, k, m / 2, m / 2);
+    drawCover(og, cover, true);
+    const o = og.getImageData(0, 0, m, m).data;
+    let hit = 0;
+    for (const i of fruitPx) if (o[i] > 127) hit++;
+    return hit / fruitPx.length;
+  };
+  let got = measure();
+  let lenK = 1;
+  for (let tries = 0; tries < 300 && got < goal - 0.02; tries++) {
+    const i = pick(fruitPx);
+    const px = (((i - 3) / 4) % m) / k - fruit.w / 2 + rand(-0.15, 0.15) * size;
+    const py = Math.floor((i - 3) / 4 / m) / k - fruit.w / 2 + rand(-0.15, 0.15) * size;
+    addCoverLeaf(cover, px, py, lenK);
+    const now = measure();
+    if (now > goal + 0.06) {
+      cover.leaves.pop();
+      lenK = Math.max(0.25, lenK * 0.75);
+    } else {
+      got = now;
+    }
+  }
+  cover.measured = got;
+  return cover;
+}
+
+// Leaves for an empty gap, so it looks like a fruit's gap.
+function decoyCover(size, li, nLeaves) {
+  const cover = newCover(size, li);
+  for (let i = 0; i < nLeaves; i++) addCoverLeaf(cover, rand(-0.45, 0.45) * size, rand(-0.2, 0.2) * size, 1);
+  return cover;
+}
+
+// ---------------------------------------------------------------------
+//  Rendering
+// ---------------------------------------------------------------------
+let gaps = [];          // openings in the leaves: {x, y, s, depth, amt, goal, cover}
+let fruitNow = null;    // the trial whose fruit is on screen
+let lastFrame = performance.now();
+
+function openGaps(t) {
+  for (const gp of gaps) gp.goal = 0;
+  gaps.push({ x: t.x, y: t.y, s: t.size, depth: t.depth, amt: 0, goal: 1, cover: t.cover });
+  for (let i = 0; i < SETTINGS.decoys; i++) {
+    let x, y, tries = 0;
+    do {
+      x = rand(0.15, 0.85) * W;
+      y = rand(0.2, 0.75) * H;
+    } while (Math.hypot(x - t.x, y - t.y) < t.size * 2.2 && ++tries < 30);
+    const d = pick(SETTINGS.depth);
+    gaps.push({ x, y, s: t.size, depth: d, amt: 0, goal: 1, cover: decoyCover(t.size, d - 1, t.cover.leaves.length) });
+  }
+}
+function closeGaps() { for (const gp of gaps) gp.goal = 0; }
+
+function drawElement(g, el, t) {
+  const sp = el.sp;
+  g.save();
+  g.translate(el.x, el.y);
+  g.rotate(el.sway * Math.sin(t * el.freq + el.phase));
+  g.drawImage(sp.canvas, -sp.ax, -sp.ay, sp.w, sp.h);
+  g.restore();
+}
+
+function drawFog(i, t, dt) {
+  const a = FOG_ALPHA[i] * SETTINGS.mist;
+  if (a <= 0) return;
+  ctx.fillStyle = css(MIST, 1, Math.min(0.9, a));
+  ctx.fillRect(0, 0, W, H);
+  const ground = ctx.createLinearGradient(0, H * 0.55, 0, H);
+  ground.addColorStop(0, css(MIST, 1, 0));
+  ground.addColorStop(1, css(MIST, 1, Math.min(0.9, a * 0.8)));
+  ctx.fillStyle = ground;
+  ctx.fillRect(0, H * 0.55, W, H * 0.45);
+  for (const b of fogBlobs[i - 1]) {
+    b.x += b.vx * dt * SETTINGS.jungleSpeed;
+    if (b.x < -b.r) b.x = W + b.r;
+    if (b.x > W + b.r) b.x = -b.r;
+    const gr = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+    gr.addColorStop(0, css(MIST, 1, Math.min(0.9, a * 0.5)));
+    gr.addColorStop(1, css(MIST, 1, 0));
+    ctx.fillStyle = gr;
+    ctx.fillRect(b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+  }
+}
+
+function frame(ts) {
+  const dt = Math.min(0.05, (ts - lastFrame) / 1000);
+  lastFrame = ts;
+  const t = ts / 1000;
+
+  // A fruit that was asked for appears now, and we note the exact time.
+  if (current && current.showAsked && !current.visible) {
+    current.visible = true;
+    current.shownAt = performance.now();
+    fruitNow = current;
+    if (!current.preview) {
+      setPhase("fruit", current.shownAt);
+      timer = setTimeout(hideFruit, current.onScreen);
+    }
+  }
+
+  for (let li = 0; li < layers.length; li++) {
+    const els = layers[li];
+    for (let k = 0; k < els.length; k++) {
+      const el = els[k];
+      el.x -= LAYERS[li].speed * SETTINGS.jungleSpeed * dt;
+      if (el.x - el.sp.ax + el.sp.w < -30) els[k] = newElement(li);
+    }
+  }
+  for (const gp of gaps) gp.amt += (gp.goal - gp.amt) * Math.min(1, dt * 5);
+  gaps = gaps.filter((gp) => gp.goal > 0 || gp.amt > 0.01);
+
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.globalAlpha = 1;
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, "#1d3a35");
+  sky.addColorStop(0.5, "#1a3229");
+  sky.addColorStop(1, "#0d1913");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+
+  for (let i = 3; i >= 0; i--) {
+    let g = ctx;
+    if (i < 3) {
+      const [bc, bg] = buffers[i];
+      bg.setTransform(1, 0, 0, 1, 0, 0);
+      bg.clearRect(0, 0, bc.width, bc.height);
+      bg.setTransform(DPR, 0, 0, DPR, 0, 0);
+      g = bg;
+    }
+    for (const el of layers[i]) drawElement(g, el, t);
+    if (i < 3) {
+      g.save();
+      g.globalCompositeOperation = "destination-out";
+      for (const gp of gaps) {
+        if (gp.depth <= i) continue;
+        const gr = g.createRadialGradient(gp.x, gp.y, gp.s * 0.6, gp.x, gp.y, gp.s * 1.15);
+        gr.addColorStop(0, `rgba(0,0,0,${gp.amt})`);
+        gr.addColorStop(1, "rgba(0,0,0,0)");
+        g.fillStyle = gr;
+        g.fillRect(gp.x - gp.s * 1.2, gp.y - gp.s * 1.2, gp.s * 2.4, gp.s * 2.4);
+      }
+      g.restore();
+      for (const gp of gaps) {
+        if (gp.depth - 1 !== i) continue;
+        g.save();
+        g.globalAlpha = gp.amt;
+        g.translate(gp.x, gp.y);
+        g.rotate(0.012 * Math.sin(t * 0.7 + gp.x));
+        drawCover(g, gp.cover, false);
+        g.restore();
+      }
+      ctx.drawImage(buffers[i][0], 0, 0, W, H);
+    }
+    if (i === 3) {
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      for (const s of shafts) {
+        ctx.fillStyle = `rgba(220, 240, 200, ${0.03 + 0.015 * Math.sin(t * 0.3 + s.ph)})`;
+        ctx.beginPath();
+        ctx.moveTo(s.x, 0);
+        ctx.lineTo(s.x + s.w, 0);
+        ctx.lineTo(s.x + s.w + s.tilt, H);
+        ctx.lineTo(s.x + s.tilt - s.w * 0.5, H);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    if (fruitNow && fruitNow.visible && fruitNow.depth === i) {
+      const f = fruitNow.fruit;
+      ctx.drawImage(f.canvas, fruitNow.x - f.w / 2, fruitNow.y - f.h / 2, f.w, f.h);
+    }
+    if (i >= 1) drawFog(i, t, dt);
+  }
+
+  const vig = ctx.createRadialGradient(W / 2, H / 2, 360, W / 2, H / 2, 560);
+  vig.addColorStop(0, "rgba(0,0,0,0)");
+  vig.addColorStop(1, "rgba(0,0,0,0.5)");
+  ctx.fillStyle = vig;
+  ctx.fillRect(0, 0, W, H);
+
+  drawMeter();
+  requestAnimationFrame(frame);
+}
+
+// ---------------------------------------------------------------------
+//  Controls on the page
+// ---------------------------------------------------------------------
+const CONTROL_DEFS = {
+  occlusion: { label: "Hidden by leaves", min: 0, max: 0.9, step: 0.05, fmt: (v) => Math.round(v * 100) + "%" },
+  light:     { label: "Light on the fruit", min: 0.05, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + "%" },
+  size:      { label: "Size", min: 30, max: 200, step: 5, fmt: (v) => v + " px" },
+  depth:     { label: "Depth in the trees", min: 1, max: 3, step: 1, fmt: (v) => ["", "1 · front", "2 · middle", "3 · deep"][v] },
+};
+const controls = {};
+for (const [name, d] of Object.entries(CONTROL_DEFS)) {
+  const list = SETTINGS[name];
+  const row = document.createElement("div");
+  row.className = "row";
+  row.innerHTML = `<span>${d.label}</span><span class="val"></span>
+    <input type="range" min="${d.min}" max="${d.max}" step="${d.step}">
+    <label class="mix"><input type="checkbox" checked> mix each turn: ${list.map(d.fmt).join(", ")}</label>`;
+  $("sceneControls").appendChild(row);
+  const range = row.querySelector("input[type=range]");
+  const box = row.querySelector("input[type=checkbox]");
+  const val = row.querySelector(".val");
+  range.value = list[Math.floor(list.length / 2)];
+  const show = () => {
+    range.disabled = box.checked;
+    range.style.opacity = box.checked ? 0.4 : 1;
+    val.textContent = box.checked ? "mix" : d.fmt(Number(range.value));
+  };
+  range.addEventListener("input", show);
+  box.addEventListener("change", show);
+  show();
+  controls[name] = { get: () => (box.checked ? pick(list) : Number(range.value)) };
+}
+
+const MIC_DEFS = {
+  voiceStartDb: { label: "Voice starts at", min: -80, max: -10 },
+  loudEnoughDb: { label: "Loud enough at", min: -70, max: 0 },
+};
+for (const [name, d] of Object.entries(MIC_DEFS)) {
+  const row = document.createElement("div");
+  row.className = "row";
+  row.innerHTML = `<span>${d.label}</span><span class="val"></span>
+    <input type="range" min="${d.min}" max="${d.max}" step="1" value="${SETTINGS[name]}">`;
+  $("micControls").appendChild(row);
+  const range = row.querySelector("input");
+  const val = row.querySelector(".val");
+  const show = () => {
+    SETTINGS[name] = Number(range.value);
+    val.textContent = SETTINGS[name] + " dB";
+  };
+  range.addEventListener("input", show);
+  show();
+}
+
+// ---------------------------------------------------------------------
+//  Microphone: loudness tells us WHEN you spoke, speech tells us WHAT.
+// ---------------------------------------------------------------------
+let audio = null;
+let analyser = null, samples = null;
+let micOn = false;
+let speechOn = false;       // true while the browser is checking words
+let rec = null, recWanted = false, recSession = 0;
+const usedWords = {};       // how many bananas we already used from each speech result
+let levelDb = -100;
+let levelLog = [];          // recent {t, db}
+let voice = null;           // the sound happening right now
+let aboveCount = 0, firstAbove = 0;
+let ignoreUntil = 0;        // ignore the mic briefly while our own beep plays
+let sounds = [];            // recent voice onsets
+
+function micStatus(text) { $("micStatus").textContent = text; }
+function micChip() {
+  $("micChip").textContent = !micOn ? "🎤 off" : speechOn ? "🎤 listening for “banana”" : "🎤 loudness only";
+}
+
+async function enableMic() {
+  if (micOn) return true;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: false },
+    });
+    audio = audio || new AudioContext();
+    await audio.resume();
+    analyser = audio.createAnalyser();
+    analyser.fftSize = 1024;
+    audio.createMediaStreamSource(stream).connect(analyser);
+    samples = new Float32Array(analyser.fftSize);
+    setInterval(micTick, 10);
+    micOn = true;
+    $("micBtn").textContent = "Mic is on";
+    startSpeech();
+    micChip();
+    return true;
+  } catch (err) {
+    micStatus("No microphone: " + err.message + (SETTINGS.keyboardTest ? " You can still test with the B key." : ""));
+    return false;
+  }
+}
+
+function startSpeech() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SETTINGS.useSpeech || !SR) {
+    micStatus("This browser can't check words, so any loud sound counts as “banana”.");
+    return;
+  }
+  rec = new SR();
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.maxAlternatives = 3;
+  rec.lang = SETTINGS.speechLang;
+  rec.onresult = (e) => {
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const r = e.results[i];
+      const text = r[0].transcript.trim();
+      let n = (text.match(new RegExp(SETTINGS.wordMatch.source, "gi")) || []).length;
+      for (let j = 1; j < r.length && n === 0; j++) if (SETTINGS.wordMatch.test(r[j].transcript)) n = 1;
+      showHeard(text);
+      const key = recSession + ":" + i;
+      while ((usedWords[key] || 0) < n) {
+        usedWords[key] = (usedWords[key] || 0) + 1;
+        wordHeard(text);
+      }
+    }
+  };
+  rec.onerror = (e) => {
+    if (["not-allowed", "service-not-allowed", "network", "audio-capture"].includes(e.error)) {
+      recWanted = false;
+      speechOn = false;
+      micStatus(`Word check is off (${e.error}), so any loud sound counts as “banana”.`);
+      micChip();
+    }
+  };
+  rec.onend = () => {
+    if (!recWanted) return;
+    setTimeout(() => {
+      try { recSession++; rec.start(); } catch (err) { /* already running */ }
+    }, 50);
+  };
+  recWanted = true;
+  speechOn = true;
+  recSession++;
+  try { rec.start(); } catch (err) { /* already running */ }
+}
+
+function micTick() {
+  analyser.getFloatTimeDomainData(samples);
+  let sum = 0;
+  for (let i = 0; i < samples.length; i++) sum += samples[i] * samples[i];
+  const db = 20 * Math.log10(Math.sqrt(sum / samples.length) + 1e-9);
+  const now = performance.now();
+  levelDb = db;
+  levelLog.push({ t: now, db });
+  while (levelLog.length && levelLog[0].t < now - 3000) levelLog.shift();
+
+  if (voice) {
+    voice.peak = Math.max(voice.peak, db);
+    if (db < SETTINGS.voiceStartDb - 6) {
+      if (!voice.quietSince) voice.quietSince = now;
+      else if (now - voice.quietSince > 250) endVoice();
+    } else {
+      voice.quietSince = 0;
+    }
+    if (voice && !speechOn && !voice.sent && now - voice.t > 400) {
+      voice.sent = true;
+      bananaSaid(voice);
+    }
+    return;
+  }
+  if (now > ignoreUntil && db > SETTINGS.voiceStartDb) {
+    aboveCount++;
+    if (aboveCount === 1) firstAbove = now - 10;
+    if (aboveCount >= 2) {
+      voice = { t: firstAbove, peak: db, input: speechOn ? "speech" : "loudness", counted: false };
+      sounds.push(voice);
+      if (sounds.length > 30) sounds.shift();
+      const p = phaseAt(voice.t);
+      if (p.trial && (p.phase === "fruit" || p.phase === "after")) p.trial.sounds.push(voice);
+    }
+  } else {
+    aboveCount = 0;
+  }
+}
+
+function endVoice() {
+  if (!speechOn && !voice.sent) {
+    voice.sent = true;
+    bananaSaid(voice);
+  }
+  voice = null;
+}
+
+// Speech said "banana". Link it to the most recent sound we heard start.
+function wordHeard(text) {
+  const now = performance.now();
+  let s = null;
+  for (let i = sounds.length - 1; i >= 0; i--) {
+    if (now - sounds[i].t > 3000) break;
+    if (!sounds[i].counted) { s = sounds[i]; break; }
+  }
+  if (!s) {
+    // The loudness never crossed the green line. Guess when it started.
+    const recent = levelLog.filter((l) => l.t > now - 1500);
+    s = { t: now - 600, peak: Math.max(-100, ...recent.map((l) => l.db)), input: "speech", estimated: true };
+  }
+  s.text = text;
+  bananaSaid(s);
+}
+
+function bananaSaid(s) {
+  if (s.counted) return;
+  s.counted = true;
+  if (!playing) return;
+  const p = phaseAt(s.t);
+  if (p.trial && !p.trial.done && (p.phase === "fruit" || p.phase === "after")) {
+    s.phase = p.phase;
+    p.trial.bananas.push(s);
+  } else if (p.phase !== "idle") {
+    wrongTimeBanana(s, p.trial && p.trial.done ? "late" : "between");
+  }
+}
+
+function drawMeter() {
+  const pct = (db) => clamp(((db + 80) / 80) * 100, 0, 100) + "%";
+  const fill = $("meterFill");
+  fill.style.width = micOn ? pct(levelDb) : "0%";
+  fill.style.background =
+    levelDb >= SETTINGS.loudEnoughDb ? "#f2cf4a" : levelDb >= SETTINGS.voiceStartDb ? "#9fe3b8" : "#7d8a80";
+  $("markStart").style.left = pct(SETTINGS.voiceStartDb);
+  $("markLoud").style.left = pct(SETTINGS.loudEnoughDb);
+}
+
+let heardTimer = null;
+function showHeard(text) {
+  const el = $("heard");
+  el.textContent = `heard: “${text}”`;
+  el.classList.add("show");
+  clearTimeout(heardTimer);
+  heardTimer = setTimeout(() => el.classList.remove("show"), 1500);
+}
+
+// ---------------------------------------------------------------------
+//  The game
+// ---------------------------------------------------------------------
+let data = [];
+let playing = false;
+let turn = 0, score = 0, lives = SETTINGS.lives, level = 1;
+let current = null;     // this turn's fruit
+let timer = null;
+let phase = "idle";     // idle, wait, fruit, after
+let phaseLog = [{ t: 0, phase: "idle", trial: null }];
+
+function setPhase(p, t = performance.now()) {
+  phase = p;
+  phaseLog.push({ t, phase: p, trial: current });
+  if (phaseLog.length > 300) phaseLog.shift();
+}
+function phaseAt(t) {
+  for (let i = phaseLog.length - 1; i >= 0; i--) if (phaseLog[i].t <= t) return phaseLog[i];
+  return phaseLog[0];
+}
+
+function timeOnScreen() {
+  const t = SETTINGS.startTime * Math.pow(SETTINGS.speedUp, level - 1);
+  return Math.max(SETTINGS.fastestTime, Math.round(t));
+}
+
+function beep(good) {
+  if (!SETTINGS.sound) return;
+  audio = audio || new AudioContext();
+  const osc = audio.createOscillator();
+  const gain = audio.createGain();
+  osc.frequency.value = good ? 880 : 180;
+  gain.gain.value = 0.06;
+  osc.connect(gain).connect(audio.destination);
+  osc.start();
+  osc.stop(audio.currentTime + 0.12);
+  ignoreUntil = performance.now() + 350;
+}
+
+function flash(good) {
+  const el = $("flash");
+  el.className = good ? "good" : "bad";
+  setTimeout(() => (el.className = ""), 180);
+}
+
+function updateHud() {
+  $("score").textContent = score;
+  $("lives").textContent = lives;
+  $("level").textContent = level;
+}
+
+function planTrial(kind) {
+  const lv = level - 1;
+  const h = SETTINGS.harder;
+  const t = {
+    kind,
+    thing: kind === "go" ? "banana" : "coconut",
+    occlusionSet: clamp(controls.occlusion.get() + h.occlusion * lv, 0, 0.9),
+    light: clamp(controls.light.get() + h.light * lv, 0.05, 1),
+    size: Math.round(clamp(controls.size.get() + h.size * lv, 30, 220)),
+    depth: controls.depth.get(),
+    rotation: rand(-0.5, 0.5) + (Math.random() < 0.5 ? Math.PI : 0),
+    x: rand(0.18, 0.82) * W,
+    y: rand(0.22, 0.72) * H,
+    onScreen: timeOnScreen(),
+    bananas: [],
+    sounds: [],
+  };
+  t.fruit = makeFruit(kind, t.size, t.rotation, t.light);
+  t.cover = coverFruit(t.fruit, t.size, t.depth - 1, t.occlusionSet);
+  openGaps(t);
+  return t;
+}
+
+async function startGame() {
+  const ok = await enableMic();
+  if (!ok && !SETTINGS.keyboardTest) return;
+  stopGame();
+  data = [];
+  turn = 0;
+  score = 0;
+  lives = SETTINGS.lives;
+  level = 1;
+  playing = true;
+  updateHud();
+  message.textContent = "Get ready... look for bananas.";
+  nextTurn();
+}
+
+function stopGame() {
+  playing = false;
+  clearTimeout(timer);
+  current = null;
+  fruitNow = null;
+  closeGaps();
+  setPhase("idle");
+}
+
+function nextTurn() {
+  if (!playing) return;
+  turn += 1;
+  current = planTrial(Math.random() < SETTINGS.stopChance ? "stop" : "go");
+  setPhase("wait");
+  const wait = SETTINGS.waitMin + Math.random() * (SETTINGS.waitMax - SETTINGS.waitMin);
+  timer = setTimeout(() => (current.showAsked = true), wait);
+}
+
+function hideFruit() {
+  if (!current) return;
+  current.visible = false;
+  current.showAsked = false;
+  setPhase("after");
+  timer = setTimeout(finishTurn, SETTINGS.listenAfter);
+}
+
+function finishTurn() {
+  const t = current;
+  t.done = true;
+  const inTime = t.bananas.filter((b) => b.phase === "fruit");
+  const b = inTime[0] || t.bananas[0];
+  let outcome;
+  if (t.kind === "go") {
+    if (inTime.length) outcome = b.peak >= SETTINGS.loudEnoughDb ? "hit" : "too_quiet";
+    else if (t.bananas.length) outcome = "too_late";
+    else if (speechOn && t.sounds.some((s) => s.t < t.shownAt + t.onScreen)) outcome = "not_banana";
+    else outcome = "miss";
+  } else {
+    outcome = t.bananas.length ? "false_alarm" : "held_back";
+  }
+  const correct = outcome === "hit" || outcome === "held_back";
+  const rt = b ? Math.round(b.t - t.shownAt) : "";
+
+  if (correct) score += t.kind === "go" ? SETTINGS.pointsForCatch : SETTINGS.pointsForStop;
+  else lives -= 1;
+  message.textContent = {
+    hit: `Banana! ${rt} ms`,
+    too_quiet: "I heard you, but say it LOUDER!",
+    too_late: "Too late, that banana got away.",
+    not_banana: "That didn't sound like “banana”.",
+    miss: "You missed a banana!",
+    false_alarm: "That was a coconut! 🥥",
+    held_back: "Nice, you kept quiet for the coconut.",
+  }[outcome];
+  beep(correct);
+  flash(correct);
+
+  data.push(row(t, {
+    said_banana: t.bananas.length ? 1 : 0,
+    rt_ms: rt,
+    peak_db: b ? Math.round(b.peak) : "",
+    outcome,
+    correct: correct ? 1 : 0,
+    input: b ? b.input : "",
+    heard: b && b.text ? b.text : "",
+  }));
+
+  if (turn % SETTINGS.turnsPerLevel === 0) {
+    level += 1;
+    message.textContent += `  Level ${level}!`;
+  }
+  afterScore();
+}
+
+// "banana" between fruits, or after a turn was already scored.
+function wrongTimeBanana(s, when) {
+  lives -= 1;
+  message.textContent = when === "late" ? "Too late! That turn was over." : "Shh! Only say banana when you see one.";
+  beep(false);
+  flash(false);
+  data.push(row(null, {
+    kind: "between", said_banana: 1, peak_db: Math.round(s.peak), outcome: when,
+    correct: 0, input: s.input, heard: s.text || "",
+  }));
+  afterScore();
+}
+
+function row(t, extra) {
+  return Object.assign({
+    turn, level,
+    kind: t ? t.kind : "",
+    thing: t ? t.thing : "",
+    depth: t ? t.depth : "",
+    size_px: t ? t.size : "",
+    light: t ? t.light.toFixed(2) : "",
+    occlusion_set: t ? t.occlusionSet.toFixed(2) : "",
+    occlusion_real: t ? t.cover.measured.toFixed(2) : "",
+    x: t ? Math.round(t.x) : "",
+    y: t ? Math.round(t.y) : "",
+    on_screen_ms: t ? t.onScreen : "",
+    said_banana: "", rt_ms: "", peak_db: "", outcome: "", correct: "", input: "", heard: "",
+  }, extra, { score, lives });
+}
+
+function afterScore() {
+  updateHud();
+  if (lives <= 0) {
+    const turns = turn;
+    stopGame();
+    message.textContent = `Game over. Score ${score}, level ${level}, ${turns} turns. Save your data!`;
+    return;
+  }
+  if (current && current.done) {
+    current = null;
+    fruitNow = null;
+    nextTurn();
+  }
+}
+
+let previewKind = "stop";
+function preview() {
+  if (playing) return;
+  clearTimeout(timer);
+  previewKind = previewKind === "go" ? "stop" : "go";
+  current = planTrial(previewKind);
+  current.preview = true;
+  timer = setTimeout(() => {
+    current.showAsked = true;
+    message.textContent = `Preview: ${current.thing}, ${Math.round(current.cover.measured * 100)}% hidden, ` +
+      `light ${Math.round(current.light * 100)}%, ${current.size} px, depth ${current.depth}.`;
+    timer = setTimeout(() => {
+      current = null;
+      fruitNow = null;
+      closeGaps();
+    }, 2500);
+  }, 600);
+}
+
+function saveCsv() {
+  if (!data.length) {
+    message.textContent = "Nothing to save yet. Play first.";
+    return;
+  }
+  const columns = Object.keys(data[0]);
+  const cell = (v) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : v);
+  const lines = [columns.join(",")].concat(data.map((r) => columns.map((c) => cell(r[c])).join(",")));
+  const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "game-week09.csv";
+  a.click();
+}
+
+$("startBtn").addEventListener("click", (e) => { e.target.blur(); startGame(); });
+$("stopBtn").addEventListener("click", () => { stopGame(); message.textContent = "Stopped."; });
+$("previewBtn").addEventListener("click", preview);
+$("saveBtn").addEventListener("click", saveCsv);
+$("micBtn").addEventListener("click", enableMic);
+window.addEventListener("keydown", (e) => {
+  if (!SETTINGS.keyboardTest || e.code !== "KeyB" || e.repeat) return;
+  const s = { t: performance.now(), peak: SETTINGS.loudEnoughDb + 3, input: "key", text: "(B key)" };
+  sounds.push(s);
+  bananaSaid(s);
+});
+
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
